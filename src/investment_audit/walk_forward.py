@@ -61,7 +61,6 @@ def run_walk_forward(
         raise ValueError("prices must not be empty")
     if not parameter_grid:
         raise ValueError("parameter_grid must not be empty")
-
     prices = prices.sort_index().ffill().dropna(how="all")
     rows: list[dict] = []
     out_of_sample_returns: list[pd.Series] = []
@@ -74,27 +73,18 @@ def run_walk_forward(
         candidates = []
         for params in parameter_grid:
             signal = build_signal(strategy, train_prices, params)
-            result = run_backtest(
-                train_prices,
-                signal,
-                cost_bps=cost_bps,
-                slippage_bps=slippage_bps,
-            )
+            result = run_backtest(train_prices, signal, cost_bps=cost_bps, slippage_bps=slippage_bps)
             score = result.metrics.get(objective, 0.0)
             if result.metrics["max_drawdown"] < max_train_drawdown:
                 score = -10**9
             candidates.append((score, params, result.metrics))
-
         score, best_params, train_metrics = max(candidates, key=lambda x: x[0])
-
-        # Generate test-period signals with warm-up history, but score only the locked OOS window.
         history = prices.loc[train_index[0] : test_index[-1]]
         signal = build_signal(strategy, history, best_params)
         result = run_backtest(history, signal, cost_bps=cost_bps, slippage_bps=slippage_bps)
         test_returns = result.returns.reindex(test_index).dropna()
         test_metrics = metrics_from_returns(test_returns)
         out_of_sample_returns.append(test_returns)
-
         rows.append(
             {
                 "window": window_id,
@@ -113,11 +103,7 @@ def run_walk_forward(
                 "test_max_drawdown": test_metrics["max_drawdown"],
             }
         )
-
-    if out_of_sample_returns:
-        returns = pd.concat(out_of_sample_returns).sort_index()
-    else:
-        returns = pd.Series(dtype=float, name="returns")
+    returns = pd.concat(out_of_sample_returns).sort_index() if out_of_sample_returns else pd.Series(dtype=float, name="returns")
     returns.name = "returns"
     equity = (1 + returns).cumprod()
     equity.name = "equity"
