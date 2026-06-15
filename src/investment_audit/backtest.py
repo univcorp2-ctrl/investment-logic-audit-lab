@@ -36,15 +36,7 @@ def max_drawdown(equity: pd.Series) -> float:
 def metrics_from_returns(returns: pd.Series, turnover: pd.Series | None = None) -> dict[str, float]:
     returns = returns.dropna()
     if returns.empty:
-        return {
-            "total_return": 0.0,
-            "annual_return": 0.0,
-            "annual_vol": 0.0,
-            "sharpe": 0.0,
-            "max_drawdown": 0.0,
-            "hit_rate": 0.0,
-            "avg_turnover": 0.0,
-        }
+        return {"total_return": 0.0, "annual_return": 0.0, "annual_vol": 0.0, "sharpe": 0.0, "max_drawdown": 0.0, "hit_rate": 0.0, "avg_turnover": 0.0}
     equity = (1 + returns).cumprod()
     total_return = float(equity.iloc[-1] - 1)
     years = max(len(returns) / TRADING_DAYS, 1 / TRADING_DAYS)
@@ -53,15 +45,7 @@ def metrics_from_returns(returns: pd.Series, turnover: pd.Series | None = None) 
     sharpe = float(annual_return / annual_vol) if annual_vol > 0 else 0.0
     hit_rate = float((returns > 0).mean())
     avg_turnover = float(turnover.reindex(returns.index).mean()) if turnover is not None else 0.0
-    return {
-        "total_return": total_return,
-        "annual_return": annual_return,
-        "annual_vol": annual_vol,
-        "sharpe": sharpe,
-        "max_drawdown": max_drawdown(equity),
-        "hit_rate": hit_rate,
-        "avg_turnover": avg_turnover,
-    }
+    return {"total_return": total_return, "annual_return": annual_return, "annual_vol": annual_vol, "sharpe": sharpe, "max_drawdown": max_drawdown(equity), "hit_rate": hit_rate, "avg_turnover": avg_turnover}
 
 
 def run_backtest(
@@ -71,25 +55,18 @@ def run_backtest(
     slippage_bps: float = 2.0,
     max_gross: float = 1.0,
 ) -> BacktestResult:
-    """Vectorized close-to-close backtest.
-
-    Signals are generated using information available at close t and are shifted so
-    positions are applied from t+1. This reduces lookahead bias in daily bars.
-    """
+    """Vectorized close-to-close backtest with next-day signal application."""
     if prices.empty:
         raise ValueError("prices must not be empty")
     missing = set(signals.columns) - set(prices.columns)
     if missing:
         raise ValueError(f"signals contain unknown price columns: {sorted(missing)}")
-
     prices = prices.sort_index().ffill().dropna(how="all")
     signals = signals.reindex(index=prices.index, columns=prices.columns).fillna(0.0)
     asset_returns = prices.pct_change().replace([np.inf, -np.inf], np.nan).fillna(0.0)
-
     target_weights = _normalize_weights(signals, max_gross=max_gross)
     weights = target_weights.shift(1).fillna(0.0)
     gross_turnover = weights.diff().abs().sum(axis=1).fillna(weights.abs().sum(axis=1))
-
     gross_returns = (weights * asset_returns).sum(axis=1)
     cost = gross_turnover * ((cost_bps + slippage_bps) / 10_000)
     net_returns = gross_returns - cost
@@ -109,6 +86,5 @@ def fee_sensitivity(
     rows = []
     for fee in fee_grid_bps:
         result = run_backtest(prices, signals, cost_bps=fee, slippage_bps=fee / 2)
-        row = {"fee_bps": fee, **result.metrics}
-        rows.append(row)
+        rows.append({"fee_bps": fee, **result.metrics})
     return pd.DataFrame(rows)
