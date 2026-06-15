@@ -60,27 +60,18 @@ def fundamental_quality_value_momentum(
     fundamentals: pd.DataFrame,
     price_momentum: pd.Series | None = None,
 ) -> pd.Series:
-    """Composite score: cheap, high quality, low leverage, improving growth, and momentum.
-
-    Higher score is better. Missing fields are ignored rather than treated as bad, because
-    crypto assets and ETFs often do not have equity-like fundamentals.
-    """
+    """Composite score: cheap, high quality, low leverage, growth, and momentum."""
     if fundamentals.empty:
         raise ValueError("fundamentals must not be empty")
-
     scores: list[pd.Series] = []
-    lower_is_better = ["pe", "pb", "debt_to_equity"]
-    higher_is_better = ["roe", "revenue_growth", "free_cash_flow_margin", "gross_margin"]
-
-    for col in lower_is_better:
+    for col in ["pe", "pb", "debt_to_equity"]:
         if col in fundamentals:
             scores.append(1 - fundamentals[col].rank(pct=True, na_option="keep"))
-    for col in higher_is_better:
+    for col in ["roe", "revenue_growth", "free_cash_flow_margin", "gross_margin"]:
         if col in fundamentals:
             scores.append(fundamentals[col].rank(pct=True, na_option="keep"))
     if price_momentum is not None:
         scores.append(price_momentum.rank(pct=True, na_option="keep"))
-
     if not scores:
         raise ValueError("No supported fundamental columns were found")
     combined = pd.concat(scores, axis=1).mean(axis=1, skipna=True)
