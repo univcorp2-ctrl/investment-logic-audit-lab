@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "investment-logic-audit-lab"
+version = "0.1.0"
+description = "Audit stock and crypto investment strategies with backtests, walk-forward validation, and fundamentals scoring."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "AI Developer" }]
+dependencies = [
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "openpyxl>=3.1",
+  "PyYAML>=6.0",
+  "requests>=2.32",
+  "yfinance>=0.2.40",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.5",
+]
+
+[project.scripts]
+investment-audit = "investment_audit.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
