@@ -1,0 +1,15 @@
+flowchart TD
+    A[Price CSV / yfinance] --> B[Data Loader]
+    F[SEC Company Facts / Fundamentals CSV] --> G[Fundamental Scorer]
+    B --> C[Signal Engine]
+    G --> C
+    C --> D[Backtest Engine]
+    D --> E[Walk-forward Validator]
+    D --> H[Fee Sensitivity]
+    E --> I[Report Writer]
+    H --> I
+    I --> J[CSV / Excel / TXT]
+    K[GitHub Actions] --> L[CI + Artifact Upload]
+    I --> L
+    M[GitHub API] --> N[Repository Inventory]
+    N --> L
