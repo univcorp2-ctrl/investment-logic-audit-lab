@@ -50,25 +50,13 @@ AAPL,28.1,39.2,1.48,1.5,0.02,0.22,0.46
 
 現在の実装はスコア関数を提供しています。実運用では、提出日・公表日を持った時系列データに変換し、過去時点で見えていた値だけを使ってください。
 
-## 5. GitHub Actionsで自動検証
+## 5. 以前作った投資関連repoを棚卸し
 
-`Actions` → `CI` → `Run workflow` を押すと、テストとサンプル検証が走り、artifactとしてレポートが出ます。
+`python -m investment_audit.github_repos --out outputs/repo_inventory` で、見える範囲の投資関連repoをCSV/JSON化できます。
 
-## 6. 以前作った投資関連repoを棚卸し
+非公開repoも含める場合は、環境変数 `GH_INVENTORY_TOKEN` に対象repo/orgのread権限を持つPATを設定してください。
 
-`Actions` → `Repository Inventory` → `Run workflow` を押します。
-
-非公開repoも含める場合:
-
-1. GitHubでPATを作成
-2. 対象repo/orgのread権限を付与
-3. このrepoの `Settings` → `Secrets and variables` → `Actions` → `New repository secret`
-4. Secret名: `GH_INVENTORY_TOKEN`
-5. Value: PATの値
-
-実行後、artifact `investment-repo-inventory` にCSVとJSONが出ます。
-
-## 7. 本番運用前のチェックリスト
+## 6. 本番運用前のチェックリスト
 
 - データは分割・配当調整済みか
 - 暗号資産は取引所ごとの差、上場廃止、API停止期間を含むか
