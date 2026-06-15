@@ -44,9 +44,7 @@ def write_report(
         if fee_sensitivity is not None:
             fee_sensitivity.to_excel(writer, sheet_name="fee_sensitivity", index=False)
         if notes:
-            pd.DataFrame([{"key": k, "value": v} for k, v in notes.items()]).to_excel(
-                writer, sheet_name="notes", index=False
-            )
+            pd.DataFrame([{"key": k, "value": v} for k, v in notes.items()]).to_excel(writer, sheet_name="notes", index=False)
 
     with files["text"].open("w", encoding="utf-8") as fh:
         fh.write("Investment Logic Audit Report\n")
