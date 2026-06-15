@@ -36,7 +36,15 @@ def max_drawdown(equity: pd.Series) -> float:
 def metrics_from_returns(returns: pd.Series, turnover: pd.Series | None = None) -> dict[str, float]:
     returns = returns.dropna()
     if returns.empty:
-        return {"total_return": 0.0, "annual_return": 0.0, "annual_vol": 0.0, "sharpe": 0.0, "max_drawdown": 0.0, "hit_rate": 0.0, "avg_turnover": 0.0}
+        return {
+            "total_return": 0.0,
+            "annual_return": 0.0,
+            "annual_vol": 0.0,
+            "sharpe": 0.0,
+            "max_drawdown": 0.0,
+            "hit_rate": 0.0,
+            "avg_turnover": 0.0,
+        }
     equity = (1 + returns).cumprod()
     total_return = float(equity.iloc[-1] - 1)
     years = max(len(returns) / TRADING_DAYS, 1 / TRADING_DAYS)
@@ -45,7 +53,15 @@ def metrics_from_returns(returns: pd.Series, turnover: pd.Series | None = None) 
     sharpe = float(annual_return / annual_vol) if annual_vol > 0 else 0.0
     hit_rate = float((returns > 0).mean())
     avg_turnover = float(turnover.reindex(returns.index).mean()) if turnover is not None else 0.0
-    return {"total_return": total_return, "annual_return": annual_return, "annual_vol": annual_vol, "sharpe": sharpe, "max_drawdown": max_drawdown(equity), "hit_rate": hit_rate, "avg_turnover": avg_turnover}
+    return {
+        "total_return": total_return,
+        "annual_return": annual_return,
+        "annual_vol": annual_vol,
+        "sharpe": sharpe,
+        "max_drawdown": max_drawdown(equity),
+        "hit_rate": hit_rate,
+        "avg_turnover": avg_turnover,
+    }
 
 
 def run_backtest(
