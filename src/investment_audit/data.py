@@ -8,20 +8,13 @@ import pandas as pd
 
 
 def load_price_csv(path: str | Path, date_col: str = "date") -> pd.DataFrame:
-    """Load a wide CSV of close prices.
-
-    Expected shape:
-
-    date,SPY,BTC-USD,ETH-USD
-    2020-01-01,100,7000,130
-    """
+    """Load a wide CSV of close prices."""
     df = pd.read_csv(path)
     if date_col not in df.columns:
         raise ValueError(f"CSV must contain a '{date_col}' column")
     df[date_col] = pd.to_datetime(df[date_col], utc=False)
     prices = df.set_index(date_col).sort_index()
-    prices = prices.apply(pd.to_numeric, errors="coerce")
-    prices = prices.dropna(how="all")
+    prices = prices.apply(pd.to_numeric, errors="coerce").dropna(how="all")
     if prices.empty:
         raise ValueError("No usable numeric price columns found")
     return prices.ffill()
@@ -35,7 +28,7 @@ def download_prices(
 ) -> pd.DataFrame:
     """Download adjusted close prices using yfinance.
 
-    This function is intentionally isolated so tests do not depend on network access.
+    This function is isolated so tests do not depend on network access.
     """
     import yfinance as yf
 
@@ -44,10 +37,7 @@ def download_prices(
         raise ValueError("At least one ticker is required")
     raw = yf.download(tickers, start=start, end=end, interval=interval, auto_adjust=True, progress=False)
     if isinstance(raw.columns, pd.MultiIndex):
-        if "Close" in raw.columns.get_level_values(0):
-            prices = raw["Close"]
-        else:
-            prices = raw.xs("Close", axis=1, level=1, drop_level=True)
+        prices = raw["Close"] if "Close" in raw.columns.get_level_values(0) else raw.xs("Close", axis=1, level=1)
     else:
         prices = raw.to_frame(name=tickers[0]) if isinstance(raw, pd.Series) else raw[["Close"]]
         prices.columns = tickers
@@ -59,15 +49,12 @@ def make_synthetic_market(days: int = 1_000, seed: int = 7) -> pd.DataFrame:
     """Create deterministic synthetic prices with trend, crash, and sideways regimes."""
     rng = np.random.default_rng(seed)
     index = pd.bdate_range("2020-01-01", periods=days)
-
     regimes = np.zeros(days)
     regimes[: days // 3] = 0.0006
     regimes[days // 3 : 2 * days // 3] = -0.0002
     regimes[2 * days // 3 :] = 0.00035
-
     vol = np.linspace(0.008, 0.018, days)
     common = regimes + rng.normal(0, vol)
-
     data = {
         "SPY_SIM": common + rng.normal(0.0001, 0.004, days),
         "BTC_SIM": 1.25 * common + rng.normal(0.0004, 0.028, days),
@@ -76,12 +63,9 @@ def make_synthetic_market(days: int = 1_000, seed: int = 7) -> pd.DataFrame:
         "SIDEWAYS_SIM": rng.normal(0.00005, 0.010, days),
     }
     returns = pd.DataFrame(data, index=index)
-
-    # Add a visible trend pocket that momentum/trend models should capture.
     returns.loc[index[120:320], "BTC_SIM"] += 0.0014
     returns.loc[index[520:660], "BTC_SIM"] -= 0.0020
     returns.loc[index[700:900], "QUALITY_SIM"] += 0.0009
-
     return 100 * (1 + returns).cumprod()
 
 
