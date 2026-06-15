@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 import numpy as np
 import pandas as pd
@@ -35,9 +35,19 @@ def download_prices(
     tickers = list(tickers)
     if not tickers:
         raise ValueError("At least one ticker is required")
-    raw = yf.download(tickers, start=start, end=end, interval=interval, auto_adjust=True, progress=False)
+    raw = yf.download(
+        tickers,
+        start=start,
+        end=end,
+        interval=interval,
+        auto_adjust=True,
+        progress=False,
+    )
     if isinstance(raw.columns, pd.MultiIndex):
-        prices = raw["Close"] if "Close" in raw.columns.get_level_values(0) else raw.xs("Close", axis=1, level=1)
+        if "Close" in raw.columns.get_level_values(0):
+            prices = raw["Close"]
+        else:
+            prices = raw.xs("Close", axis=1, level=1)
     else:
         prices = raw.to_frame(name=tickers[0]) if isinstance(raw, pd.Series) else raw[["Close"]]
         prices.columns = tickers
