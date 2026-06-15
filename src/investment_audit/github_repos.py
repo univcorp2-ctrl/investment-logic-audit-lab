@@ -69,7 +69,10 @@ def list_candidate_repos(owner: str | None, token: str | None, keywords: list[st
     lowered_keywords = [k.lower() for k in keywords]
     candidates = []
     for repo in repos:
-        blob = " ".join(str(repo.get(field) or "") for field in ["name", "description", "language", "html_url"]).lower()
+        blob = " ".join(
+            str(repo.get(field) or "")
+            for field in ["name", "description", "language", "html_url"]
+        ).lower()
         topics = repo.get("topics") or []
         blob += " " + " ".join(topics).lower()
         if any(keyword in blob for keyword in lowered_keywords):
