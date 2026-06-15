@@ -15,11 +15,7 @@ class SecClient:
     delay_seconds: float = 0.2
 
     def companyfacts(self, cik: str) -> dict[str, Any]:
-        """Fetch SEC Company Facts JSON for a zero-padded CIK.
-
-        SEC requests require a descriptive User-Agent. Keep the caller responsible for
-        setting contact information via an environment variable or configuration file.
-        """
+        """Fetch SEC Company Facts JSON for a zero-padded CIK."""
         cik10 = str(cik).zfill(10)
         headers = {"User-Agent": self.user_agent, "Accept-Encoding": "gzip, deflate"}
         response = requests.get(SEC_BASE.format(cik=cik10), headers=headers, timeout=30)
@@ -31,10 +27,10 @@ class SecClient:
 def latest_us_gaap_value(companyfacts: dict[str, Any], concept: str) -> float | None:
     """Extract the latest USD value for a US-GAAP concept when present."""
     facts = companyfacts.get("facts", {}).get("us-gaap", {}).get(concept, {}).get("units", {})
-    usd = facts.get("USD") or facts.get("shares") or []
-    if not usd:
+    values = facts.get("USD") or facts.get("shares") or []
+    if not values:
         return None
-    completed = [x for x in usd if x.get("form") in {"10-K", "10-Q"} and x.get("val") is not None]
+    completed = [x for x in values if x.get("form") in {"10-K", "10-Q"} and x.get("val") is not None]
     if not completed:
         return None
     completed.sort(key=lambda x: (x.get("end", ""), x.get("filed", "")))
