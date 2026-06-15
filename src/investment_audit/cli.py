@@ -26,20 +26,17 @@ def run_sample(out_dir: str | Path) -> dict[str, Path]:
     fundamentals = make_synthetic_fundamentals()
     price_mom = prices.iloc[-1] / prices.iloc[-126] - 1
     fundamental_scores = fundamental_quality_value_momentum(fundamentals, price_mom)
-
     strategies = {
         "ts_mom_126d": time_series_momentum(prices, lookback=126, skip=1, long_only=False),
         "ma_trend_50_200": moving_average_trend(prices, fast=50, slow=200, long_only=True),
         "cs_mom_126d": cross_sectional_momentum(prices, lookback=126, long_short=True),
     }
-
     rows = []
     equity = pd.DataFrame(index=prices.index)
     for name, signal in strategies.items():
         result = run_backtest(prices, signal, cost_bps=5, slippage_bps=2)
         rows.append(_summary_row(name, result.metrics))
         equity[name] = result.equity
-
     wf = run_walk_forward(
         prices,
         strategy="ts_mom",
@@ -55,10 +52,8 @@ def run_sample(out_dir: str | Path) -> dict[str, Path]:
     )
     rows.append(_summary_row("walk_forward_ts_mom_oos", metrics_from_returns(wf.returns)))
     equity["walk_forward_ts_mom_oos"] = wf.equity.reindex(equity.index).ffill()
-
     fee = fee_sensitivity(prices, strategies["ts_mom_126d"])
-    summary = pd.DataFrame(rows)
-    summary = summary.sort_values("sharpe", ascending=False)
+    summary = pd.DataFrame(rows).sort_values("sharpe", ascending=False)
     notes = {
         "fundamental_top": ", ".join(fundamental_scores.head(3).index.tolist()),
         "interpretation": "Prefer candidates that remain positive in walk-forward and fee sensitivity tests.",
@@ -77,7 +72,6 @@ def run_prices_file(args: argparse.Namespace) -> dict[str, Path]:
         signal = cross_sectional_momentum(prices, lookback=args.lookback, long_short=not args.long_only)
     else:
         raise ValueError(f"Unsupported strategy: {args.strategy}")
-
     result = run_backtest(prices, signal, cost_bps=args.cost_bps, slippage_bps=args.slippage_bps)
     summary = pd.DataFrame([_summary_row(args.strategy, result.metrics)])
     equity = pd.DataFrame({args.strategy: result.equity})
@@ -88,10 +82,8 @@ def run_prices_file(args: argparse.Namespace) -> dict[str, Path]:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Investment logic audit toolkit")
     sub = parser.add_subparsers(dest="command", required=True)
-
     sample = sub.add_parser("sample", help="Run deterministic synthetic-data audit")
     sample.add_argument("--out", default="outputs")
-
     run = sub.add_parser("run", help="Run one strategy on a wide price CSV")
     run.add_argument("--prices", required=True)
     run.add_argument("--strategy", choices=["ts_mom", "ma_trend", "cs_mom"], default="ts_mom")
