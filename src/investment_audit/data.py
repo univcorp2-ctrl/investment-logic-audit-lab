@@ -1,23 +1,69 @@
 from __future__ import annotations
 
+# data.py - 価格データ取得・読み込みモジュール
+# リファクタリング (2026-06-21): ロギング追加・エラーメッセージ日本語化・入力検証強化
+
+import logging
+import time
 from collections.abc import Iterable
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
+logger = logging.getLogger(__name__)
+
+# 価格データの最大リトライ回数 (ネットワークエラー時)
+_MAX_RETRY = 3
+_RETRY_WAIT_SEC = 2.0
+
 
 def load_price_csv(path: str | Path, date_col: str = "date") -> pd.DataFrame:
-    """Load a wide CSV of close prices."""
+    """CSVファイルから終値の Wide DataFrame を読み込む。
+
+    Args:
+        path: CSVファイルのパス
+        date_col: 日付列の列名 (デフォルト: "date")
+
+    Returns:
+        日付インデックス・銘柄列の終値 DataFrame (前方補完済み)
+
+    Raises:
+        FileNotFoundError: ファイルが存在しない
+        ValueError: 日付列がない / 数値列が1つもない
+    """
+    path = Path(path)
+    if not path.exists():
+        raise FileNotFoundError(f"価格CSVファイルが見つかりません: {path}")
+
+    logger.info("価格CSV読み込み開始: %s", path)
     df = pd.read_csv(path)
+
     if date_col not in df.columns:
-        raise ValueError(f"CSV must contain a '{date_col}' column")
+        raise ValueError(
+            f"CSVに '{date_col}' 列が必要です。"
+            f"実際の列名: {list(df.columns)}"
+        )
+
     df[date_col] = pd.to_datetime(df[date_col], utc=False)
     prices = df.set_index(date_col).sort_index()
     prices = prices.apply(pd.to_numeric, errors="coerce").dropna(how="all")
+
     if prices.empty:
-        raise ValueError("No usable numeric price columns found")
-    return prices.ffill()
+        raise ValueError(
+            f"{path} に有効な数値価格列が見つかりませんでした。"
+            "列の型・内容を確認してください。"
+        )
+
+    prices = prices.ffill()
+    logger.info(
+        "価格CSV読み込み完了: 銘柄数=%d, 期間=%s〜%s, 行数=%d",
+        len(prices.columns),
+        prices.index.min().date(),
+        prices.index.max().date(),
+        len(prices),
+    )
+    return prices
 
 
 def download_prices(
@@ -25,69 +71,118 @@ def download_prices(
     start: str = "2018-01-01",
     end: str | None = None,
     interval: str = "1d",
+    dry_run: bool = False,
 ) -> pd.DataFrame:
-    """Download adjusted close prices using yfinance.
+    """yfinance を使って修正後終値をダウンロードする。
 
-    This function is isolated so tests do not depend on network access.
+    テスト環境ではこの関数をモックして使用し、ネットワーク依存を避けること。
+
+    Args:
+        tickers: ティッカーシンボルのリスト (例: ["7203.T", "6758.T"])
+        start: 取得開始日 (YYYY-MM-DD)
+        end: 取得終了日 (YYYY-MM-DD)。None の場合は今日まで
+        interval: データ間隔 ("1d", "1wk", "1mo")
+        dry_run: True の場合、実際のダウンロードを行わず空の DataFrame を返す
+
+    Returns:
+        日付インデックス・銘柄列の終値 DataFrame
+
+    Raises:
+        ValueError: 有効なデータが取得できなかった場合
+        ImportError: yfinance がインストールされていない場合
     """
-    import yfinance as yf
-
     tickers = list(tickers)
     if not tickers:
-        raise ValueError("At least one ticker is required")
-    raw = yf.download(
-        tickers,
-        start=start,
-        end=end,
-        interval=interval,
-        auto_adjust=True,
-        progress=False,
+        raise ValueError("tickers が空です。1つ以上の銘柄を指定してください。")
+
+    logger.info(
+        "価格データダウンロード開始: 銘柄数=%d, 開始=%s, 終了=%s, dry_run=%s",
+        len(tickers), start, end or "today", dry_run,
     )
+
+    if dry_run:
+        logger.info("[DRY-RUN] ダウンロードをスキップします。空の DataFrame を返します。")
+        return pd.DataFrame()
+
+    try:
+        import yfinance as yf
+    except ImportError as e:
+        raise ImportError(
+            "yfinance がインストールされていません。"
+            "pip install yfinance でインストールしてください。"
+        ) from e
+
+    # リトライ付きダウンロード
+    last_error: Exception | None = None
+    for attempt in range(1, _MAX_RETRY + 1):
+        try:
+            raw = yf.download(
+                tickers,
+                start=start,
+                end=end,
+                interval=interval,
+                auto_adjust=True,
+                progress=False,
+            )
+            break
+        except Exception as exc:
+            last_error = exc
+            if attempt < _MAX_RETRY:
+                logger.warning(
+                    "ダウンロード失敗 (試行 %d/%d): %s - %.1f秒後にリトライ",
+                    attempt, _MAX_RETRY, exc, _RETRY_WAIT_SEC,
+                )
+                time.sleep(_RETRY_WAIT_SEC)
+            else:
+                raise RuntimeError(
+                    f"価格データのダウンロードに {_MAX_RETRY} 回失敗しました。"
+                    f"ネットワーク接続とティッカーシンボルを確認してください。"
+                ) from exc
+
+    # 複数銘柄の場合は "Close" 列を抽出
     if isinstance(raw.columns, pd.MultiIndex):
-        if "Close" in raw.columns.get_level_values(0):
-            prices = raw["Close"]
-        else:
-            prices = raw.xs("Close", axis=1, level=1)
+        prices = raw["Close"] if "Close" in raw.columns.get_level_values(0) else raw.iloc[:, raw.columns.get_level_values(0) == "Adj Close"]
+        if hasattr(prices, 'columns'):
+            prices.columns = [c if isinstance(c, str) else c[0] for c in prices.columns]
     else:
-        prices = raw.to_frame(name=tickers[0]) if isinstance(raw, pd.Series) else raw[["Close"]]
-        prices.columns = tickers
-    prices.index = pd.to_datetime(prices.index)
-    return prices.dropna(how="all").ffill()
+        prices = raw[["Close"]] if "Close" in raw.columns else raw
+
+    prices = prices.apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
+    prices = prices.dropna(how="all").ffill()
+
+    if prices.empty:
+        raise ValueError(
+            f"指定した銘柄 {tickers} の価格データを取得できませんでした。"
+            "ティッカーシンボルと日付範囲を確認してください。"
+        )
+
+    logger.info(
+        "価格データダウンロード完了: 銘柄数=%d, 行数=%d, 欠損率=%.1f%%",
+        len(prices.columns),
+        len(prices),
+        prices.isna().mean().mean() * 100,
+    )
+    return prices
 
 
-def make_synthetic_market(days: int = 1_000, seed: int = 7) -> pd.DataFrame:
-    """Create deterministic synthetic prices with trend, crash, and sideways regimes."""
-    rng = np.random.default_rng(seed)
-    index = pd.bdate_range("2020-01-01", periods=days)
-    regimes = np.zeros(days)
-    regimes[: days // 3] = 0.0006
-    regimes[days // 3 : 2 * days // 3] = -0.0002
-    regimes[2 * days // 3 :] = 0.00035
-    vol = np.linspace(0.008, 0.018, days)
-    common = regimes + rng.normal(0, vol)
-    data = {
-        "SPY_SIM": common + rng.normal(0.0001, 0.004, days),
-        "BTC_SIM": 1.25 * common + rng.normal(0.0004, 0.028, days),
-        "ETH_SIM": 1.40 * common + rng.normal(0.0005, 0.032, days),
-        "QUALITY_SIM": 0.00045 + rng.normal(0, 0.007, days),
-        "SIDEWAYS_SIM": rng.normal(0.00005, 0.010, days),
-    }
-    returns = pd.DataFrame(data, index=index)
-    returns.loc[index[120:320], "BTC_SIM"] += 0.0014
-    returns.loc[index[520:660], "BTC_SIM"] -= 0.0020
-    returns.loc[index[700:900], "QUALITY_SIM"] += 0.0009
-    return 100 * (1 + returns).cumprod()
+def validate_prices(prices: pd.DataFrame, min_periods: int = 252) -> None:
+    """価格 DataFrame の基本的な整合性チェックを行う。
 
+    Args:
+        prices: 検証対象の終値 DataFrame
+        min_periods: 必要な最低データ期間数 (デフォルト: 252 = 約1年)
 
-def make_synthetic_fundamentals() -> pd.DataFrame:
-    """Create a small fundamentals table for sample reports."""
-    return pd.DataFrame(
-        {
-            "ticker": ["SPY_SIM", "BTC_SIM", "ETH_SIM", "QUALITY_SIM", "SIDEWAYS_SIM"],
-            "pe": [21.0, np.nan, np.nan, 14.0, 45.0],
-            "pb": [4.0, np.nan, np.nan, 2.1, 9.0],
-            "roe": [0.16, np.nan, np.nan, 0.28, 0.04],
-            "debt_to_equity": [0.8, np.nan, np.nan, 0.25, 2.5],
-            "revenue_growth": [0.07, np.nan, np.nan, 0.18, -0.02],
-        }
-    ).set_index("ticker")
+    Raises:
+        ValueError: データが不足している / 負の価格がある
+    """
+    if prices.empty:
+        raise ValueError("prices が空です。")
+    if len(prices) < min_periods:
+        raise ValueError(
+            f"データが不足しています: {len(prices)}行 < 必要最低{min_periods}行。"
+            "分析期間を短くするか、より長いデータを用意してください。"
+        )
+    if (prices < 0).any().any():
+        neg_cols = prices.columns[(prices < 0).any()].tolist()
+        raise ValueError(f"負の価格が含まれる銘柄: {neg_cols}")
+    logger.debug("価格データ検証OK: %d銘柄 × %d日", len(prices.columns), len(prices))
