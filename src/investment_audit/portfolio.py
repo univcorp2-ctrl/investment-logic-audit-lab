@@ -132,7 +132,8 @@ def run_ranked_portfolio(
     rebalance = _rebalance_mask(price_index, config.rebalance)
     rebalance_dates = price_index[rebalance.to_numpy(dtype=bool)]
     for date in rebalance_dates:
-        available = lagged_scores.loc[date].dropna().sort_values(ascending=False).head(config.top_n)
+        score_row = lagged_scores.loc[[date], :].iloc[0]
+        available = score_row.dropna().sort_values(ascending=False).head(config.top_n)
         if available.empty:
             target.loc[date] = 0.0
             continue
