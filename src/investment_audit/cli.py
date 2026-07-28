@@ -7,6 +7,7 @@ import pandas as pd
 
 from .backtest import fee_sensitivity, metrics_from_returns, run_backtest
 from .data import load_price_csv, make_synthetic_fundamentals, make_synthetic_market
+from .factor_diagnostics import analyze_factor, write_factor_diagnostics
 from .reporting import write_report
 from .screening import ValueScreenConfig, load_table, screen_value_stocks, write_screen_results
 from .signals import (
@@ -148,6 +149,36 @@ def run_value_screen_demo(args: argparse.Namespace) -> dict[str, Path]:
     return write_screen_results(result, args.out, args.json_output)
 
 
+def _parse_horizons(value: str) -> tuple[int, ...]:
+    try:
+        horizons = tuple(int(item.strip()) for item in value.split(",") if item.strip())
+    except ValueError as exc:
+        raise ValueError("horizons must be a comma-separated list of integers") from exc
+    if not horizons or any(horizon < 1 for horizon in horizons):
+        raise ValueError("horizons must contain positive integers")
+    return horizons
+
+
+def run_factor_audit(args: argparse.Namespace) -> dict[str, Path]:
+    scores = load_table(args.scores)
+    prices = load_table(args.prices)
+    groups: pd.Series | None = None
+    if args.groups:
+        group_table = load_table(args.groups)
+        if group_table.shape[1] < 1:
+            raise ValueError("groups file must contain at least one data column")
+        groups = group_table.iloc[:, 0].astype(str)
+    result = analyze_factor(
+        scores=scores,
+        prices=prices,
+        horizons=_parse_horizons(args.horizons),
+        quantiles=args.quantiles,
+        groups=groups,
+        group_neutral=args.group_neutral,
+    )
+    return write_factor_diagnostics(result, args.out)
+
+
 def _add_screen_options(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--out", default="outputs/value-ranking.csv")
     parser.add_argument("--json", dest="json_output", default="outputs/value-ranking.json")
@@ -186,6 +217,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     demo = sub.add_parser("value-screen-demo", help="Run a fully offline value-screen demo")
     _add_screen_options(demo)
+
+    factor = sub.add_parser("factor-audit", help="Audit factor IC, quantiles, and turnover")
+    factor.add_argument("--scores", required=True, help="Wide date-by-symbol factor scores")
+    factor.add_argument("--prices", required=True, help="Wide date-by-symbol adjusted prices")
+    factor.add_argument("--groups", help="Optional symbol-indexed sector/group table")
+    factor.add_argument("--group-neutral", action="store_true")
+    factor.add_argument("--horizons", default="1,5,21,63")
+    factor.add_argument("--quantiles", type=int, default=5)
+    factor.add_argument("--out", default="outputs/factor-audit")
     return parser
 
 
@@ -200,6 +240,8 @@ def main(argv: list[str] | None = None) -> int:
         paths = run_value_screen(args)
     elif args.command == "value-screen-demo":
         paths = run_value_screen_demo(args)
+    elif args.command == "factor-audit":
+        paths = run_factor_audit(args)
     else:
         parser.error(f"unknown command: {args.command}")
     for name, path in paths.items():
