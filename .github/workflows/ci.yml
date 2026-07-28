@@ -39,6 +39,7 @@ jobs:
         run: |
           set +e
           mypy \
+            --python-version ${{ matrix.python-version }} \
             --show-column-numbers \
             --show-error-codes \
             --no-error-summary \
@@ -58,6 +59,6 @@ jobs:
           done < mypy-output.txt
           exit "$status"
       - name: Tests with coverage
-        run: pytest --cov=investment_audit --cov-report=term-missing --cov-fail-under=80
+        run: pytest --maxfail=20 --cov=investment_audit --cov-report=term-missing --cov-fail-under=80
       - name: Repeat tests twice for flake detection
         run: pytest && pytest
