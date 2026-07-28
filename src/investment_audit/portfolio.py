@@ -34,22 +34,25 @@ def _clean_wide(frame: pd.DataFrame, name: str) -> pd.DataFrame:
     if frame.empty:
         raise ValueError(f"{name} must not be empty")
     cleaned = frame.copy()
-    index = pd.to_datetime(cleaned.index, errors="coerce", utc=True)
-    cleaned.index = index.tz_convert(None)
-    cleaned = cleaned.loc[~cleaned.index.isna()]
-    cleaned = cleaned[~cleaned.index.duplicated(keep="last")].sort_index()
+    date_index = pd.DatetimeIndex(pd.to_datetime(cleaned.index, errors="coerce", utc=True))
+    cleaned.index = date_index.tz_convert(None)
+    valid_positions = np.flatnonzero(cleaned.index.notna())
+    cleaned = cleaned.iloc[valid_positions]
+    unique_positions = np.flatnonzero(~cleaned.index.duplicated(keep="last"))
+    cleaned = cleaned.iloc[unique_positions].sort_index()
     cleaned = cleaned.apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
     return cleaned
 
 
 def _rebalance_mask(index: pd.DatetimeIndex, frequency: str) -> pd.Series:
     if frequency == "monthly":
-        period = index.to_period("M")
+        periods = index.to_period("M")
     elif frequency == "weekly":
-        period = index.to_period("W-FRI")
+        periods = index.to_period("W-FRI")
     else:
         raise ValueError("rebalance must be 'monthly' or 'weekly'")
-    return pd.Series(period != pd.Series(period, index=index).shift(-1).to_numpy(), index=index)
+    period_series = pd.Series(periods, index=index)
+    return period_series.ne(period_series.shift(-1))
 
 
 def _performance_metrics(
@@ -102,7 +105,7 @@ def _performance_metrics(
         "max_drawdown": drawdown,
         "turnover": float(turnover.mean()),
         "hit_rate": float((clean > 0).mean()),
-        "exposure": float(weights.abs().sum(axis=1).mean()),
+        "exposure": float(weights.abs().sum(axis="columns").mean()),
         "benchmark_excess_cagr": cagr - benchmark_cagr,
     }
 
@@ -125,47 +128,50 @@ def run_ranked_portfolio(
     )
     lagged_scores = scores.shift(config.fundamental_lag_days)
     target = pd.DataFrame(np.nan, index=prices.index, columns=prices.columns, dtype=float)
-    rebalance = _rebalance_mask(prices.index, config.rebalance)
-    for date in prices.index[rebalance]:
+    price_index = pd.DatetimeIndex(prices.index)
+    rebalance = _rebalance_mask(price_index, config.rebalance)
+    rebalance_dates = price_index[rebalance.to_numpy(dtype=bool)]
+    for date in rebalance_dates:
         available = lagged_scores.loc[date].dropna().sort_values(ascending=False).head(config.top_n)
         if available.empty:
             target.loc[date] = 0.0
             continue
         if config.weighting == "equal":
-            weights = pd.Series(1.0 / len(available), index=available.index)
+            selection_weights = pd.Series(1.0 / len(available), index=available.index)
         elif config.weighting == "score":
             positive = (available - available.min() + 1e-9).clip(lower=0.0)
-            weights = positive / positive.sum()
+            selection_weights = positive / positive.sum()
         else:
             raise ValueError("weighting must be 'equal' or 'score'")
-        weights = weights.clip(upper=config.max_position)
+        selection_weights = selection_weights.clip(upper=config.max_position)
         row = pd.Series(0.0, index=prices.columns)
-        row.loc[weights.index] = weights
+        row.loc[selection_weights.index] = selection_weights
         target.loc[date] = row
     target = target.ffill().fillna(0.0)
-    weights = target.shift(1).fillna(0.0)
+    execution_weights = target.shift(1).fillna(0.0)
     asset_returns = (
         prices.pct_change(fill_method=None)
         .replace([np.inf, -np.inf], np.nan)
         .fillna(0.0)
     )
-    gross_returns = (weights * asset_returns).sum(axis=1)
-    turnover = weights.diff().abs().sum(axis=1).fillna(weights.abs().sum(axis=1))
+    gross_returns = execution_weights.mul(asset_returns).sum(axis="columns")
+    turnover = execution_weights.diff().abs().sum(axis="columns")
+    turnover = turnover.fillna(execution_weights.abs().sum(axis="columns"))
     costs = turnover * ((config.cost_bps + config.slippage_bps) / 10_000.0)
     net_returns = gross_returns - costs
     equity = (1.0 + net_returns).cumprod()
-    benchmark_returns = asset_returns.mean(axis=1)
+    benchmark_returns = asset_returns.mean(axis="columns")
     metrics = _performance_metrics(
         net_returns,
         turnover,
         benchmark_returns,
         config.annualization_days,
-        weights,
+        execution_weights,
     )
     return RankedPortfolioResult(
         returns=net_returns,
         equity=equity,
-        weights=weights,
+        weights=execution_weights,
         turnover=turnover,
         benchmark_returns=benchmark_returns,
         metrics=metrics,
