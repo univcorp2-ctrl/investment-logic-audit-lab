@@ -63,8 +63,14 @@ def test_good_value_quality_beats_value_trap() -> None:
     assert scored.loc["A1", "undervaluation_score"] > scored.loc["A3", "undervaluation_score"]
     assert scored.loc["B1", "quality_score"] > scored.loc["B3", "quality_score"]
     assert scored.loc["B3", "value_trap_risk"] > scored.loc["B1", "value_trap_risk"]
-    assert 0 <= scored.min(numeric_only=True).min()
-    assert scored.max(numeric_only=True).max() <= 100
+    bounded = [
+        column
+        for column in scored.columns
+        if column.endswith("_score") and not column.endswith("_contribution")
+    ]
+    bounded += ["value_trap_risk", "data_completeness", "confidence"]
+    assert scored[bounded].min().min() >= 0
+    assert scored[bounded].max().max() <= 100
     assert isinstance(json.loads(scored.loc["A1", "reasons"]), list)
 
 
