@@ -24,8 +24,17 @@ def make_ohlcv(periods: int = 320) -> pd.DataFrame:
 def test_indicators_and_scores_are_bounded() -> None:
     result = analyze_technical(make_ohlcv())
     required = {
-        "sma20", "sma50", "sma200", "rsi14", "macd", "bollinger_upper",
-        "atr14", "adx14", "position_52w", "technical_score", "decision_score"
+        "sma20",
+        "sma50",
+        "sma200",
+        "rsi14",
+        "macd",
+        "bollinger_upper",
+        "atr14",
+        "adx14",
+        "position_52w",
+        "technical_score",
+        "decision_score",
     }
     assert required.issubset(result.columns)
     for column in ("rsi14", "adx14", "trend_score", "momentum_score", "technical_score"):
@@ -40,7 +49,8 @@ def test_decision_score_is_strictly_lagged() -> None:
     after = analyze_technical(changed)
     assert before["decision_score"].iloc[-1] == after["decision_score"].iloc[-1]
     assert before["technical_score"].iloc[-1] != after["technical_score"].iloc[-1]
-    pd.testing.assert_series_equal(before["technical_score"].shift(1), before["decision_score"])
+    expected = before["technical_score"].shift(1).rename("decision_score")
+    pd.testing.assert_series_equal(expected, before["decision_score"])
 
 
 def test_short_constant_series_does_not_crash() -> None:
