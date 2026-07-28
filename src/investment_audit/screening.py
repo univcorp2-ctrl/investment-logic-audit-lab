@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Mapping
 
 import numpy as np
 import pandas as pd
@@ -179,6 +179,9 @@ def write_screen_results(
     if json_output is not None:
         json_path = Path(json_output)
         json_path.parent.mkdir(parents=True, exist_ok=True)
-        json_path.write_text(result.reset_index(names="symbol").to_json(orient="records", force_ascii=False), encoding="utf-8")
+        json_path.write_text(
+            result.reset_index(names="symbol").to_json(orient="records", force_ascii=False),
+            encoding="utf-8",
+        )
         outputs["json"] = json_path
     return outputs
