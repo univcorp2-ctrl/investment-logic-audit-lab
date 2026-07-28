@@ -1,0 +1,39 @@
+name: Production Smoke
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify ValueScope Japan production page
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://valuescope-japan.pages.dev/"
+          status="000"
+          for attempt in $(seq 1 12); do
+            status=$(curl --location --silent --show-error \
+              --output response.html \
+              --write-out "%{http_code}" \
+              --max-time 30 \
+              "$url" || true)
+            if [[ "$status" == "200" ]]; then
+              break
+            fi
+            echo "Attempt ${attempt}: HTTP ${status}; retrying"
+            sleep 10
+          done
+          test "$status" = "200"
+          grep --fixed-strings '<title>ValueScope Japan | 割安株分析</title>' response.html
+          grep --fixed-strings 'id="rankingBody"' response.html
+          grep --fixed-strings 'CSVは端末内で処理' response.html
+          content_type=$(curl --location --silent --show-error --head "$url" \
+            | tr -d '\r' \
+            | awk -F': ' 'tolower($1)=="content-type" {print $2}' \
+            | tail -n 1)
+          echo "Production smoke passed: HTTP ${status}; Content-Type=${content_type}"
