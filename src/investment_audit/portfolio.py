@@ -61,24 +61,37 @@ def _performance_metrics(
 ) -> dict[str, float]:
     clean = returns.dropna()
     if clean.empty:
-        return {name: float("nan") for name in (
-            "cagr", "annualized_volatility", "sharpe", "sortino", "calmar",
-            "max_drawdown", "turnover", "hit_rate", "exposure", "benchmark_excess_cagr"
-        )}
+        return {
+            name: float("nan")
+            for name in (
+                "cagr",
+                "annualized_volatility",
+                "sharpe",
+                "sortino",
+                "calmar",
+                "max_drawdown",
+                "turnover",
+                "hit_rate",
+                "exposure",
+                "benchmark_excess_cagr",
+            )
+        }
     equity = (1.0 + clean).cumprod()
     years = len(clean) / annualization_days
     cagr = float(equity.iloc[-1] ** (1.0 / years) - 1.0) if years > 0 else float("nan")
     volatility = float(clean.std(ddof=1) * np.sqrt(annualization_days))
     sharpe = cagr / volatility if volatility > 0 else float("nan")
     downside = clean.clip(upper=0.0)
-    downside_deviation = float(np.sqrt((downside.pow(2).mean())) * np.sqrt(annualization_days))
+    downside_deviation = float(np.sqrt(downside.pow(2).mean()) * np.sqrt(annualization_days))
     sortino = cagr / downside_deviation if downside_deviation > 0 else float("nan")
     drawdown = max_drawdown(equity)
     calmar = cagr / abs(drawdown) if drawdown < 0 else float("nan")
     benchmark = benchmark_returns.reindex(clean.index).fillna(0.0)
     benchmark_equity = (1.0 + benchmark).cumprod()
     benchmark_cagr = (
-        float(benchmark_equity.iloc[-1] ** (1.0 / years) - 1.0) if years > 0 else float("nan")
+        float(benchmark_equity.iloc[-1] ** (1.0 / years) - 1.0)
+        if years > 0
+        else float("nan")
     )
     return {
         "cagr": cagr,
@@ -105,7 +118,11 @@ def run_ranked_portfolio(
     if config.top_n < 1:
         raise ValueError("top_n must be positive")
     prices = _clean_wide(prices, "prices").ffill()
-    scores = _clean_wide(scores, "scores").reindex(index=prices.index, columns=prices.columns).ffill()
+    scores = (
+        _clean_wide(scores, "scores")
+        .reindex(index=prices.index, columns=prices.columns)
+        .ffill()
+    )
     lagged_scores = scores.shift(config.fundamental_lag_days)
     target = pd.DataFrame(np.nan, index=prices.index, columns=prices.columns, dtype=float)
     rebalance = _rebalance_mask(prices.index, config.rebalance)
@@ -127,7 +144,11 @@ def run_ranked_portfolio(
         target.loc[date] = row
     target = target.ffill().fillna(0.0)
     weights = target.shift(1).fillna(0.0)
-    asset_returns = prices.pct_change(fill_method=None).replace([np.inf, -np.inf], np.nan).fillna(0.0)
+    asset_returns = (
+        prices.pct_change(fill_method=None)
+        .replace([np.inf, -np.inf], np.nan)
+        .fillna(0.0)
+    )
     gross_returns = (weights * asset_returns).sum(axis=1)
     turnover = weights.diff().abs().sum(axis=1).fillna(weights.abs().sum(axis=1))
     costs = turnover * ((config.cost_bps + config.slippage_bps) / 10_000.0)
@@ -171,7 +192,9 @@ def robustness_summary(
                         fundamental_lag_days=lag,
                     ),
                 )
-                rows.append({"top_n": top_n, "cost_bps": cost, "lag_days": lag, **result.metrics})
+                rows.append(
+                    {"top_n": top_n, "cost_bps": cost, "lag_days": lag, **result.metrics}
+                )
     table = pd.DataFrame(rows)
     table.attrs["positive_sharpe_ratio"] = float((table["sharpe"] > 0).mean())
     table.attrs["median_sharpe"] = float(table["sharpe"].median())
