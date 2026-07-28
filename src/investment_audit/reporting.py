@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Mapping
 
 import pandas as pd
 
@@ -35,7 +35,6 @@ def write_report(
     if fee_sensitivity is not None:
         files["fee_sensitivity_csv"] = out / "fee_sensitivity.csv"
         fee_sensitivity.to_csv(files["fee_sensitivity_csv"], index=False)
-
     with pd.ExcelWriter(files["excel"], engine="openpyxl") as writer:
         summary.to_excel(writer, sheet_name="summary", index=False)
         equity_curve.to_excel(writer, sheet_name="equity_curve")
@@ -44,19 +43,22 @@ def write_report(
         if fee_sensitivity is not None:
             fee_sensitivity.to_excel(writer, sheet_name="fee_sensitivity", index=False)
         if notes:
-            pd.DataFrame([{"key": k, "value": v} for k, v in notes.items()]).to_excel(writer, sheet_name="notes", index=False)
-
-    with files["text"].open("w", encoding="utf-8") as fh:
-        fh.write("Investment Logic Audit Report\n")
-        fh.write("=============================\n\n")
-        fh.write(summary.to_string(index=False))
-        fh.write("\n\n")
+            pd.DataFrame([{"key": key, "value": value} for key, value in notes.items()]).to_excel(
+                writer,
+                sheet_name="notes",
+                index=False,
+            )
+    with files["text"].open("w", encoding="utf-8") as handle:
+        handle.write("Investment Logic Audit Report\n")
+        handle.write("=============================\n\n")
+        handle.write(summary.to_string(index=False))
+        handle.write("\n\n")
         if walk_forward is not None and not walk_forward.empty:
-            fh.write("Walk-forward windows\n")
-            fh.write(walk_forward.to_string(index=False))
-            fh.write("\n\n")
+            handle.write("Walk-forward windows\n")
+            handle.write(walk_forward.to_string(index=False))
+            handle.write("\n\n")
         if notes:
-            fh.write("Notes\n")
+            handle.write("Notes\n")
             for key, value in notes.items():
-                fh.write(f"- {key}: {value}\n")
+                handle.write(f"- {key}: {value}\n")
     return files
