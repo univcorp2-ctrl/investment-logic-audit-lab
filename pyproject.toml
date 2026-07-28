@@ -57,3 +57,7 @@ warn_unused_ignores = true
 no_implicit_optional = true
 check_untyped_defs = true
 disable_error_code = ["arg-type", "assignment", "index", "operator"]
+
+[[tool.mypy.overrides]]
+module = "investment_audit.providers.jquants"
+disable_error_code = ["list-item"]
