@@ -116,7 +116,10 @@ def screen_value_stocks(
             liquidity_source = liquidity_source.combine_first(
                 pd.to_numeric(source[column], errors="coerce")
             )
-    liquidity_source = liquidity_source.combine_first(technical.get("average_dollar_volume_20d"))
+    if "average_dollar_volume_20d" in technical.columns:
+        liquidity_source = liquidity_source.combine_first(
+            pd.to_numeric(technical["average_dollar_volume_20d"], errors="coerce")
+        )
     liquidity_score = _percentile(liquidity_source).fillna(50.0)
     risk_control = technical["technical_risk_score"].fillna(50.0)
     liquidity_risk = (liquidity_score * 0.70 + risk_control * 0.30).clip(0.0, 100.0)
