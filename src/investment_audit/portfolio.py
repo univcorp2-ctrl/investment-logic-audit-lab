@@ -5,7 +5,9 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
+from .allocation import HRPConfig, hrp_weights
 from .backtest import max_drawdown
+from .risk_metrics import extended_risk_metrics
 
 
 @dataclass(frozen=True)
@@ -18,6 +20,7 @@ class RankedPortfolioConfig:
     slippage_bps: float = 2.0
     max_position: float = 1.0
     annualization_days: int = 252
+    hrp_minimum_history: int = 60
 
 
 @dataclass(frozen=True)
@@ -34,14 +37,11 @@ def _clean_wide(frame: pd.DataFrame, name: str) -> pd.DataFrame:
     if frame.empty:
         raise ValueError(f"{name} must not be empty")
     cleaned = frame.copy()
-    date_index = pd.DatetimeIndex(pd.to_datetime(cleaned.index, errors="coerce", utc=True))
-    cleaned.index = date_index.tz_convert(None)
-    valid_positions = np.flatnonzero(cleaned.index.notna())
-    cleaned = cleaned.iloc[valid_positions]
-    unique_positions = np.flatnonzero(~cleaned.index.duplicated(keep="last"))
-    cleaned = cleaned.iloc[unique_positions].sort_index()
-    cleaned = cleaned.apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
-    return cleaned
+    index = pd.DatetimeIndex(pd.to_datetime(cleaned.index, errors="coerce", utc=True))
+    cleaned.index = index.tz_convert(None)
+    cleaned = cleaned.iloc[np.flatnonzero(cleaned.index.notna())]
+    cleaned = cleaned.iloc[np.flatnonzero(~cleaned.index.duplicated(keep="last"))].sort_index()
+    return cleaned.apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
 
 
 def _rebalance_mask(index: pd.DatetimeIndex, frequency: str) -> pd.Series:
@@ -51,8 +51,8 @@ def _rebalance_mask(index: pd.DatetimeIndex, frequency: str) -> pd.Series:
         periods = index.to_period("W-FRI")
     else:
         raise ValueError("rebalance must be 'monthly' or 'weekly'")
-    period_series = pd.Series(periods, index=index)
-    return period_series.ne(period_series.shift(-1))
+    series = pd.Series(periods, index=index)
+    return series.ne(series.shift(-1))
 
 
 def _performance_metrics(
@@ -64,50 +64,31 @@ def _performance_metrics(
 ) -> dict[str, float]:
     clean = returns.dropna()
     if clean.empty:
-        return {
-            name: float("nan")
-            for name in (
-                "cagr",
-                "annualized_volatility",
-                "sharpe",
-                "sortino",
-                "calmar",
-                "max_drawdown",
-                "turnover",
-                "hit_rate",
-                "exposure",
-                "benchmark_excess_cagr",
-            )
-        }
+        return extended_risk_metrics(clean)
     equity = (1.0 + clean).cumprod()
     years = len(clean) / annualization_days
     cagr = float(equity.iloc[-1] ** (1.0 / years) - 1.0) if years > 0 else float("nan")
     volatility = float(clean.std(ddof=1) * np.sqrt(annualization_days))
-    sharpe = cagr / volatility if volatility > 0 else float("nan")
     downside = clean.clip(upper=0.0)
     downside_deviation = float(np.sqrt(downside.pow(2).mean()) * np.sqrt(annualization_days))
-    sortino = cagr / downside_deviation if downside_deviation > 0 else float("nan")
     drawdown = max_drawdown(equity)
-    calmar = cagr / abs(drawdown) if drawdown < 0 else float("nan")
     benchmark = benchmark_returns.reindex(clean.index).fillna(0.0)
     benchmark_equity = (1.0 + benchmark).cumprod()
-    benchmark_cagr = (
-        float(benchmark_equity.iloc[-1] ** (1.0 / years) - 1.0)
-        if years > 0
-        else float("nan")
-    )
-    return {
+    benchmark_cagr = float(benchmark_equity.iloc[-1] ** (1.0 / years) - 1.0) if years > 0 else float("nan")
+    metrics = {
         "cagr": cagr,
         "annualized_volatility": volatility,
-        "sharpe": sharpe,
-        "sortino": sortino,
-        "calmar": calmar,
+        "sharpe": cagr / volatility if volatility > 0 else float("nan"),
+        "sortino": cagr / downside_deviation if downside_deviation > 0 else float("nan"),
+        "calmar": cagr / abs(drawdown) if drawdown < 0 else float("nan"),
         "max_drawdown": drawdown,
         "turnover": float(turnover.mean()),
         "hit_rate": float((clean > 0).mean()),
         "exposure": float(weights.abs().sum(axis="columns").mean()),
         "benchmark_excess_cagr": cagr - benchmark_cagr,
     }
+    metrics.update(extended_risk_metrics(clean))
+    return metrics
 
 
 def run_ranked_portfolio(
@@ -115,68 +96,53 @@ def run_ranked_portfolio(
     scores: pd.DataFrame,
     config: RankedPortfolioConfig | None = None,
 ) -> RankedPortfolioResult:
-    """Backtest point-in-time rankings with publication lag and next-day execution."""
-
     config = config or RankedPortfolioConfig()
     if config.top_n < 1:
         raise ValueError("top_n must be positive")
     prices = _clean_wide(prices, "prices").ffill()
-    scores = (
-        _clean_wide(scores, "scores")
-        .reindex(index=prices.index, columns=prices.columns)
-        .ffill()
-    )
+    scores = _clean_wide(scores, "scores").reindex(index=prices.index, columns=prices.columns).ffill()
     lagged_scores = scores.shift(config.fundamental_lag_days)
     target = pd.DataFrame(np.nan, index=prices.index, columns=prices.columns, dtype=float)
-    price_index = pd.DatetimeIndex(prices.index)
-    rebalance = _rebalance_mask(price_index, config.rebalance)
-    rebalance_dates = price_index[rebalance.to_numpy(dtype=bool)]
-    for date in rebalance_dates:
-        score_row = lagged_scores.loc[[date], :].iloc[0]
-        available = score_row.dropna().sort_values(ascending=False).head(config.top_n)
+    mask = _rebalance_mask(pd.DatetimeIndex(prices.index), config.rebalance)
+    for date in prices.index[mask.to_numpy(dtype=bool)]:
+        available = lagged_scores.loc[[date]].iloc[0].dropna().sort_values(ascending=False).head(config.top_n)
         if available.empty:
             target.loc[date] = 0.0
             continue
         if config.weighting == "equal":
-            selection_weights = pd.Series(1.0 / len(available), index=available.index)
+            selection = pd.Series(1.0 / len(available), index=available.index)
         elif config.weighting == "score":
             positive = (available - available.min() + 1e-9).clip(lower=0.0)
-            selection_weights = positive / positive.sum()
+            selection = positive / positive.sum()
+        elif config.weighting == "hrp":
+            history = prices.loc[prices.index < date, available.index].pct_change(fill_method=None)
+            selection = hrp_weights(
+                history,
+                HRPConfig(
+                    minimum_history=config.hrp_minimum_history,
+                    max_position=config.max_position,
+                ),
+            )
+            if selection.empty:
+                selection = pd.Series(1.0 / len(available), index=available.index)
         else:
-            raise ValueError("weighting must be 'equal' or 'score'")
-        selection_weights = selection_weights.clip(upper=config.max_position)
+            raise ValueError("weighting must be 'equal', 'score', or 'hrp'")
+        selection = selection.reindex(available.index).fillna(0.0)
+        if selection.sum() > 0:
+            selection = selection / selection.sum()
         row = pd.Series(0.0, index=prices.columns)
-        row.loc[selection_weights.index] = selection_weights
+        row.loc[selection.index] = selection
         target.loc[date] = row
     target = target.ffill().fillna(0.0)
-    execution_weights = target.shift(1).fillna(0.0)
-    asset_returns = (
-        prices.pct_change(fill_method=None)
-        .replace([np.inf, -np.inf], np.nan)
-        .fillna(0.0)
-    )
-    gross_returns = execution_weights.mul(asset_returns).sum(axis="columns")
-    turnover = execution_weights.diff().abs().sum(axis="columns")
-    turnover = turnover.fillna(execution_weights.abs().sum(axis="columns"))
+    weights = target.shift(1).fillna(0.0)
+    asset_returns = prices.pct_change(fill_method=None).replace([np.inf, -np.inf], np.nan).fillna(0.0)
+    turnover = weights.diff().abs().sum(axis="columns").fillna(weights.abs().sum(axis="columns"))
     costs = turnover * ((config.cost_bps + config.slippage_bps) / 10_000.0)
-    net_returns = gross_returns - costs
+    net_returns = weights.mul(asset_returns).sum(axis="columns") - costs
     equity = (1.0 + net_returns).cumprod()
     benchmark_returns = asset_returns.mean(axis="columns")
-    metrics = _performance_metrics(
-        net_returns,
-        turnover,
-        benchmark_returns,
-        config.annualization_days,
-        execution_weights,
-    )
-    return RankedPortfolioResult(
-        returns=net_returns,
-        equity=equity,
-        weights=execution_weights,
-        turnover=turnover,
-        benchmark_returns=benchmark_returns,
-        metrics=metrics,
-    )
+    metrics = _performance_metrics(net_returns, turnover, benchmark_returns, config.annualization_days, weights)
+    return RankedPortfolioResult(net_returns, equity, weights, turnover, benchmark_returns, metrics)
 
 
 def robustness_summary(
@@ -193,15 +159,9 @@ def robustness_summary(
                 result = run_ranked_portfolio(
                     prices,
                     scores,
-                    RankedPortfolioConfig(
-                        top_n=top_n,
-                        cost_bps=cost,
-                        fundamental_lag_days=lag,
-                    ),
+                    RankedPortfolioConfig(top_n=top_n, cost_bps=cost, fundamental_lag_days=lag),
                 )
-                rows.append(
-                    {"top_n": top_n, "cost_bps": cost, "lag_days": lag, **result.metrics}
-                )
+                rows.append({"top_n": top_n, "cost_bps": cost, "lag_days": lag, **result.metrics})
     table = pd.DataFrame(rows)
     table.attrs["positive_sharpe_ratio"] = float((table["sharpe"] > 0).mean())
     table.attrs["median_sharpe"] = float(table["sharpe"].median())
