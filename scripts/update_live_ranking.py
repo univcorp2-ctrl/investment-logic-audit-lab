@@ -141,7 +141,7 @@ def _history_metrics(history: pd.DataFrame) -> dict[str, Any]:
     volume = pd.to_numeric(clean.get("Volume"), errors="coerce")
     average_daily_value = (
         float((clean["Close"] * volume).tail(20).mean())
-        if volume is not None and volume.notna().any()
+        if isinstance(volume, pd.Series) and volume.notna().any()
         else None
     )
     market_date = pd.Timestamp(clean.index[-1]).date().isoformat()
@@ -187,14 +187,25 @@ def fetch_symbol(row: dict[str, str], retries: int = 3) -> dict[str, Any] | None
 
 
 def _json_value(value: Any) -> Any:
+    if value is None or value is pd.NA:
+        return None
+    if isinstance(value, dict):
+        return {str(key): _json_value(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple, set)):
+        return [_json_value(item) for item in value]
+    if isinstance(value, np.ndarray):
+        return [_json_value(item) for item in value.tolist()]
     if isinstance(value, (np.integer,)):
         return int(value)
     if isinstance(value, (np.floating,)):
         return None if not np.isfinite(value) else float(value)
     if isinstance(value, pd.Timestamp):
         return value.isoformat()
-    if pd.isna(value):
-        return None
+    try:
+        if bool(pd.isna(value)):
+            return None
+    except (TypeError, ValueError):
+        pass
     return value
 
 
