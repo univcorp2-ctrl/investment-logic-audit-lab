@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -161,9 +162,12 @@ def analyze_factor(
         ic = _daily_spearman(clean_scores, evaluated)
         ic_columns[f"{horizon}d"] = ic
 
-        score_long = clean_scores.stack().rename("score")
-        quantile_long = quantile_frame.stack().rename("quantile")
-        forward_long = evaluated.stack().rename("forward_return")
+        score_long = cast(pd.Series, clean_scores.stack())
+        score_long.name = "score"
+        quantile_long = cast(pd.Series, quantile_frame.stack())
+        quantile_long.name = "quantile"
+        forward_long = cast(pd.Series, evaluated.stack())
+        forward_long.name = "forward_return"
         long = pd.concat(
             [score_long, quantile_long, forward_long],
             axis="columns",
