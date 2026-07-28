@@ -23,7 +23,7 @@ def test_screen_ranks_good_candidates_and_filters_traps() -> None:
 
 def test_thresholds_are_configurable() -> None:
     fundamentals = sample_fundamentals()
-    strict = ValueScreenConfig(minimum_quality=90, maximum_value_trap_risk=20)
+    strict = ValueScreenConfig(minimum_quality=101, maximum_value_trap_risk=20)
     result = screen_value_stocks(fundamentals, config=strict)
     assert not result["eligible"].any()
 
