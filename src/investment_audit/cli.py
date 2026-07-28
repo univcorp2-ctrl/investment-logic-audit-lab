@@ -8,6 +8,7 @@ import pandas as pd
 from .backtest import fee_sensitivity, metrics_from_returns, run_backtest
 from .data import load_price_csv, make_synthetic_fundamentals, make_synthetic_market
 from .reporting import write_report
+from .screening import ValueScreenConfig, load_table, screen_value_stocks, write_screen_results
 from .signals import (
     cross_sectional_momentum,
     fundamental_quality_value_momentum,
@@ -24,20 +25,20 @@ def _summary_row(name: str, metrics: dict[str, float]) -> dict[str, float | str]
 def run_sample(out_dir: str | Path) -> dict[str, Path]:
     prices = make_synthetic_market()
     fundamentals = make_synthetic_fundamentals()
-    price_mom = prices.iloc[-1] / prices.iloc[-126] - 1
-    fundamental_scores = fundamental_quality_value_momentum(fundamentals, price_mom)
+    price_momentum = prices.iloc[-1] / prices.iloc[-126] - 1.0
+    fundamental_scores = fundamental_quality_value_momentum(fundamentals, price_momentum)
     strategies = {
         "ts_mom_126d": time_series_momentum(prices, lookback=126, skip=1, long_only=False),
         "ma_trend_50_200": moving_average_trend(prices, fast=50, slow=200, long_only=True),
         "cs_mom_126d": cross_sectional_momentum(prices, lookback=126, long_short=True),
     }
-    rows = []
+    rows: list[dict[str, float | str]] = []
     equity = pd.DataFrame(index=prices.index)
     for name, signal in strategies.items():
         result = run_backtest(prices, signal, cost_bps=5, slippage_bps=2)
         rows.append(_summary_row(name, result.metrics))
         equity[name] = result.equity
-    wf = run_walk_forward(
+    walk_forward = run_walk_forward(
         prices,
         strategy="ts_mom",
         parameter_grid=[
@@ -50,40 +51,122 @@ def run_sample(out_dir: str | Path) -> dict[str, Path]:
         test_days=126,
         purge_days=5,
     )
-    rows.append(_summary_row("walk_forward_ts_mom_oos", metrics_from_returns(wf.returns)))
-    equity["walk_forward_ts_mom_oos"] = wf.equity.reindex(equity.index).ffill()
+    rows.append(
+        _summary_row("walk_forward_ts_mom_oos", metrics_from_returns(walk_forward.returns))
+    )
+    equity["walk_forward_ts_mom_oos"] = walk_forward.equity.reindex(equity.index).ffill()
     fee = fee_sensitivity(prices, strategies["ts_mom_126d"])
     summary = pd.DataFrame(rows).sort_values("sharpe", ascending=False)
     notes = {
         "fundamental_top": ", ".join(fundamental_scores.head(3).index.tolist()),
         "interpretation": "Prefer candidates that remain positive in walk-forward and fee sensitivity tests.",
-        "data": "Synthetic sample data; replace with real adjusted close and fundamentals before decisions.",
+        "data": "Synthetic sample data; replace it with point-in-time real data before decisions.",
     }
-    return write_report(out_dir, summary, equity, wf.windows, fee, notes)
+    return write_report(out_dir, summary, equity, walk_forward.windows, fee, notes)
 
 
 def run_prices_file(args: argparse.Namespace) -> dict[str, Path]:
     prices = load_price_csv(args.prices)
     if args.strategy == "ts_mom":
-        signal = time_series_momentum(prices, lookback=args.lookback, skip=args.skip, long_only=args.long_only)
+        signal = time_series_momentum(
+            prices,
+            lookback=args.lookback,
+            skip=args.skip,
+            long_only=args.long_only,
+        )
     elif args.strategy == "ma_trend":
-        signal = moving_average_trend(prices, fast=args.fast, slow=args.slow, long_only=args.long_only)
+        signal = moving_average_trend(
+            prices,
+            fast=args.fast,
+            slow=args.slow,
+            long_only=args.long_only,
+        )
     elif args.strategy == "cs_mom":
-        signal = cross_sectional_momentum(prices, lookback=args.lookback, long_short=not args.long_only)
+        signal = cross_sectional_momentum(
+            prices,
+            lookback=args.lookback,
+            long_short=not args.long_only,
+        )
     else:
         raise ValueError(f"Unsupported strategy: {args.strategy}")
-    result = run_backtest(prices, signal, cost_bps=args.cost_bps, slippage_bps=args.slippage_bps)
+    result = run_backtest(
+        prices,
+        signal,
+        cost_bps=args.cost_bps,
+        slippage_bps=args.slippage_bps,
+    )
     summary = pd.DataFrame([_summary_row(args.strategy, result.metrics)])
     equity = pd.DataFrame({args.strategy: result.equity})
     fee = fee_sensitivity(prices, signal)
     return write_report(args.out, summary, equity, fee_sensitivity=fee)
 
 
+def _screen_config(args: argparse.Namespace) -> ValueScreenConfig:
+    return ValueScreenConfig(
+        fundamental_weight=args.fundamental_weight,
+        technical_weight=args.technical_weight,
+        liquidity_risk_weight=args.liquidity_weight,
+        minimum_quality=args.minimum_quality,
+        maximum_value_trap_risk=args.maximum_value_trap_risk,
+        minimum_data_completeness=args.minimum_data_completeness,
+        minimum_liquidity_score=args.minimum_liquidity,
+    )
+
+
+def run_value_screen(args: argparse.Namespace) -> dict[str, Path]:
+    fundamentals = load_table(args.fundamentals)
+    technical = load_table(args.technical) if args.technical else None
+    result = screen_value_stocks(
+        fundamentals,
+        technical_scores=technical,
+        config=_screen_config(args),
+    )
+    return write_screen_results(result, args.out, args.json_output)
+
+
+def run_value_screen_demo(args: argparse.Namespace) -> dict[str, Path]:
+    fundamentals = make_synthetic_fundamentals()
+    prices = make_synthetic_market(days=320)
+    histories: dict[str, pd.DataFrame] = {}
+    for symbol in prices.columns:
+        close = prices[symbol]
+        histories[str(symbol)] = pd.DataFrame(
+            {
+                "open": close,
+                "high": close * 1.005,
+                "low": close * 0.995,
+                "close": close,
+                "volume": 1_000_000.0,
+            },
+            index=prices.index,
+        )
+    result = screen_value_stocks(
+        fundamentals,
+        price_history=histories,
+        config=_screen_config(args),
+    )
+    return write_screen_results(result, args.out, args.json_output)
+
+
+def _add_screen_options(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--out", default="outputs/value-ranking.csv")
+    parser.add_argument("--json", dest="json_output", default="outputs/value-ranking.json")
+    parser.add_argument("--fundamental-weight", type=float, default=0.65)
+    parser.add_argument("--technical-weight", type=float, default=0.25)
+    parser.add_argument("--liquidity-weight", type=float, default=0.10)
+    parser.add_argument("--minimum-quality", type=float, default=40.0)
+    parser.add_argument("--maximum-value-trap-risk", type=float, default=60.0)
+    parser.add_argument("--minimum-data-completeness", type=float, default=45.0)
+    parser.add_argument("--minimum-liquidity", type=float, default=20.0)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Investment logic audit toolkit")
     sub = parser.add_subparsers(dest="command", required=True)
+
     sample = sub.add_parser("sample", help="Run deterministic synthetic-data audit")
     sample.add_argument("--out", default="outputs")
+
     run = sub.add_parser("run", help="Run one strategy on a wide price CSV")
     run.add_argument("--prices", required=True)
     run.add_argument("--strategy", choices=["ts_mom", "ma_trend", "cs_mom"], default="ts_mom")
@@ -95,6 +178,14 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--cost-bps", type=float, default=5.0)
     run.add_argument("--slippage-bps", type=float, default=2.0)
     run.add_argument("--out", default="outputs")
+
+    value = sub.add_parser("value-screen", help="Rank value candidates from CSV or Parquet")
+    value.add_argument("--fundamentals", required=True)
+    value.add_argument("--technical")
+    _add_screen_options(value)
+
+    demo = sub.add_parser("value-screen-demo", help="Run a fully offline value-screen demo")
+    _add_screen_options(demo)
     return parser
 
 
@@ -105,6 +196,10 @@ def main(argv: list[str] | None = None) -> int:
         paths = run_sample(args.out)
     elif args.command == "run":
         paths = run_prices_file(args)
+    elif args.command == "value-screen":
+        paths = run_value_screen(args)
+    elif args.command == "value-screen-demo":
+        paths = run_value_screen_demo(args)
     else:
         parser.error(f"unknown command: {args.command}")
     for name, path in paths.items():
