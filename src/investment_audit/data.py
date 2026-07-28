@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-# data.py - 価格データ取得・読み込みモジュール
-# リファクタリング (2026-06-21): ロギング追加・エラーメッセージ日本語化・入力検証強化
-
 import logging
 import time
 from collections.abc import Iterable
@@ -12,57 +9,27 @@ import numpy as np
 import pandas as pd
 
 logger = logging.getLogger(__name__)
-
-# 価格データの最大リトライ回数 (ネットワークエラー時)
 _MAX_RETRY = 3
 _RETRY_WAIT_SEC = 2.0
 
 
 def load_price_csv(path: str | Path, date_col: str = "date") -> pd.DataFrame:
-    """CSVファイルから終値の Wide DataFrame を読み込む。
+    """Load a wide adjusted-close CSV indexed by date."""
 
-    Args:
-        path: CSVファイルのパス
-        date_col: 日付列の列名 (デフォルト: "date")
-
-    Returns:
-        日付インデックス・銘柄列の終値 DataFrame (前方補完済み)
-
-    Raises:
-        FileNotFoundError: ファイルが存在しない
-        ValueError: 日付列がない / 数値列が1つもない
-    """
-    path = Path(path)
-    if not path.exists():
-        raise FileNotFoundError(f"価格CSVファイルが見つかりません: {path}")
-
-    logger.info("価格CSV読み込み開始: %s", path)
-    df = pd.read_csv(path)
-
-    if date_col not in df.columns:
+    source = Path(path)
+    if not source.exists():
+        raise FileNotFoundError(f"価格CSVファイルが見つかりません: {source}")
+    frame = pd.read_csv(source)
+    if date_col not in frame.columns:
         raise ValueError(
-            f"CSVに '{date_col}' 列が必要です。"
-            f"実際の列名: {list(df.columns)}"
+            f"CSVに '{date_col}' 列が必要です。実際の列名: {list(frame.columns)}"
         )
-
-    df[date_col] = pd.to_datetime(df[date_col], utc=False)
-    prices = df.set_index(date_col).sort_index()
-    prices = prices.apply(pd.to_numeric, errors="coerce").dropna(how="all")
-
+    frame[date_col] = pd.to_datetime(frame[date_col], errors="raise", utc=False)
+    prices = frame.set_index(date_col).sort_index()
+    prices = prices.apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
+    prices = prices.dropna(how="all").ffill()
     if prices.empty:
-        raise ValueError(
-            f"{path} に有効な数値価格列が見つかりませんでした。"
-            "列の型・内容を確認してください。"
-        )
-
-    prices = prices.ffill()
-    logger.info(
-        "価格CSV読み込み完了: 銘柄数=%d, 期間=%s〜%s, 行数=%d",
-        len(prices.columns),
-        prices.index.min().date(),
-        prices.index.max().date(),
-        len(prices),
-    )
+        raise ValueError(f"{source} に有効な数値価格列が見つかりませんでした。")
     return prices
 
 
@@ -73,51 +40,25 @@ def download_prices(
     interval: str = "1d",
     dry_run: bool = False,
 ) -> pd.DataFrame:
-    """yfinance を使って修正後終値をダウンロードする。
+    """Download adjusted prices with yfinance and bounded retry handling."""
 
-    テスト環境ではこの関数をモックして使用し、ネットワーク依存を避けること。
-
-    Args:
-        tickers: ティッカーシンボルのリスト (例: ["7203.T", "6758.T"])
-        start: 取得開始日 (YYYY-MM-DD)
-        end: 取得終了日 (YYYY-MM-DD)。None の場合は今日まで
-        interval: データ間隔 ("1d", "1wk", "1mo")
-        dry_run: True の場合、実際のダウンロードを行わず空の DataFrame を返す
-
-    Returns:
-        日付インデックス・銘柄列の終値 DataFrame
-
-    Raises:
-        ValueError: 有効なデータが取得できなかった場合
-        ImportError: yfinance がインストールされていない場合
-    """
-    tickers = list(tickers)
-    if not tickers:
+    symbols = [str(ticker) for ticker in tickers]
+    if not symbols:
         raise ValueError("tickers が空です。1つ以上の銘柄を指定してください。")
-
-    logger.info(
-        "価格データダウンロード開始: 銘柄数=%d, 開始=%s, 終了=%s, dry_run=%s",
-        len(tickers), start, end or "today", dry_run,
-    )
-
     if dry_run:
-        logger.info("[DRY-RUN] ダウンロードをスキップします。空の DataFrame を返します。")
         return pd.DataFrame()
-
     try:
         import yfinance as yf
-    except ImportError as e:
+    except ImportError as exc:
         raise ImportError(
-            "yfinance がインストールされていません。"
-            "pip install yfinance でインストールしてください。"
-        ) from e
+            "yfinance がインストールされていません。pip install yfinance を実行してください。"
+        ) from exc
 
-    # リトライ付きダウンロード
-    last_error: Exception | None = None
+    raw: pd.DataFrame | None = None
     for attempt in range(1, _MAX_RETRY + 1):
         try:
             raw = yf.download(
-                tickers,
+                symbols,
                 start=start,
                 end=end,
                 interval=interval,
@@ -126,63 +67,129 @@ def download_prices(
             )
             break
         except Exception as exc:
-            last_error = exc
-            if attempt < _MAX_RETRY:
-                logger.warning(
-                    "ダウンロード失敗 (試行 %d/%d): %s - %.1f秒後にリトライ",
-                    attempt, _MAX_RETRY, exc, _RETRY_WAIT_SEC,
-                )
-                time.sleep(_RETRY_WAIT_SEC)
-            else:
+            if attempt == _MAX_RETRY:
                 raise RuntimeError(
                     f"価格データのダウンロードに {_MAX_RETRY} 回失敗しました。"
-                    f"ネットワーク接続とティッカーシンボルを確認してください。"
                 ) from exc
+            logger.warning("価格取得失敗。再試行します: attempt=%d", attempt)
+            time.sleep(_RETRY_WAIT_SEC)
+    if raw is None:
+        raise RuntimeError("価格データ取得結果がありません。")
 
-    # 複数銘柄の場合は "Close" 列を抽出
     if isinstance(raw.columns, pd.MultiIndex):
-        prices = raw["Close"] if "Close" in raw.columns.get_level_values(0) else raw.iloc[:, raw.columns.get_level_values(0) == "Adj Close"]
-        if hasattr(prices, 'columns'):
-            prices.columns = [c if isinstance(c, str) else c[0] for c in prices.columns]
+        level_zero = raw.columns.get_level_values(0)
+        label = "Close" if "Close" in level_zero else "Adj Close"
+        prices = raw.loc[:, level_zero == label].copy()
+        prices.columns = [
+            column[1] if isinstance(column, tuple) and len(column) > 1 else str(column)
+            for column in prices.columns
+        ]
+    elif "Close" in raw.columns:
+        prices = raw[["Close"]].copy()
+        if len(symbols) == 1:
+            prices.columns = symbols
     else:
-        prices = raw[["Close"]] if "Close" in raw.columns else raw
+        prices = raw.copy()
 
-    prices = prices.apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
-    prices = prices.dropna(how="all").ffill()
-
+    prices = prices.apply(pd.to_numeric, errors="coerce")
+    prices = prices.replace([np.inf, -np.inf], np.nan).dropna(how="all").ffill()
     if prices.empty:
-        raise ValueError(
-            f"指定した銘柄 {tickers} の価格データを取得できませんでした。"
-            "ティッカーシンボルと日付範囲を確認してください。"
-        )
-
-    logger.info(
-        "価格データダウンロード完了: 銘柄数=%d, 行数=%d, 欠損率=%.1f%%",
-        len(prices.columns),
-        len(prices),
-        prices.isna().mean().mean() * 100,
-    )
+        raise ValueError(f"指定した銘柄 {symbols} の価格データを取得できませんでした。")
     return prices
 
 
 def validate_prices(prices: pd.DataFrame, min_periods: int = 252) -> None:
-    """価格 DataFrame の基本的な整合性チェックを行う。
+    """Validate shape, history length, finiteness, and positive prices."""
 
-    Args:
-        prices: 検証対象の終値 DataFrame
-        min_periods: 必要な最低データ期間数 (デフォルト: 252 = 約1年)
-
-    Raises:
-        ValueError: データが不足している / 負の価格がある
-    """
     if prices.empty:
         raise ValueError("prices が空です。")
     if len(prices) < min_periods:
         raise ValueError(
             f"データが不足しています: {len(prices)}行 < 必要最低{min_periods}行。"
-            "分析期間を短くするか、より長いデータを用意してください。"
         )
-    if (prices < 0).any().any():
-        neg_cols = prices.columns[(prices < 0).any()].tolist()
-        raise ValueError(f"負の価格が含まれる銘柄: {neg_cols}")
-    logger.debug("価格データ検証OK: %d銘柄 × %d日", len(prices.columns), len(prices))
+    numeric = prices.apply(pd.to_numeric, errors="coerce")
+    if np.isinf(numeric.to_numpy(dtype=float, na_value=np.nan)).any():
+        raise ValueError("無限大の価格が含まれています。")
+    if (numeric <= 0).any().any():
+        invalid = numeric.columns[(numeric <= 0).any()].tolist()
+        raise ValueError(f"0以下の価格が含まれる銘柄: {invalid}")
+
+
+def make_synthetic_market(
+    days: int = 1000,
+    seed: int = 20260621,
+    start: str = "2022-01-03",
+) -> pd.DataFrame:
+    """Return deterministic offline prices for examples and regression tests.
+
+    The three paths intentionally represent a broad market, a higher-quality
+    compounder, and a choppy sideways name.  The generator uses only prior
+    shocks and never reads network data.
+    """
+
+    if days < 2:
+        raise ValueError("days must be at least 2")
+    rng = np.random.default_rng(seed)
+    index = pd.date_range(start, periods=days, freq="B", name="date")
+    common = rng.normal(0.00025, 0.0070, days)
+    quality_noise = rng.normal(0.0, 0.0045, days)
+    sideways_noise = rng.normal(0.0, 0.0100, days)
+    cycle = np.sin(np.arange(days) / 24.0)
+
+    log_returns = pd.DataFrame(
+        {
+            "SPY_SIM": common,
+            "QUALITY_SIM": 0.00045 + 0.55 * common + quality_noise,
+            "SIDEWAYS_SIM": -0.00002 + 0.0008 * cycle + sideways_noise,
+        },
+        index=index,
+    )
+    prices = 100.0 * np.exp(log_returns.cumsum())
+    prices.iloc[0] = 100.0
+    return prices.astype(float)
+
+
+def make_synthetic_fundamentals() -> pd.DataFrame:
+    """Return deterministic fundamentals compatible with legacy and new scorers."""
+
+    return pd.DataFrame(
+        {
+            "sector": ["Broad Market", "Industrials", "Consumer"],
+            "pe": [19.0, 14.0, 31.0],
+            "pb": [3.2, 2.1, 5.4],
+            "debt_to_equity": [0.75, 0.28, 1.65],
+            "roe": [0.16, 0.25, 0.07],
+            "revenue_growth": [0.06, 0.13, -0.02],
+            "free_cash_flow_margin": [0.12, 0.19, 0.03],
+            "gross_margin": [0.43, 0.52, 0.27],
+            "market_cap": [1_000_000.0, 180_000.0, 65_000.0],
+            "enterprise_value": [1_050_000.0, 170_000.0, 90_000.0],
+            "net_income": [52_000.0, 14_000.0, 1_200.0],
+            "book_value": [310_000.0, 86_000.0, 12_000.0],
+            "free_cash_flow": [48_000.0, 18_500.0, -900.0],
+            "ebitda": [82_000.0, 22_000.0, 3_200.0],
+            "dividends": [16_000.0, 3_500.0, 400.0],
+            "buybacks": [9_000.0, 2_000.0, -1_000.0],
+            "net_cash": [-50_000.0, 20_000.0, -24_000.0],
+            "revenue": [520_000.0, 108_000.0, 44_000.0],
+            "gross_profit": [224_000.0, 56_000.0, 12_000.0],
+            "operating_income": [78_000.0, 21_000.0, 1_100.0],
+            "operating_cash_flow": [65_000.0, 20_000.0, 400.0],
+            "total_assets": [900_000.0, 145_000.0, 78_000.0],
+            "invested_capital": [600_000.0, 92_000.0, 58_000.0],
+            "total_debt": [140_000.0, 18_000.0, 46_000.0],
+            "eps_growth": [0.07, 0.15, -0.12],
+            "fcf_growth": [0.05, 0.17, -0.25],
+            "margin_stability": [0.78, 0.91, 0.32],
+            "earnings_volatility": [0.20, 0.10, 0.72],
+            "earnings_stability": [0.80, 0.93, 0.25],
+            "fcf_stability": [0.76, 0.90, 0.15],
+            "share_count_growth": [-0.01, -0.02, 0.08],
+            "debt_to_ebitda_change": [-0.05, -0.20, 0.65],
+            "operating_margin_change": [0.005, 0.018, -0.055],
+            "negative_earnings_years": [0, 0, 1],
+            "negative_fcf_years": [0, 0, 2],
+            "average_daily_value": [3_000_000_000.0, 450_000_000.0, 35_000_000.0],
+        },
+        index=pd.Index(["SPY_SIM", "QUALITY_SIM", "SIDEWAYS_SIM"], name="symbol"),
+    )
