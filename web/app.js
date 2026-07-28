@@ -1,12 +1,148 @@
-import{demoFundamentals}from'./demo-data.js';import{DEFAULT_CONFIG,parseCsv,scoreRows,summarizeRows,toCsv}from'./scoring.js';
-const state={fundamentals:structuredClone(demoFundamentals),technical:new Map(),config:{...DEFAULT_CONFIG},search:'',eligibleOnly:false,sortKey:'rank',sortDirection:1,selected:null,demo:true},$=selector=>document.querySelector(selector),refs={body:$('#rankingBody'),error:$('#dataError'),empty:$('#emptyState'),uploadStatus:$('#uploadStatus'),eligible:$('#eligibleCount'),eligibleSub:$('#eligibleSub'),median:$('#medianScore'),confidence:$('#averageConfidence'),trap:$('#averageTrap'),detail:$('#detailPanel'),detailContent:$('#detailContent'),backdrop:$('#detailBackdrop'),weightError:$('#weightError')},controls=['fundamentalWeight','technicalWeight','liquidityWeight','minimumQuality','maximumTrap','minimumCompleteness','minimumLiquidity'],formatScore=value=>Number.isFinite(value)?value.toFixed(1):'–',escapeHtml=value=>String(value??'').replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
-function readConfig(){controls.forEach(name=>{state.config[name]=Number($(`#${name}`).value);$(`#${name}Value`).textContent=name.includes('Weight')?`${state.config[name]}%`:String(state.config[name])});localStorage.setItem('valuescope-settings',JSON.stringify(state.config))}
-const applyTechnical=rows=>rows.map(row=>{const symbol=String(row.symbol??row.code??row.Code??row.ticker??'').trim();return{...row,...(state.technical.get(symbol)??{})}});
-function currentRows(){readConfig();const sum=state.config.fundamentalWeight+state.config.technicalWeight+state.config.liquidityWeight;refs.weightError.hidden=Math.abs(sum-100)<1e-6;if(!refs.weightError.hidden)return[];return scoreRows(applyTechnical(state.fundamentals),state.config)}
-const scoreBar=(value,tone='good')=>`<span class="score-cell ${tone}"><b>${formatScore(value)}</b><i><span style="width:${Math.max(0,Math.min(100,value))}%"></span></i></span>`;
-function render(){try{refs.error.hidden=true;let rows=currentRows();const summary=summarizeRows(rows);refs.eligible.textContent=summary.eligible;refs.eligibleSub.textContent=`${summary.total}銘柄中`;refs.median.textContent=formatScore(summary.medianOverall);refs.confidence.textContent=formatScore(summary.averageConfidence);refs.trap.textContent=formatScore(summary.averageTrap);const query=state.search.trim().toLowerCase();rows=rows.filter(row=>(!state.eligibleOnly||row.eligible)&&(!query||[row.symbol,row.company_name,row.sector].join(' ').toLowerCase().includes(query)));rows.sort((a,b)=>{const left=a[state.sortKey],right=b[state.sortKey];if(typeof left==='string')return left.localeCompare(right,'ja')*state.sortDirection;return((left??-Infinity)-(right??-Infinity))*state.sortDirection});refs.body.innerHTML=rows.map(row=>`<tr tabindex="0" data-symbol="${escapeHtml(row.symbol)}" aria-label="${escapeHtml(row.company_name||row.symbol)}の詳細"><td class="rank">${row.rank}</td><td><strong>${escapeHtml(row.symbol)}</strong><small>${escapeHtml(row.company_name)}</small><em>${escapeHtml(row.sector)}</em></td><td>${scoreBar(row.overall_score)}</td><td>${scoreBar(row.undervaluation_score)}</td><td>${scoreBar(row.quality_score)}</td><td>${scoreBar(row.technical_score)}</td><td>${scoreBar(row.value_trap_risk,'risk')}</td><td>${scoreBar(row.confidence,'confidence')}</td><td><span class="eligibility ${row.eligible?'pass':'fail'}">${row.eligible?'適格':'除外'}</span></td></tr>`).join('');refs.empty.hidden=rows.length!==0;refs.body.querySelectorAll('tr').forEach(tr=>{const open=()=>showDetail(currentRows().find(row=>row.symbol===tr.dataset.symbol));tr.addEventListener('click',open);tr.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();open()}})})}catch(error){showError(error.message)}}
-function showDetail(row){if(!row)return;state.selected=row.symbol;const chart=[['割安',row.undervaluation_score,'var(--green)'],['品質',row.quality_score,'var(--blue)'],['成長安定',row.growth_stability_score,'var(--purple)'],['テクニカル',row.technical_score,'var(--cyan)'],['流動性',row.liquidity_score,'var(--orange)'],['Trap Risk',row.value_trap_risk,'var(--red)']].map(([label,value,color])=>`<div class="detail-bar"><span>${label}</span><i><b style="width:${value}%;background:${color}"></b></i><strong>${formatScore(value)}</strong></div>`).join('');refs.detailContent.innerHTML=`<p class="eyebrow">STOCK DETAIL</p><h2 id="detailTitle">${escapeHtml(row.company_name||row.symbol)}</h2><p class="detail-symbol">${escapeHtml(row.symbol)} · ${escapeHtml(row.sector)}</p><div class="detail-score"><span>総合スコア</span><strong>${formatScore(row.overall_score)}</strong><em class="eligibility ${row.eligible?'pass':'fail'}">${row.eligible?'適格':'除外'}</em></div><div class="detail-bars">${chart}</div><section><h3>評価理由</h3><ul>${row.reasons.map(reason=>`<li>${escapeHtml(reason)}</li>`).join('')}</ul></section><section><h3>除外理由</h3>${row.filter_reasons.length?`<ul class="risk-list">${row.filter_reasons.map(reason=>`<li>${escapeHtml(reason)}</li>`).join('')}</ul>`:'<p class="success-copy">現在の閾値をすべて通過しています。</p>'}</section><section class="data-grid"><div><span>Value</span><strong>${formatScore(row.value_score)}</strong></div><div><span>Confidence</span><strong>${formatScore(row.confidence)}</strong></div><div><span>Data completeness</span><strong>${formatScore(row.data_completeness)}%</strong></div><div><span>時価総額</span><strong>${row.market_cap?Number(row.market_cap).toLocaleString('ja-JP'):'–'}</strong></div></section>`;refs.detail.setAttribute('aria-hidden','false');refs.backdrop.hidden=false;document.body.classList.add('detail-open')}
-function closeDetail(){refs.detail.setAttribute('aria-hidden','true');refs.backdrop.hidden=true;document.body.classList.remove('detail-open')}function showError(message){refs.error.textContent=message;refs.error.hidden=false}
-async function loadFile(file,type){if(!file)return;try{const rows=parseCsv(await file.text());if(type==='fundamental'){const symbolColumn=['symbol','code','Code','ticker','Ticker'].find(column=>column in rows[0]);if(!symbolColumn)throw new Error('ファンダメンタルCSVにsymbol、code、Code、tickerのいずれかが必要です。');state.fundamentals=rows;state.demo=false;refs.uploadStatus.textContent=`${file.name}: ${rows.length}銘柄を読み込みました。データは外部送信されません。`}else{state.technical=new Map(rows.map(row=>{const symbol=String(row.symbol??row.code??row.Code??row.ticker??'').trim();return[symbol,{technical_score:row.technical_score,risk_score:row.risk_score,average_daily_value:row.average_daily_value??row.average_dollar_volume_20d}]}).filter(([symbol])=>symbol));refs.uploadStatus.textContent=`${file.name}: テクニカル${state.technical.size}銘柄を結合しました。`}render()}catch(error){showError(`${file.name}: ${error.message}`)}}
-function bindDrop(zoneSelector,inputSelector,type){const zone=$(zoneSelector),input=$(inputSelector);input.addEventListener('change',()=>loadFile(input.files[0],type));['dragenter','dragover'].forEach(name=>zone.addEventListener(name,event=>{event.preventDefault();zone.classList.add('dragging')}));['dragleave','drop'].forEach(name=>zone.addEventListener(name,event=>{event.preventDefault();zone.classList.remove('dragging')}));zone.addEventListener('drop',event=>loadFile(event.dataTransfer.files[0],type))}
-controls.forEach(name=>$(`#${name}`).addEventListener('input',render));$('#searchInput').addEventListener('input',event=>{state.search=event.target.value;render()});$('#eligibleOnly').addEventListener('change',event=>{state.eligibleOnly=event.target.checked;render()});document.querySelectorAll('th button[data-sort]').forEach(button=>button.addEventListener('click',()=>{const key=button.dataset.sort;state.sortDirection=state.sortKey===key?-state.sortDirection:(key==='symbol'?1:-1);state.sortKey=key;render()}));$('#resetSettings').addEventListener('click',()=>{state.config={...DEFAULT_CONFIG};controls.forEach(name=>{$(`#${name}`).value=state.config[name]});render()});$('#resetDemo').addEventListener('click',()=>{state.fundamentals=structuredClone(demoFundamentals);state.technical.clear();state.demo=true;refs.uploadStatus.textContent='完全オフラインのデモデータへ戻しました。';render()});$('#downloadSample').addEventListener('click',()=>{const blob=new Blob([`\uFEFF${toCsv(demoFundamentals)}`],{type:'text/csv;charset=utf-8'}),link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='valuescope-fundamentals-sample.csv';link.click();URL.revokeObjectURL(link.href)});$('#closeDetail').addEventListener('click',closeDetail);refs.backdrop.addEventListener('click',closeDetail);document.addEventListener('keydown',event=>{if(event.key==='Escape')closeDetail()});$('#themeToggle').addEventListener('click',()=>{const next=document.documentElement.dataset.theme==='light'?'dark':'light';document.documentElement.dataset.theme=next;localStorage.setItem('valuescope-theme',next)});bindDrop('#fundamentalDrop','#fundamentalFile','fundamental');bindDrop('#technicalDrop','#technicalFile','technical');try{const saved=JSON.parse(localStorage.getItem('valuescope-settings')||'null');if(saved){state.config={...DEFAULT_CONFIG,...saved};controls.forEach(name=>{if(name in state.config)$(`#${name}`).value=state.config[name]})}}catch{localStorage.removeItem('valuescope-settings')}document.documentElement.dataset.theme=localStorage.getItem('valuescope-theme')||'auto';render();
+import { demoFundamentals } from './demo-data.js';
+import { parseCsv, scoreRows, summarizeRows, toCsv } from './scoring.js';
+
+const $ = selector => document.querySelector(selector);
+const state = { rows: [], rawRows: [], search: '', payload: null };
+const formatScore = value => Number.isFinite(Number(value)) ? Number(value).toFixed(1) : '–';
+const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;' }[char]));
+const formatDate = value => {
+  if (!value) return '日付不明';
+  const date = new Date(`${value}T00:00:00+09:00`);
+  return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat('ja-JP', { year:'numeric', month:'long', day:'numeric' }).format(date);
+};
+const yen = value => Number.isFinite(Number(value)) ? new Intl.NumberFormat('ja-JP', { style:'currency', currency:'JPY', maximumFractionDigits:0 }).format(Number(value)) : '–';
+
+function candidateRows() {
+  const eligible = state.rows.filter(row => row.eligible);
+  return (eligible.length >= 5 ? eligible : state.rows).slice(0, 5);
+}
+
+function renderTopPicks() {
+  $('#topPicks').innerHTML = candidateRows().map((row, index) => `
+    <button class="pick-card" data-symbol="${escapeHtml(row.symbol)}" type="button">
+      <span class="pick-rank">${index + 1}</span>
+      <div class="pick-name"><strong>${escapeHtml(row.company_name || row.symbol)}</strong><small>${escapeHtml(row.symbol)} · ${escapeHtml(row.sector)}</small></div>
+      <div class="pick-score"><strong>${formatScore(row.overall_score)}</strong><small>総合点</small></div>
+      <p>${escapeHtml((row.reasons || [])[0] || '総合スコアが上位')}</p>
+      <span class="pick-more">理由を見る →</span>
+    </button>`).join('');
+  document.querySelectorAll('.pick-card').forEach(card => card.addEventListener('click', () => showDetail(state.rows.find(row => String(row.symbol) === card.dataset.symbol))));
+}
+
+function renderTable() {
+  const query = state.search.trim().toLowerCase();
+  const rows = state.rows.filter(row => !query || [row.symbol, row.company_name, row.sector].join(' ').toLowerCase().includes(query));
+  $('#rankingBody').innerHTML = rows.map(row => `
+    <tr data-symbol="${escapeHtml(row.symbol)}" tabindex="0">
+      <td class="rank">${row.rank}</td>
+      <td><strong>${escapeHtml(row.company_name || row.symbol)}</strong><small>${escapeHtml(row.symbol)} · ${escapeHtml(row.sector)}</small></td>
+      <td><b class="score strong">${formatScore(row.overall_score)}</b></td>
+      <td><b class="score">${formatScore(row.undervaluation_score)}</b></td>
+      <td><b class="score">${formatScore(row.quality_score)}</b></td>
+      <td><b class="score">${formatScore(row.technical_score)}</b></td>
+      <td><b class="score risk">${formatScore(row.value_trap_risk)}</b></td>
+      <td><span class="status ${row.eligible ? 'pass' : 'watch'}">${row.eligible ? '候補' : '要確認'}</span></td>
+    </tr>`).join('');
+  document.querySelectorAll('#rankingBody tr').forEach(row => {
+    const open = () => showDetail(state.rows.find(item => String(item.symbol) === row.dataset.symbol));
+    row.addEventListener('click', open);
+    row.addEventListener('keydown', event => { if (event.key === 'Enter') open(); });
+  });
+}
+
+function renderSummary() {
+  const summary = summarizeRows(state.rows);
+  $('#scoredCount').textContent = state.rows.length;
+  $('#eligibleCount').textContent = summary.eligible;
+  $('#medianScore').textContent = formatScore(summary.medianOverall);
+  $('#averageTrap').textContent = formatScore(summary.averageTrap);
+}
+
+function render() {
+  renderTopPicks();
+  renderTable();
+  renderSummary();
+}
+
+function showDetail(row) {
+  if (!row) return;
+  const reasons = Array.isArray(row.reasons) ? row.reasons : [];
+  const filters = Array.isArray(row.filter_reasons) ? row.filter_reasons : [];
+  $('#detailContent').innerHTML = `
+    <p class="eyebrow">WHY THIS STOCK</p>
+    <h2>${escapeHtml(row.company_name || row.symbol)}</h2>
+    <p class="detail-meta">${escapeHtml(row.symbol)} · ${escapeHtml(row.sector)}</p>
+    <div class="detail-total"><span>総合スコア</span><strong>${formatScore(row.overall_score)}</strong><em class="status ${row.eligible ? 'pass' : 'watch'}">${row.eligible ? '候補' : '要確認'}</em></div>
+    <div class="detail-grid">
+      <div><span>割安</span><strong>${formatScore(row.undervaluation_score)}</strong></div>
+      <div><span>品質</span><strong>${formatScore(row.quality_score)}</strong></div>
+      <div><span>買い時</span><strong>${formatScore(row.technical_score)}</strong></div>
+      <div><span>Trap Risk</span><strong>${formatScore(row.value_trap_risk)}</strong></div>
+    </div>
+    <section><h3>選ばれた理由</h3><ul>${reasons.map(reason => `<li>${escapeHtml(reason)}</li>`).join('') || '<li>総合スコアが上位です。</li>'}</ul></section>
+    <section><h3>注意点</h3>${filters.length ? `<ul class="warning-list">${filters.map(reason => `<li>${escapeHtml(reason)}</li>`).join('')}</ul>` : '<p class="safe">現在の自動除外条件を通過しています。</p>'}</section>
+    <section><h3>参考情報</h3><dl><div><dt>株価</dt><dd>${yen(row.last_price)}</dd></div><div><dt>20日騰落</dt><dd>${Number.isFinite(Number(row.change_20d)) ? `${(Number(row.change_20d) * 100).toFixed(1)}%` : '–'}</dd></div><div><dt>データ充足率</dt><dd>${formatScore(row.data_completeness)}%</dd></div><div><dt>信頼度</dt><dd>${formatScore(row.confidence)}</dd></div></dl></section>`;
+  $('#detailPanel').setAttribute('aria-hidden', 'false');
+  $('#backdrop').hidden = false;
+}
+
+function closeDetail() { $('#detailPanel').setAttribute('aria-hidden', 'true'); $('#backdrop').hidden = true; }
+
+async function loadLiveRanking() {
+  try {
+    const response = await fetch(`./live-ranking.json?ts=${Date.now()}`, { cache: 'no-store' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const payload = await response.json();
+    if (!Array.isArray(payload.rows) || payload.rows.length < 1) throw new Error('live ranking is empty');
+    state.payload = payload;
+    state.rows = payload.rows;
+    state.rawRows = payload.rows;
+    $('#liveState').textContent = '自動抽出済み';
+    $('#marketDate').textContent = `${formatDate(payload.market_date)} 時点`;
+    $('#sourceLabel').textContent = `${payload.source} · ${payload.scored_count}銘柄を分析`;
+    render();
+  } catch (error) {
+    state.rawRows = structuredClone(demoFundamentals);
+    state.rows = scoreRows(state.rawRows);
+    $('#liveState').textContent = 'デモ表示';
+    $('#marketDate').textContent = '実データ更新を準備中';
+    $('#sourceLabel').textContent = '自動取得に失敗したためデモデータを表示しています';
+    $('#dataError').hidden = false;
+    $('#dataError').textContent = `実データを読み込めませんでした。デモ表示に切り替えました。(${error.message})`;
+    render();
+  }
+}
+
+$('#searchInput').addEventListener('input', event => { state.search = event.target.value; renderTable(); });
+$('#fundamentalFile').addEventListener('change', async event => {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    const rows = parseCsv(await file.text());
+    const symbolColumn = ['symbol', 'code', 'Code', 'ticker', 'Ticker'].find(column => column in rows[0]);
+    if (!symbolColumn) throw new Error('symbol、code、Code、tickerのいずれかの列が必要です。');
+    state.rawRows = rows;
+    state.rows = scoreRows(rows);
+    $('#uploadStatus').textContent = `${file.name} の${rows.length}銘柄をブラウザ内で分析しました。`;
+    $('#liveState').textContent = 'CSV分析中';
+    $('#marketDate').textContent = file.name;
+    $('#sourceLabel').textContent = 'このCSVは外部サーバーへ送信されていません';
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (error) {
+    $('#uploadStatus').textContent = `読み込みエラー: ${error.message}`;
+  }
+});
+$('#downloadSample').addEventListener('click', () => {
+  const blob = new Blob([`\uFEFF${toCsv(demoFundamentals)}`], { type: 'text/csv;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'valuescope-sample.csv';
+  link.click();
+  URL.revokeObjectURL(link.href);
+});
+$('#closeDetail').addEventListener('click', closeDetail);
+$('#backdrop').addEventListener('click', closeDetail);
+document.addEventListener('keydown', event => { if (event.key === 'Escape') closeDetail(); });
+
+loadLiveRanking();
