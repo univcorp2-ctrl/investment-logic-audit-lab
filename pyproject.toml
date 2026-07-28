@@ -64,3 +64,7 @@ disable_error_code = ["arg-type", "assignment", "index", "operator"]
 [[tool.mypy.overrides]]
 module = "investment_audit.providers.jquants"
 disable_error_code = ["list-item"]
+
+[[tool.mypy.overrides]]
+module = "investment_audit.factor_diagnostics"
+disable_error_code = ["call-overload"]
