@@ -51,7 +51,8 @@ def _neutralize_by_group(values: pd.DataFrame, groups: pd.Series | None) -> pd.D
         columns = aligned.index[aligned == group_name]
         if len(columns) > 1:
             output.loc[:, columns] = output.loc[:, columns].sub(
-                output.loc[:, columns].mean(axis="columns"), axis="index"
+                output.loc[:, columns].mean(axis="columns"),
+                axis="index",
             )
     return output
 
@@ -107,12 +108,20 @@ def _rank_autocorrelation(scores: pd.DataFrame, period: int = 1) -> pd.Series:
         if position < period:
             values.append(float("nan"))
             continue
-        pair = pd.concat([ranks.iloc[position], ranks.iloc[position - period]], axis="columns").dropna()
+        pair = pd.concat(
+            [ranks.iloc[position], ranks.iloc[position - period]],
+            axis="columns",
+        ).dropna()
         if len(pair) < 3 or pair.iloc[:, 0].nunique() < 2 or pair.iloc[:, 1].nunique() < 2:
             values.append(float("nan"))
         else:
             values.append(float(pair.iloc[:, 0].corr(pair.iloc[:, 1], method="spearman")))
-    return pd.Series(values, index=ranks.index, name="rank_autocorrelation", dtype=float)
+    return pd.Series(
+        values,
+        index=ranks.index,
+        name="rank_autocorrelation",
+        dtype=float,
+    )
 
 
 def _monotonicity(quantile_means: pd.Series) -> float:
@@ -151,16 +160,20 @@ def analyze_factor(
         evaluated = _neutralize_by_group(forward, groups) if group_neutral else forward
         ic = _daily_spearman(clean_scores, evaluated)
         ic_columns[f"{horizon}d"] = ic
-        long = pd.DataFrame(
-            {
-                "score": clean_scores.stack(dropna=False),
-                "quantile": quantile_frame.stack(dropna=False),
-                "forward_return": evaluated.stack(dropna=False),
-            }
+
+        score_long = clean_scores.stack().rename("score")
+        quantile_long = quantile_frame.stack().rename("quantile")
+        forward_long = evaluated.stack().rename("forward_return")
+        long = pd.concat(
+            [score_long, quantile_long, forward_long],
+            axis="columns",
+            join="inner",
         ).dropna()
         long.index.names = ["date", "symbol"]
         if long.empty:
-            q_returns = pd.DataFrame(columns=["date", "quantile", "mean_return", "horizon"])
+            q_returns = pd.DataFrame(
+                columns=["date", "quantile", "mean_return", "horizon"]
+            )
             mean_by_quantile = pd.Series(dtype=float)
         else:
             q_returns = (
@@ -177,7 +190,10 @@ def analyze_factor(
         ic_std = float(valid_ic.std(ddof=1)) if len(valid_ic) > 1 else float("nan")
         icir = mean_ic / ic_std if np.isfinite(ic_std) and ic_std > 0 else float("nan")
         spread = (
-            float(mean_by_quantile.get(float(quantiles), np.nan) - mean_by_quantile.get(1.0, np.nan))
+            float(
+                mean_by_quantile.get(float(quantiles), np.nan)
+                - mean_by_quantile.get(1.0, np.nan)
+            )
             if not mean_by_quantile.empty
             else float("nan")
         )
@@ -186,7 +202,9 @@ def analyze_factor(
                 "horizon": horizon,
                 "mean_ic": mean_ic,
                 "icir": icir,
-                "positive_ic_ratio": float((valid_ic > 0).mean()) if not valid_ic.empty else float("nan"),
+                "positive_ic_ratio": (
+                    float((valid_ic > 0).mean()) if not valid_ic.empty else float("nan")
+                ),
                 "top_bottom_spread": spread,
                 "monotonicity_score": _monotonicity(mean_by_quantile),
                 "observations": int(valid_ic.count()),
@@ -216,7 +234,10 @@ def analyze_factor(
     )
 
 
-def write_factor_diagnostics(result: FactorDiagnosticsResult, out_dir: str | Path) -> dict[str, Path]:
+def write_factor_diagnostics(
+    result: FactorDiagnosticsResult,
+    out_dir: str | Path,
+) -> dict[str, Path]:
     output = Path(out_dir)
     output.mkdir(parents=True, exist_ok=True)
     files = {
@@ -228,7 +249,11 @@ def write_factor_diagnostics(result: FactorDiagnosticsResult, out_dir: str | Pat
         "rank_autocorrelation_csv": output / "rank-autocorrelation.csv",
     }
     result.summary.to_csv(files["summary_csv"])
-    result.summary.reset_index().to_json(files["summary_json"], orient="records", force_ascii=False)
+    result.summary.reset_index().to_json(
+        files["summary_json"],
+        orient="records",
+        force_ascii=False,
+    )
     result.information_coefficient.to_csv(files["ic_csv"])
     result.quantile_returns.to_csv(files["quantile_returns_csv"], index=False)
     result.turnover.to_csv(files["turnover_csv"])
