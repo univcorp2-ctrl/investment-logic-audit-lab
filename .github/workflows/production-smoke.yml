@@ -16,24 +16,25 @@ jobs:
           set -euo pipefail
           url="https://valuescope-japan.pages.dev/"
           status="000"
-          for attempt in $(seq 1 12); do
-            status=$(curl --location --silent --show-error \
-              --output response.html \
-              --write-out "%{http_code}" \
-              --max-time 30 \
-              "$url" || true)
-            if [[ "$status" == "200" ]]; then
+          for attempt in $(seq 1 18); do
+            status=$(curl --location --silent --show-error --output response.html --write-out "%{http_code}" --max-time 30 "$url" || true)
+            if [[ "$status" == "200" ]] && grep --quiet '今日の割安候補' response.html; then
               break
             fi
-            echo "Attempt ${attempt}: HTTP ${status}; retrying"
+            echo "Attempt ${attempt}: HTTP ${status}; waiting for Pages deployment"
             sleep 10
           done
           test "$status" = "200"
-          grep --fixed-strings '<title>ValueScope Japan | 割安株分析</title>' response.html
-          grep --fixed-strings 'id="rankingBody"' response.html
-          grep --fixed-strings 'CSVは端末内で処理' response.html
-          content_type=$(curl --location --silent --show-error --head "$url" \
-            | tr -d '\r' \
-            | awk -F': ' 'tolower($1)=="content-type" {print $2}' \
-            | tail -n 1)
-          echo "Production smoke passed: HTTP ${status}; Content-Type=${content_type}"
+          grep --fixed-strings '<title>ValueScope Japan | 今日の割安候補</title>' response.html
+          grep --fixed-strings '自動抽出された上位5銘柄' response.html
+          grep --fixed-strings 'どうやって割安銘柄を選ぶの？' response.html
+          json_status=$(curl --location --silent --show-error --output ranking.json --write-out "%{http_code}" --max-time 30 "${url}live-ranking.json")
+          test "$json_status" = "200"
+          python - <<'PY'
+          import json
+          data = json.load(open("ranking.json", encoding="utf-8"))
+          assert len(data["rows"]) >= 8
+          assert data["market_date"]
+          assert data["source"]
+          print(f"Live ranking verified: {len(data['rows'])} rows, market date {data['market_date']}")
+          PY
