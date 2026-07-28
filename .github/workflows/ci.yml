@@ -35,12 +35,28 @@ jobs:
           tests/test_screening.py
           tests/test_portfolio.py
       - name: Type check enhanced analysis code
-        run: >-
-          mypy
-          src/investment_audit/fundamentals.py
-          src/investment_audit/technical.py
-          src/investment_audit/screening.py
-          src/investment_audit/portfolio.py
+        shell: bash
+        run: |
+          set +e
+          mypy \
+            --show-column-numbers \
+            --show-error-codes \
+            --no-error-summary \
+            src/investment_audit/fundamentals.py \
+            src/investment_audit/technical.py \
+            src/investment_audit/screening.py \
+            src/investment_audit/portfolio.py | tee mypy-output.txt
+          status=${PIPESTATUS[0]}
+          while IFS= read -r line; do
+            if [[ "$line" =~ ^([^:]+):([0-9]+):([0-9]+):\ error:\ (.*)$ ]]; then
+              file="${BASH_REMATCH[1]}"
+              line_no="${BASH_REMATCH[2]}"
+              column="${BASH_REMATCH[3]}"
+              message="${BASH_REMATCH[4]}"
+              echo "::error file=${file},line=${line_no},col=${column}::${message}"
+            fi
+          done < mypy-output.txt
+          exit "$status"
       - name: Tests with coverage
         run: pytest --cov=investment_audit --cov-report=term-missing --cov-fail-under=80
       - name: Repeat tests twice for flake detection
