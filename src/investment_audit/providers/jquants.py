@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime as dt
 import hashlib
 import importlib
 import inspect
@@ -7,7 +8,6 @@ import os
 import time
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from datetime import date, datetime, time as datetime_time
 from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
@@ -65,7 +65,7 @@ class JQuantsConfig:
 class JQuantsProvider:
     """J-Quants API V2 adapter using the official ``jquantsapi.ClientV2``.
 
-    The client can be injected for tests.  No live API call is made by the CI
+    The client can be injected for tests. No live API call is made by the CI
     suite, and the API key is never included in cache keys or error messages.
     """
 
@@ -99,7 +99,7 @@ class JQuantsProvider:
         return client_class(api_key=api_key)
 
     @staticmethod
-    def _date_text(value: date | str | None) -> str | None:
+    def _date_text(value: dt.date | str | None) -> str | None:
         if value is None:
             return None
         parsed = pd.Timestamp(value)
@@ -108,15 +108,18 @@ class JQuantsProvider:
         return parsed.strftime("%Y%m%d")
 
     @staticmethod
-    def _jst_datetime(value: date | str) -> datetime:
+    def _jst_datetime(value: dt.date | str) -> dt.datetime:
         parsed = pd.Timestamp(value)
         if pd.isna(parsed):
             raise ValueError(f"invalid date: {value}")
         plain_date = parsed.date()
-        return datetime.combine(plain_date, datetime_time.min, tzinfo=ZoneInfo("Asia/Tokyo"))
+        return dt.datetime.combine(plain_date, dt.time.min, tzinfo=ZoneInfo("Asia/Tokyo"))
 
     @staticmethod
-    def _validate_range(start: date | str | None, end: date | str | None) -> None:
+    def _validate_range(
+        start: dt.date | str | None,
+        end: dt.date | str | None,
+    ) -> None:
         if start is not None and end is not None and pd.Timestamp(start) > pd.Timestamp(end):
             raise ValueError("start must be on or before end")
 
@@ -175,7 +178,7 @@ class JQuantsProvider:
         if self.config.cache_dir is None:
             return None
         serialized = "|".join(
-            f"{key}={value.isoformat() if isinstance(value, (date, datetime)) else value}"
+            f"{key}={value.isoformat() if isinstance(value, (dt.date, dt.datetime)) else value}"
             for key, value in sorted(parameters.items())
             if value is not None
         )
@@ -240,7 +243,7 @@ class JQuantsProvider:
         raise JQuantsProviderError(f"{operation} failed without a response")
 
     @staticmethod
-    def _code(value: Any) -> str | pd.NA:
+    def _code(value: Any) -> Any:
         if pd.isna(value):
             return pd.NA
         text = str(value).strip()
@@ -280,7 +283,7 @@ class JQuantsProvider:
     def get_master(
         self,
         code: str | None = None,
-        as_of: date | str | None = None,
+        as_of: dt.date | str | None = None,
     ) -> pd.DataFrame:
         frame = self._request(
             "get_eq_master",
@@ -308,13 +311,17 @@ class JQuantsProvider:
     def get_daily_bars(
         self,
         code: str | None = None,
-        start: date | str | None = None,
-        end: date | str | None = None,
-        as_of: date | str | None = None,
+        start: dt.date | str | None = None,
+        end: dt.date | str | None = None,
+        as_of: dt.date | str | None = None,
     ) -> pd.DataFrame:
         self._validate_range(start, end)
-        if code is None and as_of is None and start is not None and end is not None and hasattr(
-            self._client, "get_eq_bars_daily_range"
+        if (
+            code is None
+            and as_of is None
+            and start is not None
+            and end is not None
+            and hasattr(self._client, "get_eq_bars_daily_range")
         ):
             operation = "get_eq_bars_daily_range"
             options = [
@@ -359,13 +366,17 @@ class JQuantsProvider:
     def get_financial_summary(
         self,
         code: str | None = None,
-        start: date | str | None = None,
-        end: date | str | None = None,
-        as_of: date | str | None = None,
+        start: dt.date | str | None = None,
+        end: dt.date | str | None = None,
+        as_of: dt.date | str | None = None,
     ) -> pd.DataFrame:
         self._validate_range(start, end)
-        if code is None and as_of is None and start is not None and end is not None and hasattr(
-            self._client, "get_fin_summary_range"
+        if (
+            code is None
+            and as_of is None
+            and start is not None
+            and end is not None
+            and hasattr(self._client, "get_fin_summary_range")
         ):
             operation = "get_fin_summary_range"
             options = [
