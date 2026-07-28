@@ -36,10 +36,12 @@ def normalize_ohlcv(frame: pd.DataFrame) -> pd.DataFrame:
         normalized[target] = values
     if normalized["close"].isna().all():
         raise ValueError("OHLCV data requires a close/adjusted-close column")
-    index = pd.to_datetime(normalized.index, errors="coerce", utc=True)
-    normalized.index = index.tz_convert(None)
-    normalized = normalized.loc[~normalized.index.isna()]
-    normalized = normalized[~normalized.index.duplicated(keep="last")].sort_index()
+    date_index = pd.DatetimeIndex(pd.to_datetime(normalized.index, errors="coerce", utc=True))
+    normalized.index = date_index.tz_convert(None)
+    valid_positions = np.flatnonzero(normalized.index.notna())
+    normalized = normalized.iloc[valid_positions]
+    unique_positions = np.flatnonzero(~normalized.index.duplicated(keep="last"))
+    normalized = normalized.iloc[unique_positions].sort_index()
     normalized["high"] = normalized["high"].combine_first(normalized["close"])
     normalized["low"] = normalized["low"].combine_first(normalized["close"])
     normalized["open"] = normalized["open"].combine_first(normalized["close"])
@@ -113,14 +115,14 @@ def analyze_technical(
     result["atr14"], result["adx14"] = _atr_adx(data, config.adx_period)
     low_52w = close.rolling(252, min_periods=20).min()
     high_52w = close.rolling(252, min_periods=20).max()
-    result["position_52w"] = ((close - low_52w) / (high_52w - low_52w).where(high_52w > low_52w)).clip(
-        0.0, 1.0
-    )
+    result["position_52w"] = (
+        (close - low_52w) / (high_52w - low_52w).where(high_52w > low_52w)
+    ).clip(0.0, 1.0)
     for days in (63, 126, 252):
         result[f"relative_strength_{days}d"] = close.pct_change(days)
-    result["annualized_volatility"] = close.pct_change().rolling(63, min_periods=20).std() * np.sqrt(
-        config.annualization_days
-    )
+    result["annualized_volatility"] = close.pct_change().rolling(
+        63, min_periods=20
+    ).std() * np.sqrt(config.annualization_days)
     average_volume = volume.rolling(20, min_periods=5).mean()
     result["volume_ratio_20d"] = volume / average_volume.where(average_volume > 0)
     result["average_dollar_volume_20d"] = (close * volume).rolling(20, min_periods=5).mean()
@@ -152,7 +154,9 @@ def analyze_technical(
     mean_reversion += np.where(result["rsi14"] < 35, 22.0, 0.0)
     mean_reversion += np.where(close < result["bollinger_lower"], 18.0, 0.0)
     mean_reversion += np.where(result["position_52w"] < 0.25, 10.0, 0.0)
-    mean_reversion += np.where(result["macd_histogram"] > result["macd_histogram"].shift(1), 10.0, 0.0)
+    mean_reversion += np.where(
+        result["macd_histogram"] > result["macd_histogram"].shift(1), 10.0, 0.0
+    )
     mean_reversion -= np.where(close < result["sma200"], 18.0, 0.0)
     result["mean_reversion_score"] = _bounded(mean_reversion)
 
