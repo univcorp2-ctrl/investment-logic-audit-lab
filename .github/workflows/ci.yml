@@ -32,6 +32,10 @@ jobs:
           src/investment_audit/portfolio.py
           src/investment_audit/backtest.py
           src/investment_audit/cli.py
+          src/investment_audit/factor_diagnostics.py
+          src/investment_audit/feature_library.py
+          src/investment_audit/risk_metrics.py
+          src/investment_audit/allocation.py
           src/investment_audit/providers
           tests/test_fundamentals.py
           tests/test_technical.py
@@ -40,6 +44,11 @@ jobs:
           tests/test_backtest.py
           tests/test_cli.py
           tests/test_jquants_provider.py
+          tests/test_factor_diagnostics.py
+          tests/test_feature_library.py
+          tests/test_risk_metrics.py
+          tests/test_allocation.py
+          tests/test_factor_cli.py
       - name: Type check enhanced analysis code
         shell: bash
         run: |
@@ -55,6 +64,10 @@ jobs:
             src/investment_audit/portfolio.py \
             src/investment_audit/backtest.py \
             src/investment_audit/cli.py \
+            src/investment_audit/factor_diagnostics.py \
+            src/investment_audit/feature_library.py \
+            src/investment_audit/risk_metrics.py \
+            src/investment_audit/allocation.py \
             src/investment_audit/providers | tee mypy-output.txt
           status=${PIPESTATUS[0]}
           while IFS= read -r line; do
