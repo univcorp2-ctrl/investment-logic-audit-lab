@@ -1,7 +1,11 @@
 import numpy as np
 import pandas as pd
 
-from investment_audit.portfolio import RankedPortfolioConfig, robustness_summary, run_ranked_portfolio
+from investment_audit.portfolio import (
+    RankedPortfolioConfig,
+    robustness_summary,
+    run_ranked_portfolio,
+)
 
 
 def make_panel() -> tuple[pd.DataFrame, pd.DataFrame]:
