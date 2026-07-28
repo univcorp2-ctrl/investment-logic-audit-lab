@@ -3,7 +3,11 @@ import json
 import numpy as np
 import pandas as pd
 
-from investment_audit.fundamentals import FundamentalConfig, derive_fundamental_metrics, score_fundamentals
+from investment_audit.fundamentals import (
+    FundamentalConfig,
+    derive_fundamental_metrics,
+    score_fundamentals,
+)
 
 
 def sample_fundamentals() -> pd.DataFrame:
@@ -44,7 +48,10 @@ def sample_fundamentals() -> pd.DataFrame:
 
 
 def test_derivation_preserves_missing_and_avoids_infinity() -> None:
-    frame = pd.DataFrame({"market_cap": [0.0, 100.0], "net_income": [10.0, np.nan]}, index=["X", "Y"])
+    frame = pd.DataFrame(
+        {"market_cap": [0.0, 100.0], "net_income": [10.0, np.nan]},
+        index=["X", "Y"],
+    )
     metrics = derive_fundamental_metrics(frame)
     assert np.isnan(metrics.loc["X", "earnings_yield"])
     assert np.isnan(metrics.loc["Y", "earnings_yield"])
