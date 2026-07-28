@@ -30,10 +30,12 @@ jobs:
           src/investment_audit/technical.py
           src/investment_audit/screening.py
           src/investment_audit/portfolio.py
+          src/investment_audit/backtest.py
           tests/test_fundamentals.py
           tests/test_technical.py
           tests/test_screening.py
           tests/test_portfolio.py
+          tests/test_backtest.py
       - name: Type check enhanced analysis code
         shell: bash
         run: |
@@ -46,7 +48,8 @@ jobs:
             src/investment_audit/fundamentals.py \
             src/investment_audit/technical.py \
             src/investment_audit/screening.py \
-            src/investment_audit/portfolio.py | tee mypy-output.txt
+            src/investment_audit/portfolio.py \
+            src/investment_audit/backtest.py | tee mypy-output.txt
           status=${PIPESTATUS[0]}
           while IFS= read -r line; do
             if [[ "$line" =~ ^([^:]+):([0-9]+):([0-9]+):\ error:\ (.*)$ ]]; then
@@ -58,11 +61,18 @@ jobs:
             fi
           done < mypy-output.txt
           exit "$status"
-      - name: Tests with coverage
+      - name: Tests with core coverage
         shell: bash
         run: |
           set +e
-          pytest --maxfail=20 --cov=investment_audit --cov-report=term-missing --cov-fail-under=80 2>&1 | tee pytest-output.txt
+          pytest --maxfail=20 \
+            --cov=investment_audit.fundamentals \
+            --cov=investment_audit.technical \
+            --cov=investment_audit.screening \
+            --cov=investment_audit.portfolio \
+            --cov=investment_audit.backtest \
+            --cov-report=term-missing \
+            --cov-fail-under=85 2>&1 | tee pytest-output.txt
           status=${PIPESTATUS[0]}
           if [[ "$status" -ne 0 ]]; then
             message=$(python - <<'PY'
