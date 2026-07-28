@@ -27,21 +27,22 @@ _COLUMN_ALIASES = {
 def normalize_ohlcv(frame: pd.DataFrame) -> pd.DataFrame:
     if frame.empty:
         return pd.DataFrame(columns=["open", "high", "low", "close", "volume"])
-    normalized = pd.DataFrame(index=frame.index)
+    working = frame.copy()
+    date_index = pd.DatetimeIndex(pd.to_datetime(working.index, errors="coerce", utc=True))
+    working.index = date_index.tz_convert(None)
+    working = working.iloc[np.flatnonzero(working.index.notna())]
+    working = working.iloc[np.flatnonzero(~working.index.duplicated(keep="last"))].sort_index()
+
+    normalized = pd.DataFrame(index=working.index)
     for target, aliases in _COLUMN_ALIASES.items():
-        values = pd.Series(np.nan, index=frame.index, dtype=float)
+        values = pd.Series(np.nan, index=working.index, dtype=float)
         for alias in aliases:
-            if alias in frame.columns:
-                values = values.combine_first(pd.to_numeric(frame[alias], errors="coerce"))
+            if alias in working.columns:
+                candidate = pd.to_numeric(working[alias], errors="coerce")
+                values = values.where(values.notna(), candidate)
         normalized[target] = values
     if normalized["close"].isna().all():
         raise ValueError("OHLCV data requires a close/adjusted-close column")
-    date_index = pd.DatetimeIndex(pd.to_datetime(normalized.index, errors="coerce", utc=True))
-    normalized.index = date_index.tz_convert(None)
-    valid_positions = np.flatnonzero(normalized.index.notna())
-    normalized = normalized.iloc[valid_positions]
-    unique_positions = np.flatnonzero(~normalized.index.duplicated(keep="last"))
-    normalized = normalized.iloc[unique_positions].sort_index()
     normalized["high"] = normalized["high"].combine_first(normalized["close"])
     normalized["low"] = normalized["low"].combine_first(normalized["close"])
     normalized["open"] = normalized["open"].combine_first(normalized["close"])
