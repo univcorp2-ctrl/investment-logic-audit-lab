@@ -59,6 +59,20 @@ jobs:
           done < mypy-output.txt
           exit "$status"
       - name: Tests with coverage
-        run: pytest --maxfail=20 --cov=investment_audit --cov-report=term-missing --cov-fail-under=80
+        shell: bash
+        run: |
+          set +e
+          pytest --maxfail=20 --cov=investment_audit --cov-report=term-missing --cov-fail-under=80 2>&1 | tee pytest-output.txt
+          status=${PIPESTATUS[0]}
+          if [[ "$status" -ne 0 ]]; then
+            message=$(python - <<'PY'
+          from pathlib import Path
+          text = Path("pytest-output.txt").read_text(encoding="utf-8", errors="replace")[-20000:]
+          print(text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A"))
+          PY
+            )
+            echo "::error title=Pytest failure::${message}"
+          fi
+          exit "$status"
       - name: Repeat tests twice for flake detection
         run: pytest && pytest
