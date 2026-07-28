@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ブラウザ内で完結する日本株向け割安株分析ダッシュボード" />
+    <meta name="theme-color" content="#07111f" />
+    <title>ValueScope Japan | 割安株分析</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#ranking">ランキングへ移動</a>
+    <header class="site-header">
+      <div class="brand-wrap">
+        <div class="brand-mark" aria-hidden="true">VS</div>
+        <div>
+          <p class="eyebrow">VALUE · QUALITY · TIMING</p>
+          <h1>ValueScope Japan</h1>
+          <p class="subtitle">割安株分析ダッシュボード</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="privacy-badge"><span class="status-dot"></span>CSVは端末内で処理</span>
+        <button id="themeToggle" class="icon-button" type="button" aria-label="配色を切り替える">◐</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero panel">
+        <div class="hero-copy">
+          <p class="eyebrow">ROBUST VALUE SCREENING</p>
+          <h2>安い理由まで確認して、<br /><span>バリュートラップを避ける。</span></h2>
+          <p>
+            割安性だけでなく、企業品質、成長安定性、テクニカル、流動性を統合。
+            欠損値を0点にせず、利用可能な指標だけで相対評価します。
+          </p>
+          <div class="hero-actions">
+            <button id="downloadSample" class="button primary" type="button">サンプルCSV</button>
+            <button id="resetDemo" class="button secondary" type="button">デモへ戻す</button>
+          </div>
+        </div>
+        <div class="upload-grid" aria-label="CSVアップロード">
+          <label class="drop-zone" id="fundamentalDrop">
+            <input id="fundamentalFile" type="file" accept=".csv,text/csv" />
+            <span class="drop-icon" aria-hidden="true">⇧</span>
+            <strong>ファンダメンタルCSV</strong>
+            <small>ドラッグ＆ドロップ / 選択</small>
+          </label>
+          <label class="drop-zone" id="technicalDrop">
+            <input id="technicalFile" type="file" accept=".csv,text/csv" />
+            <span class="drop-icon" aria-hidden="true">＋</span>
+            <strong>テクニカルCSV</strong>
+            <small>任意 · symbolで結合</small>
+          </label>
+          <p class="upload-note" id="uploadStatus" role="status">現在は完全オフラインのデモデータを表示しています。</p>
+        </div>
+      </section>
+
+      <section class="summary-grid" aria-label="分析サマリー">
+        <article class="metric-card accent-green"><span>適格銘柄</span><strong id="eligibleCount">–</strong><small id="eligibleSub">全銘柄中</small></article>
+        <article class="metric-card accent-blue"><span>総合スコア中央値</span><strong id="medianScore">–</strong><small>0–100</small></article>
+        <article class="metric-card accent-purple"><span>平均信頼度</span><strong id="averageConfidence">–</strong><small>データ充足率を反映</small></article>
+        <article class="metric-card accent-orange"><span>平均Trap Risk</span><strong id="averageTrap">–</strong><small>低いほど安全</small></article>
+      </section>
+
+      <section class="workspace-grid">
+        <aside class="panel controls-panel" aria-labelledby="controlsTitle">
+          <div class="section-heading"><div><p class="eyebrow">SCREEN SETTINGS</p><h2 id="controlsTitle">配点と除外条件</h2></div><button id="resetSettings" class="text-button" type="button">初期値</button></div>
+          <div id="weightError" class="inline-error" hidden>重みの合計を100%にしてください。</div>
+          <div class="control-group"><label for="fundamentalWeight">ファンダメンタル <output id="fundamentalWeightValue">65%</output></label><input id="fundamentalWeight" type="range" min="0" max="100" step="5" value="65" /></div>
+          <div class="control-group"><label for="technicalWeight">テクニカル <output id="technicalWeightValue">25%</output></label><input id="technicalWeight" type="range" min="0" max="100" step="5" value="25" /></div>
+          <div class="control-group"><label for="liquidityWeight">流動性・リスク <output id="liquidityWeightValue">10%</output></label><input id="liquidityWeight" type="range" min="0" max="100" step="5" value="10" /></div>
+          <hr />
+          <div class="control-group compact"><label for="minimumQuality">最低Quality <output id="minimumQualityValue">40</output></label><input id="minimumQuality" type="range" min="0" max="100" value="40" /></div>
+          <div class="control-group compact"><label for="maximumTrap">最大Trap Risk <output id="maximumTrapValue">60</output></label><input id="maximumTrap" type="range" min="0" max="100" value="60" /></div>
+          <div class="control-group compact"><label for="minimumCompleteness">最低充足率 <output id="minimumCompletenessValue">45</output></label><input id="minimumCompleteness" type="range" min="0" max="100" value="45" /></div>
+          <div class="control-group compact"><label for="minimumLiquidity">最低流動性 <output id="minimumLiquidityValue">20</output></label><input id="minimumLiquidity" type="range" min="0" max="100" value="20" /></div>
+        </aside>
+
+        <section class="panel factor-panel" aria-labelledby="factorTitle">
+          <div class="section-heading"><div><p class="eyebrow">FACTOR QUALITY</p><h2 id="factorTitle">因子品質チェック</h2></div><span class="demo-pill">デモ指標</span></div>
+          <p class="muted">Alphalens型のIC、分位差、回転率を想定した検証表示です。実データの因子診断はPython CLIで出力できます。</p>
+          <div class="factor-grid">
+            <div class="factor-stat"><span>21日 Mean IC</span><strong>0.087</strong><div class="mini-bar"><i style="width:68%"></i></div><small>順位予測力は正</small></div>
+            <div class="factor-stat"><span>Top−Bottom</span><strong>+4.8%</strong><div class="mini-bar"><i style="width:76%"></i></div><small>63日先デモ</small></div>
+            <div class="factor-stat"><span>Top Turnover</span><strong>22%</strong><div class="mini-bar warning"><i style="width:22%"></i></div><small>低回転を維持</small></div>
+          </div>
+          <div class="oss-note"><strong>OSS-inspired</strong><span>Alphalens · Qlib · QuantStats · PyPortfolioOptの考え方を独自実装</span></div>
+        </section>
+
+        <section class="panel jquants-panel" aria-labelledby="jquantsTitle">
+          <div class="section-heading"><div><p class="eyebrow">DATA PIPELINE</p><h2 id="jquantsTitle">J-Quants API V2</h2></div><span class="ready-pill">Adapter Ready</span></div>
+          <ul class="status-list"><li><span class="check">✓</span>上場銘柄マスタ</li><li><span class="check">✓</span>日次株価・調整済みOHLCV</li><li><span class="check">✓</span>財務サマリー</li><li><span class="check">✓</span>429/5xx retry・cache</li></ul>
+          <p class="security-note">APIキーをブラウザへ保存しません。本番接続時はCloudflare Worker等の認証済みbackend proxyを利用します。</p>
+        </section>
+      </section>
+
+      <section class="panel ranking-panel" id="ranking" aria-labelledby="rankingTitle">
+        <div class="ranking-toolbar"><div><p class="eyebrow">VALUE RANKING</p><h2 id="rankingTitle">割安候補ランキング</h2></div><div class="toolbar-actions"><label class="search-box"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="銘柄コード・会社名・業種" aria-label="ランキングを検索" /></label><label class="toggle-label"><input id="eligibleOnly" type="checkbox" /> 適格のみ</label></div></div>
+        <div id="dataError" class="error-banner" role="alert" hidden></div>
+        <div class="table-wrap"><table><thead><tr><th><button data-sort="rank">順位</button></th><th><button data-sort="symbol">銘柄</button></th><th><button data-sort="overall_score">総合</button></th><th><button data-sort="undervaluation_score">割安</button></th><th><button data-sort="quality_score">品質</button></th><th><button data-sort="technical_score">テクニカル</button></th><th><button data-sort="value_trap_risk">Trap</button></th><th><button data-sort="confidence">信頼度</button></th><th>判定</th></tr></thead><tbody id="rankingBody"></tbody></table></div>
+        <p id="emptyState" class="empty-state" hidden>条件に一致する銘柄がありません。</p>
+      </section>
+
+      <aside id="detailPanel" class="detail-panel" aria-labelledby="detailTitle" aria-hidden="true"><button id="closeDetail" class="detail-close" type="button" aria-label="詳細を閉じる">×</button><div id="detailContent"></div></aside>
+      <div id="detailBackdrop" class="detail-backdrop" hidden></div>
+    </main>
+
+    <footer><p><strong>免責:</strong> 本画面は調査・学習用であり、投資助言ではありません。スコアは相対評価で、将来の収益を保証しません。</p><p>CSVデータは外部サーバーへ送信されず、ブラウザ内だけで処理されます。</p></footer>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
