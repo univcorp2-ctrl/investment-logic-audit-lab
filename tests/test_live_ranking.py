@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from scripts.update_live_ranking import build_fundamental_row
+import numpy as np
+import pandas as pd
+
+from scripts.update_live_ranking import _json_value, build_fundamental_row
 
 
 def test_build_fundamental_row_derives_value_and_quality_metrics() -> None:
@@ -46,3 +49,15 @@ def test_negative_results_create_trap_inputs() -> None:
     )
     assert row["negative_earnings_years"] == 1
     assert row["negative_fcf_years"] == 1
+
+
+def test_json_value_handles_nested_pandas_and_numpy_values() -> None:
+    value = {
+        "reasons": ["割安", np.float64(2.5), np.nan],
+        "filters": np.array([1, 2]),
+        "date": pd.Timestamp("2026-07-28"),
+    }
+    converted = _json_value(value)
+    assert converted["reasons"] == ["割安", 2.5, None]
+    assert converted["filters"] == [1, 2]
+    assert converted["date"].startswith("2026-07-28")
