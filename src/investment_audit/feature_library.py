@@ -1,3 +1,5 @@
+"""Original multi-horizon OHLCV features inspired by public factor-library concepts."""
+
 from __future__ import annotations
 
 import numpy as np
@@ -19,19 +21,27 @@ def _normalize(frame: pd.DataFrame) -> pd.DataFrame:
     index = pd.DatetimeIndex(pd.to_datetime(working.index, errors="coerce", utc=True))
     working.index = index.tz_convert(None)
     working = working.iloc[np.flatnonzero(working.index.notna())]
-    working = working.iloc[np.flatnonzero(~working.index.duplicated(keep="last"))].sort_index()
+    working = working.iloc[
+        np.flatnonzero(~working.index.duplicated(keep="last"))
+    ].sort_index()
     output = pd.DataFrame(index=working.index)
     for target, candidates in aliases.items():
         values = pd.Series(np.nan, index=working.index, dtype=float)
         for candidate in candidates:
             if candidate in working.columns:
-                values = values.combine_first(pd.to_numeric(working[candidate], errors="coerce"))
+                values = values.combine_first(
+                    pd.to_numeric(working[candidate], errors="coerce")
+                )
         output[target] = values
     if output["close"].isna().all():
         raise ValueError("OHLCV data requires a close column")
     output["open"] = output["open"].combine_first(output["close"])
-    output["high"] = output["high"].combine_first(output[["open", "close"]].max(axis="columns"))
-    output["low"] = output["low"].combine_first(output[["open", "close"]].min(axis="columns"))
+    output["high"] = output["high"].combine_first(
+        output[["open", "close"]].max(axis="columns")
+    )
+    output["low"] = output["low"].combine_first(
+        output[["open", "close"]].min(axis="columns")
+    )
     return output.replace([np.inf, -np.inf], np.nan)
 
 
@@ -45,7 +55,9 @@ def build_feature_library(
     output = data.copy()
     output["return_1d"] = returns_1d
     output["overnight_return"] = data["open"] / close.shift(1) - 1.0
-    output["intraday_return"] = close / data["open"].where(data["open"].abs() > 1e-12) - 1.0
+    output["intraday_return"] = (
+        close / data["open"].where(data["open"].abs() > 1e-12) - 1.0
+    )
     true_range = pd.concat(
         [
             (data["high"] - data["low"]).abs(),
@@ -64,9 +76,16 @@ def build_feature_library(
         sma = close.rolling(window, min_periods=minimum).mean()
         ema = close.ewm(span=window, adjust=False, min_periods=minimum).mean()
         output[f"return_{window}d"] = close.pct_change(window, fill_method=None)
-        output[f"close_to_sma_{window}"] = close / sma.where(sma.abs() > 1e-12) - 1.0
-        output[f"close_to_ema_{window}"] = close / ema.where(ema.abs() > 1e-12) - 1.0
-        output[f"realized_vol_{window}"] = returns_1d.rolling(window, min_periods=minimum).std(ddof=1)
+        output[f"close_to_sma_{window}"] = (
+            close / sma.where(sma.abs() > 1e-12) - 1.0
+        )
+        output[f"close_to_ema_{window}"] = (
+            close / ema.where(ema.abs() > 1e-12) - 1.0
+        )
+        output[f"realized_vol_{window}"] = returns_1d.rolling(
+            window,
+            min_periods=minimum,
+        ).std(ddof=1)
         downside = returns_1d.where(returns_1d < 0, 0.0)
         output[f"downside_vol_{window}"] = np.sqrt(
             downside.pow(2).rolling(window, min_periods=minimum).mean()
@@ -76,12 +95,15 @@ def build_feature_library(
         ).rolling(window, min_periods=minimum).mean()
         volume_mean = data["volume"].rolling(window, min_periods=minimum).mean()
         volume_std = data["volume"].rolling(window, min_periods=minimum).std(ddof=1)
-        output[f"volume_ratio_{window}"] = data["volume"] / volume_mean.where(volume_mean > 0)
-        output[f"volume_zscore_{window}"] = (
-            (data["volume"] - volume_mean) / volume_std.where(volume_std > 0)
+        output[f"volume_ratio_{window}"] = (
+            data["volume"] / volume_mean.where(volume_mean > 0)
         )
+        output[f"volume_zscore_{window}"] = (
+            data["volume"] - volume_mean
+        ) / volume_std.where(volume_std > 0)
         output[f"price_volume_corr_{window}"] = returns_1d.rolling(
-            window, min_periods=minimum
+            window,
+            min_periods=minimum,
         ).corr(volume_change)
         output[f"amihud_{window}"] = (
             returns_1d.abs() / dollar_volume.where(dollar_volume > 0)
