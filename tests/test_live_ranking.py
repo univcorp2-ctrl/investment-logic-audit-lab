@@ -1,9 +1,26 @@
 from __future__ import annotations
 
+import importlib.util
+from pathlib import Path
+from types import ModuleType
+
 import numpy as np
 import pandas as pd
 
-from scripts.update_live_ranking import _json_value, build_fundamental_row
+
+def _load_script() -> ModuleType:
+    script_path = Path(__file__).resolve().parents[1] / "scripts" / "update_live_ranking.py"
+    specification = importlib.util.spec_from_file_location("update_live_ranking", script_path)
+    assert specification is not None
+    assert specification.loader is not None
+    module = importlib.util.module_from_spec(specification)
+    specification.loader.exec_module(module)
+    return module
+
+
+LIVE_RANKING = _load_script()
+build_fundamental_row = LIVE_RANKING.build_fundamental_row
+_json_value = LIVE_RANKING._json_value
 
 
 def test_build_fundamental_row_derives_value_and_quality_metrics() -> None:
