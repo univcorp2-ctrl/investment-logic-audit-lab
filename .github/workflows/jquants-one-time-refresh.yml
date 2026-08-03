@@ -9,7 +9,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -37,13 +37,12 @@ jobs:
               f'https://drive.google.com/uc?export=download&id={file_id}',
               f'https://docs.google.com/spreadsheets/d/{file_id}/export?format=xlsx',
               f'https://docs.google.com/spreadsheets/d/{file_id}/export?format=csv',
-              f'https://docs.google.com/spreadsheets/d/{file_id}/gviz/tq?tqx=out:csv&sheet=Tab',
+              f'https://docs.google.com/spreadsheets/d/{file_id}/gviz/tq?tqx=out:csv',
               f'https://docs.google.com/spreadsheets/d/{file_id}/edit?usp=drivesdk',
           ]
 
           def is_target(value):
-              normalized = re.sub(r'[^a-z0-9]', '', str(value).lower())
-              return 'jquants' in normalized
+              return 'jquants' in re.sub(r'[^a-z0-9]', '', str(value).lower())
 
           def valid_key(value):
               text = str(value or '').strip()
@@ -85,16 +84,12 @@ jobs:
                   request = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
                   with urllib.request.urlopen(request, timeout=30) as response:
                       data = response.read()
-                  if data.startswith(b'PK\x03\x04'):
-                      key = from_xlsx(data)
-                  else:
-                      key = from_text(data.decode('utf-8-sig', errors='replace'))
+                  key = from_xlsx(data) if data.startswith(b'PK\x03\x04') else from_text(data.decode('utf-8-sig', errors='replace'))
                   if key:
                       break
                   failures.append('no matching row')
               except Exception as exc:
                   failures.append(type(exc).__name__)
-
           if not key:
               raise SystemExit('The authorized J-Quants row could not be read. Attempts: ' + ', '.join(failures))
           print(f'::add-mask::{key}')
@@ -103,23 +98,67 @@ jobs:
           PY
       - name: Validate API connection
         run: investment-audit jquants-plan-check --plan free --as-of 2026-08-03 --out-dir outputs/jquants
-      - name: Run Free-plan point-in-time screen
-        run: investment-audit jquants-screen --plan free --as-of 2026-08-03 --market Prime,Standard,Growth --top-n 100 --min-average-daily-value 100000000 --out-dir outputs/jquants
-      - name: Publish sanitized ranking
+      - name: Run screen and create redacted status
+        id: screen
         shell: bash
         run: |
-          cp outputs/jquants/ranking.json web/jquants-ranking.json
-          cp outputs/jquants/ranking.csv web/jquants-ranking.csv
+          set +e
+          investment-audit jquants-screen --plan free --as-of 2026-08-03 --market Prime,Standard,Growth --top-n 100 --min-average-daily-value 100000000 --out-dir outputs/jquants > /tmp/jquants.stdout 2> /tmp/jquants.stderr
+          code=$?
+          export SCREEN_EXIT_CODE="$code"
+          python - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          secret = os.environ.get('JQUANTS_API_KEY', '')
+          stdout = Path('/tmp/jquants.stdout').read_text(encoding='utf-8', errors='replace')[-6000:]
+          stderr = Path('/tmp/jquants.stderr').read_text(encoding='utf-8', errors='replace')[-6000:]
+          def clean(text):
+              if secret:
+                  text = text.replace(secret, '[REDACTED]')
+              text = re.sub(r'(?i)(x-api-key|authorization)\s*[:=]\s*\S+', r'\1=[REDACTED]', text)
+              text = re.sub(r'[A-Za-z0-9_.~+/=-]{48,}', '[REDACTED-LONG-TOKEN]', text)
+              return text
+          status = {
+              'generated_at': dt.datetime.now(dt.timezone.utc).isoformat(),
+              'status': 'success' if os.environ['SCREEN_EXIT_CODE'] == '0' else 'failure',
+              'exit_code': int(os.environ['SCREEN_EXIT_CODE']),
+              'stdout_tail': clean(stdout),
+              'stderr_tail': clean(stderr),
+          }
+          Path('web/jquants-run-status.json').write_text(json.dumps(status, ensure_ascii=False, indent=2), encoding='utf-8')
+          PY
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Publish sanitized ranking or diagnostic status
+        shell: bash
+        run: |
+          if [ '${{ steps.screen.outputs.exit_code }}' = '0' ]; then
+            cp outputs/jquants/ranking.json web/jquants-ranking.json
+            cp outputs/jquants/ranking.csv web/jquants-ranking.csv
+          fi
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add web/jquants-ranking.json web/jquants-ranking.csv
+          git add web/jquants-run-status.json
+          if [ '${{ steps.screen.outputs.exit_code }}' = '0' ]; then
+            git add web/jquants-ranking.json web/jquants-ranking.csv
+          fi
           if ! git diff --cached --quiet; then
-            git commit -m 'data: publish sanitized J-Quants ranking [skip ci]'
+            git commit -m 'data: publish J-Quants run result [skip ci]'
             git push
           fi
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: jquants-screen-${{ github.run_id }}
-          path: outputs/jquants
-          if-no-files-found: error
+          path: |
+            outputs/jquants
+            web/jquants-run-status.json
+          if-no-files-found: warn
           retention-days: 14
+      - name: Fail when screening failed
+        if: steps.screen.outputs.exit_code != '0'
+        run: exit 1
