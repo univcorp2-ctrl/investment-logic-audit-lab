@@ -10,6 +10,16 @@ J-Quantsのサニタイズ済みランキングを表示・操作するCloudflar
 
 優先して `jquants-ranking.json` を読み込みます。Pythonパイプラインの `ranking.json` をそのまま利用できます。`metadata`には`generated_at`、`as_of`、`effective_data_cutoff`、`plan`、`scored_count`、`eligible_count`、`warnings`を、`rows`には`rank`、`code`、`company_name`、`market`、`sector`、各スコア、データ日付、判定、理由を含めます。
 
+2026年8月3日の実API検証ではFreeプランの12週間遅延を適用し、2026年5月11日を実効カットオフとして、最新日売買代金上位の普通株15銘柄を段階取得しました。15銘柄すべての株価・財務履歴を取得し、10銘柄が適格条件を通過しました。
+
+## データ更新
+
+1. 公開済みのキーはJ-Quants側で失効・再発行します。
+2. GitHub repository secret `JQUANTS_API_KEY` に再発行キーを登録します。
+3. Actionsの `J-Quants screening refresh` を実行します。
+4. Freeはレート制限を守る段階取得、Light以上は通常の全体スクリーニングを使います。
+5. 成功時はサニタイズ済みJSON/CSVだけをcommitし、Cloudflare Pagesが再デプロイします。
+
 ## ローカル確認
 
 ```bash
@@ -28,4 +38,4 @@ python -m http.server 8000 -d dist
 - Build output directory: `dist`
 - Node.js: 22
 
-J-QuantsのAPIキーをPagesのブラウザコードへ設定しないでください。データ更新はGitHub Actionsの `jquants-screen.yml` または安全なサーバー側バッチで行い、生成されたランキングだけを公開します。
+J-QuantsのAPIキーをPagesのブラウザコードへ設定しないでください。生成されたランキングだけを公開します。
