@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-03T20:19:10.672878+09:00",
+  "generated_at": "2026-08-03T20:22:33.484892+09:00",
   "paper_only": true,
   "manual_review_required": true,
   "proposals": [
@@ -66,14 +66,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 49160.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -86,11 +84,10 @@
           "20日線が60日線を下回る下降基調",
           "20日モメンタムがマイナス",
           "20日高値からの下落が大きい",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",
@@ -167,14 +164,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 3844.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -190,11 +185,10 @@
           "20日線が60日線を下回る下降基調",
           "20日モメンタムがマイナス",
           "60日モメンタムがマイナス",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",
@@ -268,14 +262,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 30890.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -288,11 +280,10 @@
           "20日モメンタムがマイナス",
           "60日モメンタムがマイナス",
           "20日高値からの下落が大きい",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",
@@ -370,14 +361,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 4290.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -394,11 +383,10 @@
           "20日モメンタムがマイナス",
           "60日モメンタムがマイナス",
           "20日高値からの下落が大きい",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",
@@ -471,14 +459,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 40910.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -492,11 +478,10 @@
           "20日モメンタムがマイナス",
           "60日モメンタムがマイナス",
           "20日高値からの下落が大きい",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",
@@ -575,14 +560,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 54990.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -600,11 +583,10 @@
           "20日モメンタムがマイナス",
           "RSIが弱気圏",
           "20日高値からの下落が大きい",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",
@@ -679,14 +661,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 5393.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -700,11 +680,10 @@
           "20日モメンタムがマイナス",
           "60日モメンタムがマイナス",
           "20日高値からの下落が大きい",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",

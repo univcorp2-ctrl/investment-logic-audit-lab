@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-03T20:19:10.672878+09:00",
+  "generated_at": "2026-08-03T20:22:33.484892+09:00",
   "trading_date": "2026-08-03",
   "mode": "monitor-only",
   "paper_only": true,
@@ -21,7 +21,7 @@
   },
   "quote_source": {
     "endpoint": "https://valuescope-japan.pages.dev/api/quotes?compact=1",
-    "generated_at": "2026-08-03T11:19:08.519Z",
+    "generated_at": "2026-08-03T11:22:32.325Z",
     "errors": []
   },
   "config": {
@@ -41,13 +41,13 @@
   },
   "summary": {
     "cash": 0.0,
-    "market_value": 30722100.0,
-    "equity": 30722100.0,
+    "market_value": 30809600.0,
+    "equity": 30809600.0,
     "realized_pnl": 0.0,
-    "unrealized_pnl": 0.0,
-    "total_pnl": 0.0,
-    "cumulative_return_pct": 0.0,
-    "daily_return_pct": 0.0,
+    "unrealized_pnl": 87500.0,
+    "total_pnl": 87500.0,
+    "cumulative_return_pct": 0.2848,
+    "daily_return_pct": 0.2848,
     "max_drawdown_pct": 0.0,
     "position_count": 10,
     "turnover_today": 0.0,
@@ -118,14 +118,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 49160.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -138,11 +136,10 @@
           "20日線が60日線を下回る下降基調",
           "20日モメンタムがマイナス",
           "20日高値からの下落が大きい",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",
@@ -219,14 +216,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 3844.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -242,11 +237,10 @@
           "20日線が60日線を下回る下降基調",
           "20日モメンタムがマイナス",
           "60日モメンタムがマイナス",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",
@@ -320,14 +314,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 30890.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -340,11 +332,10 @@
           "20日モメンタムがマイナス",
           "60日モメンタムがマイナス",
           "20日高値からの下落が大きい",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",
@@ -422,14 +413,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 4290.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -446,11 +435,10 @@
           "20日モメンタムがマイナス",
           "60日モメンタムがマイナス",
           "20日高値からの下落が大きい",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",
@@ -525,14 +513,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 31430.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_HOLD",
@@ -547,8 +533,7 @@
           "RSIが過熱しすぎない強気圏"
         ],
         "risks": [
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
         "execution_allowed": false,
         "execution_note": "監視のみ"
@@ -624,14 +609,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 40910.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -645,11 +628,10 @@
           "20日モメンタムがマイナス",
           "60日モメンタムがマイナス",
           "20日高値からの下落が大きい",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",
@@ -725,14 +707,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 7589.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_HOLD",
@@ -747,8 +727,7 @@
         ],
         "risks": [
           "データ充足率が低い",
-          "60日モメンタムがマイナス",
-          "現在値を取得できない"
+          "60日モメンタムがマイナス"
         ],
         "execution_allowed": false,
         "execution_note": "監視のみ"
@@ -830,14 +809,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 54990.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -855,11 +832,10 @@
           "20日モメンタムがマイナス",
           "RSIが弱気圏",
           "20日高値からの下落が大きい",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",
@@ -930,14 +906,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 79600.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_HOLD",
@@ -949,8 +923,7 @@
         ],
         "risks": [
           "株価が20日移動平均を下回る",
-          "20日モメンタムがマイナス",
-          "現在値を取得できない"
+          "20日モメンタムがマイナス"
         ],
         "execution_allowed": false,
         "execution_note": "監視のみ"
@@ -1028,14 +1001,12 @@
         "missing": []
       },
       "quote": {
-        "valid": false,
-        "current_price": null,
-        "quote_time": null,
-        "verification": null,
-        "max_difference_pct": null,
-        "risks": [
-          "現在値を取得できない"
-        ]
+        "valid": true,
+        "current_price": 5393.0,
+        "quote_time": "2026-08-03T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
@@ -1049,11 +1020,10 @@
           "20日モメンタムがマイナス",
           "60日モメンタムがマイナス",
           "20日高値からの下落が大きい",
-          "短期ボラティリティが高い",
-          "現在値を取得できない"
+          "短期ボラティリティが高い"
         ],
-        "execution_allowed": false,
-        "execution_note": "価格検証により停止"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
         "side": "SELL",
@@ -1064,50 +1034,7 @@
     }
   ],
   "executed_simulation_events": [],
-  "skipped": [
-    {
-      "symbol": "285A.T",
-      "reasons": [
-        "現在値を取得できない"
-      ]
-    },
-    {
-      "symbol": "5016.T",
-      "reasons": [
-        "現在値を取得できない"
-      ]
-    },
-    {
-      "symbol": "5706.T",
-      "reasons": [
-        "現在値を取得できない"
-      ]
-    },
-    {
-      "symbol": "5803.T",
-      "reasons": [
-        "現在値を取得できない"
-      ]
-    },
-    {
-      "symbol": "6920.T",
-      "reasons": [
-        "現在値を取得できない"
-      ]
-    },
-    {
-      "symbol": "8035.T",
-      "reasons": [
-        "現在値を取得できない"
-      ]
-    },
-    {
-      "symbol": "9984.T",
-      "reasons": [
-        "現在値を取得できない"
-      ]
-    }
-  ],
+  "skipped": [],
   "disclosures": {
     "availability": "unavailable",
     "provider": "J-Quants TDnet/Company Disclosure add-on",

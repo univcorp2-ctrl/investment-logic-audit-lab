@@ -2,12 +2,12 @@
   "history": [
     {
       "date": "2026-08-03",
-      "equity": 30722100.0,
+      "equity": 30809600.0,
       "realized_pnl": 0.0,
-      "unrealized_pnl": 0.0,
-      "total_pnl": 0.0,
-      "daily_return_pct": 0.0,
-      "cumulative_return_pct": 0.0
+      "unrealized_pnl": 87500.0,
+      "total_pnl": 87500.0,
+      "daily_return_pct": 0.2848,
+      "cumulative_return_pct": 0.2848
     }
   ]
 }
