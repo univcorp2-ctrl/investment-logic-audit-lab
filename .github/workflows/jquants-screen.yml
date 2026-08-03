@@ -1,0 +1,57 @@
+name: J-Quants point-in-time screen
+
+on:
+  workflow_dispatch:
+    inputs:
+      plan:
+        description: J-Quants plan configured for the repository secret
+        required: true
+        type: choice
+        default: free
+        options:
+          - free
+          - light
+          - standard
+          - premium
+      as_of:
+        description: Optional YYYY-MM-DD evaluation date
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      JQUANTS_API_KEY: ${{ secrets.JQUANTS_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install
+        run: pip install -e '.[jquants]'
+      - name: Check secret
+        shell: bash
+        run: |
+          if [ -z "$JQUANTS_API_KEY" ]; then
+            echo '::error::Configure a rotated JQUANTS_API_KEY repository secret before dispatching.'
+            exit 1
+          fi
+      - name: Run plan check and screen
+        shell: bash
+        run: |
+          ARGS=(--plan '${{ inputs.plan }}' --out-dir outputs/jquants)
+          if [ -n '${{ inputs.as_of }}' ]; then ARGS+=(--as-of '${{ inputs.as_of }}'); fi
+          investment-audit jquants-plan-check "${ARGS[@]}"
+          investment-audit jquants-screen "${ARGS[@]}" --top-n 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jquants-ranking-${{ github.run_id }}
+          path: outputs/jquants
+          if-no-files-found: error
+          retention-days: 14
