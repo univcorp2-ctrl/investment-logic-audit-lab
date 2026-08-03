@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Local credentials and environment files
+.env
+.env.*
+!.env.example
+
+# Generated and cached market data
+.cache/
+outputs/
+*.pkl
+*.parquet
+
+# Editor / OS
+.DS_Store
+.vscode/
+.idea/
