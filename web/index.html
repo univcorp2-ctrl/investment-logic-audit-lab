@@ -3,82 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="毎日自動更新する日本株の割安候補ランキング" />
+    <meta name="description" content="J-Quantsデータを使った日本株の割安・品質・テクニカル分析ダッシュボード" />
     <meta name="theme-color" content="#07111f" />
-    <title>ValueScope Japan | 今日の割安候補</title>
+    <title>ValueScope Japan | J-Quants銘柄分析</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="header">
-      <a class="brand" href="#top"><span>VS</span><div><strong>ValueScope Japan</strong><small>日本株の割安候補を自動抽出</small></div></a>
-      <span class="auto-badge"><i></i>平日18:30ごろ自動更新</span>
+      <a class="brand" href="#top" aria-label="ValueScope Japan ホーム"><span>VS</span><div><strong>ValueScope Japan</strong><small>J-Quants 日本株スクリーナー</small></div></a>
+      <div class="header-actions"><button id="reloadData" class="button ghost" type="button">データ再読込</button><a class="button primary" href="https://github.com/univcorp2-ctrl/investment-logic-audit-lab/actions/workflows/jquants-screen.yml" target="_blank" rel="noreferrer">更新ワークフロー</a></div>
     </header>
-
     <main id="top">
       <section class="hero">
-        <div>
-          <p class="eyebrow">今日見る場所はここだけ</p>
-          <h1>今日の割安候補</h1>
-          <p class="lead">割安性・企業の健全性・株価の買い時を自動採点し、上位候補だけを表示します。</p>
-        </div>
-        <div class="live-status">
-          <span id="liveState">データを確認中</span>
-          <strong id="marketDate">–</strong>
-          <small id="sourceLabel">実データを取得しています</small>
-        </div>
+        <div><p class="eyebrow">POINT-IN-TIME EQUITY SCREEN</p><h1>投資候補を<br /><span>数字で絞り込む。</span></h1><p class="lead">割安性、企業品質、成長安定性、テクニカル、流動性、バリュートラップを一画面で比較します。APIキーはブラウザへ配信されません。</p></div>
+        <aside class="live-status" aria-live="polite"><div class="status-line"><span id="liveState" class="status-pill loading">読込中</span><small id="sourceLabel">データを確認しています</small></div><strong id="asOfLabel">–</strong><dl class="freshness-list"><div><dt>実効カットオフ</dt><dd id="cutoffLabel">–</dd></div><div><dt>最新株価</dt><dd id="priceDateLabel">–</dd></div><div><dt>最新開示</dt><dd id="disclosureDateLabel">–</dd></div><div><dt>プラン</dt><dd id="planLabel">–</dd></div></dl></aside>
       </section>
-
-      <section aria-labelledby="picksTitle">
-        <div class="section-title"><div><p class="eyebrow">AUTO SELECTED</p><h2 id="picksTitle">自動抽出された上位5銘柄</h2></div><p>カードを押すと、割安と判断した理由が見られます。</p></div>
-        <div id="topPicks" class="pick-grid" aria-live="polite"></div>
-      </section>
-
-      <section class="how-it-works" aria-labelledby="howTitle">
-        <div class="section-title"><div><p class="eyebrow">HOW IT WORKS</p><h2 id="howTitle">どうやって割安銘柄を選ぶの？</h2></div></div>
-        <div class="step-grid">
-          <article><span>1</span><h3>まず「安い」を探す</h3><p>利益利回り、PBR、FCF利回り、EV/EBITDA、配当、ネットキャッシュを同業他社と比較します。</p></article>
-          <article><span>2</span><h3>安いだけの罠を外す</h3><p>赤字、マイナスFCF、借金過多、利益悪化、データ不足を減点します。</p></article>
-          <article><span>3</span><h3>買い時を確認する</h3><p>長期トレンド、モメンタム、ボラティリティ、流動性を確認して総合順位を決めます。</p></article>
-        </div>
-      </section>
-
-      <section class="summary-grid" aria-label="自動抽出サマリー">
-        <article><span>分析済み</span><strong id="scoredCount">–</strong><small>銘柄</small></article>
-        <article><span>適格候補</span><strong id="eligibleCount">–</strong><small>銘柄</small></article>
-        <article><span>総合中央値</span><strong id="medianScore">–</strong><small>100点満点</small></article>
-        <article><span>平均Trap Risk</span><strong id="averageTrap">–</strong><small>低いほど安全</small></article>
-      </section>
-
-      <section class="ranking" id="ranking" aria-labelledby="rankingTitle">
-        <div class="section-title table-title">
-          <div><p class="eyebrow">FULL RANKING</p><h2 id="rankingTitle">全ランキング</h2></div>
-          <label class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="銘柄コード・会社名・業種" /></label>
-        </div>
-        <div id="dataError" class="error" hidden></div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>順位</th><th>銘柄</th><th>総合</th><th>割安</th><th>品質</th><th>買い時</th><th>Trap</th><th>判定</th></tr></thead>
-            <tbody id="rankingBody"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <details class="own-data">
-        <summary>自分のCSVでも分析する</summary>
-        <div class="own-data-content">
-          <div><h3>ファンダメンタルCSV</h3><p>symbol列と財務項目を含むCSVを選択してください。データは外部送信されません。</p><input id="fundamentalFile" type="file" accept=".csv,text/csv" /></div>
-          <div><h3>サンプルを確認</h3><p>入力形式が分からない場合はサンプルCSVを利用できます。</p><button id="downloadSample" type="button">サンプルCSVを保存</button></div>
-        </div>
-        <p id="uploadStatus" class="upload-status"></p>
-      </details>
-
-      <section class="notice"><strong>データについて</strong><p>現在の自動ランキングはYahoo Financeをyfinance経由で取得した調査・参考用データです。取引前に適時開示、決算資料、J-Quants等の公式データで確認してください。</p></section>
+      <section id="dataError" class="alert error" hidden></section><section id="dataNotice" class="alert notice" hidden></section>
+      <section class="summary-grid" aria-label="分析サマリー"><article><span>分析済み</span><strong id="scoredCount">–</strong><small>銘柄</small></article><article><span>表示中</span><strong id="visibleCount">–</strong><small>銘柄</small></article><article><span>適格候補</span><strong id="eligibleCount">–</strong><small>銘柄</small></article><article><span>総合中央値</span><strong id="medianScore">–</strong><small>100点満点</small></article><article><span>平均Trap Risk</span><strong id="averageTrap">–</strong><small>低いほど安全</small></article></section>
+      <section class="visual-grid" aria-label="スコア可視化"><article class="chart-card"><div class="card-heading"><div><p class="eyebrow">DISTRIBUTION</p><h2>総合スコア分布</h2></div><small>現在の絞り込み結果</small></div><canvas id="scoreHistogram" height="210" aria-label="総合スコア分布チャート"></canvas></article><article class="chart-card"><div class="card-heading"><div><p class="eyebrow">TOP COMPARISON</p><h2>上位銘柄比較</h2></div><small>総合・割安・品質</small></div><div id="comparisonChart" class="comparison-chart"></div></article></section>
+      <section class="filters" aria-labelledby="filterTitle"><div class="card-heading"><div><p class="eyebrow">SCREENING CONTROLS</p><h2 id="filterTitle">条件を調整</h2></div><div class="filter-actions"><button id="resetFilters" class="button ghost" type="button">リセット</button><button id="downloadCsv" class="button primary" type="button">表示結果をCSV保存</button></div></div><div class="filter-grid"><label class="field wide"><span>銘柄検索</span><input id="searchInput" type="search" placeholder="コード・会社名・市場・業種" /></label><label class="field"><span>市場</span><select id="marketFilter"><option value="">すべて</option></select></label><label class="field"><span>業種</span><select id="sectorFilter"><option value="">すべて</option></select></label><label class="field"><span>判定</span><select id="eligibleFilter"><option value="all">すべて</option><option value="eligible">適格のみ</option><option value="watch">要確認のみ</option></select></label><label class="field"><span>最低 総合 <b id="overallValue">0</b></span><input id="minOverall" type="range" min="0" max="100" value="0" /></label><label class="field"><span>最低 割安 <b id="valueValue">0</b></span><input id="minValue" type="range" min="0" max="100" value="0" /></label><label class="field"><span>最低 品質 <b id="qualityValue">0</b></span><input id="minQuality" type="range" min="0" max="100" value="0" /></label><label class="field"><span>最低 充足率 <b id="completenessValue">0</b></span><input id="minCompleteness" type="range" min="0" max="100" value="0" /></label><label class="field"><span>最大 Trap <b id="trapValue">100</b></span><input id="maxTrap" type="range" min="0" max="100" value="100" /></label><label class="field"><span>表示件数</span><select id="limitFilter"><option>10</option><option selected>30</option><option>50</option><option>100</option><option value="all">すべて</option></select></label><label class="field"><span>並べ替え</span><select id="sortField"><option value="overall_score">総合</option><option value="value_score">割安</option><option value="quality_score">品質</option><option value="technical_score">テクニカル</option><option value="liquidity_score">流動性</option><option value="value_trap_risk">Trap Risk</option><option value="data_completeness">データ充足率</option><option value="code">コード</option></select></label><label class="field"><span>順序</span><select id="sortDirection"><option value="desc">高い順</option><option value="asc">低い順</option></select></label></div></section>
+      <section class="ranking" aria-labelledby="rankingTitle"><div class="card-heading table-heading"><div><p class="eyebrow">RANKING</p><h2 id="rankingTitle">銘柄ランキング</h2></div><small>行を選ぶと詳細を表示</small></div><div class="table-wrap"><table><thead><tr><th>順位</th><th>銘柄</th><th>市場 / 業種</th><th>株価</th><th>総合</th><th>割安</th><th>品質</th><th>テクニカル</th><th>流動性</th><th>Trap</th><th>充足率</th><th>判定</th></tr></thead><tbody id="rankingBody"></tbody></table></div><p id="emptyState" class="empty-state" hidden>現在の条件に該当する銘柄はありません。</p></section>
+      <details class="own-data"><summary>自分のCSVをブラウザ内で分析する</summary><div class="own-data-content"><div><h3>ファンダメンタルCSV</h3><p>symbol、code、Code、tickerのいずれかと財務項目を含むCSVを選択してください。外部送信されません。</p><input id="fundamentalFile" type="file" accept=".csv,text/csv" /></div><div><h3>入力サンプル</h3><p>既存スコアリング用のサンプルCSVを保存できます。</p><button id="downloadSample" class="button primary" type="button">サンプルCSVを保存</button></div></div><p id="uploadStatus" class="upload-status"></p></details>
+      <section class="methodology"><div><p class="eyebrow">HOW TO READ</p><h2>ランキングの使い方</h2></div><div class="method-grid"><article><span>01</span><h3>高得点を候補化</h3><p>総合点だけで買わず、割安・品質・データ充足率のバランスを確認します。</p></article><article><span>02</span><h3>Trapを確認</h3><p>継続赤字、負のFCF、悪化傾向、欠損が多いほどリスクが高くなります。</p></article><article><span>03</span><h3>一次情報で再確認</h3><p>決算短信、適時開示、企業行動、現在価格を必ず確認してから判断します。</p></article></div></section>
+      <section class="alert warning"><strong>重要</strong><p>本画面は分析・学習用で、売買注文や自動発注は行いません。FreeプランのJ-Quantsデータは遅延するため、短期の売買タイミングには適しません。表示スコアは将来の利益を保証しません。</p></section>
     </main>
-
-    <aside id="detailPanel" class="detail-panel" aria-hidden="true"><button id="closeDetail" aria-label="閉じる">×</button><div id="detailContent"></div></aside>
-    <div id="backdrop" class="backdrop" hidden></div>
-
-    <footer>本画面は調査・学習用であり、投資助言ではありません。過去・現在のスコアは将来の収益を保証しません。</footer>
-    <script type="module" src="./app.js"></script>
+    <aside id="detailPanel" class="detail-panel" aria-hidden="true"><button id="closeDetail" aria-label="詳細を閉じる">×</button><div id="detailContent"></div></aside><div id="backdrop" class="backdrop" hidden></div><footer><span>ValueScope Japan</span><p>J-Quants APIキーはサーバー側の実行環境だけで使用し、Web成果物には含めません。</p></footer><script type="module" src="./app.js"></script>
   </body>
 </html>
