@@ -1,0 +1,31 @@
+{
+  "portfolio_id": "valuescope-demo-20260803-afternoon",
+  "name": "ValueScope 本番デモトレード #1",
+  "status": "open",
+  "currency": "JPY",
+  "opened_at": "2026-08-03T14:35:00+09:00",
+  "completed_at": "2026-08-03T14:38:00+09:00",
+  "execution_method": "2026年8月3日後場のYahoo!ファイナンス日本版リアルタイム表示を使った順次成行シミュレーション",
+  "allocation_method": "各銘柄100株（東証の通常単元を想定）",
+  "total_entry_value": 30722100,
+  "commission": 0,
+  "tax": 0,
+  "notes": [
+    "実際の証券口座への注文・約定ではありません。",
+    "売買手数料、税金、配当、貸株料は未反映です。",
+    "一次確認はYahoo!ファイナンス日本版、二次確認はGoogle FinanceとYahoo公開分足APIです。",
+    "公開データは配信元の都合で遅延・停止・訂正される場合があります。"
+  ],
+  "positions": [
+    {"rank":1,"symbol":"8035.T","code":"8035","company_name":"東京エレクトロン","quantity":100,"entry_price":54720,"entry_value":5472000,"entry_time":"2026-08-03T14:35:00+09:00","entry_source":"Yahoo!ファイナンス日本版（リアルタイム株価表示）","day_high":55550,"day_low":52550,"secondary_price":54700,"secondary_time":"2026-08-03T11:30:00+09:00","secondary_source":"Google Finance","entry_verified":true},
+    {"rank":2,"symbol":"6857.T","code":"6857","company_name":"アドバンテスト","quantity":100,"entry_price":31260,"entry_value":3126000,"entry_time":"2026-08-03T14:35:00+09:00","entry_source":"Yahoo!ファイナンス日本版（リアルタイム株価表示）","day_high":32780,"day_low":31100,"secondary_price":31350,"secondary_time":"2026-08-03T11:30:00+09:00","secondary_source":"Google Finance","entry_verified":true},
+    {"rank":3,"symbol":"5803.T","code":"5803","company_name":"フジクラ","quantity":100,"entry_price":4294,"entry_value":429400,"entry_time":"2026-08-03T14:36:00+09:00","entry_source":"Yahoo!ファイナンス日本版（リアルタイム株価表示）","day_high":4325,"day_low":4008,"secondary_price":4295,"secondary_time":"2026-08-03T14:07:41+09:00","secondary_source":"Google Finance","entry_verified":true},
+    {"rank":4,"symbol":"5016.T","code":"5016","company_name":"JX金属","quantity":100,"entry_price":3827,"entry_value":382700,"entry_time":"2026-08-03T14:36:00+09:00","entry_source":"Yahoo!ファイナンス日本版（リアルタイム株価表示）","day_high":3833,"day_low":3577,"secondary_price":3820,"secondary_time":"2026-08-03T14:06:54+09:00","secondary_source":"Google Finance","entry_verified":true},
+    {"rank":5,"symbol":"6920.T","code":"6920","company_name":"レーザーテック","quantity":100,"entry_price":41060,"entry_value":4106000,"entry_time":"2026-08-03T14:36:00+09:00","entry_source":"Yahoo!ファイナンス日本版（リアルタイム株価表示）","day_high":41520,"day_low":37200,"secondary_price":40880,"secondary_time":"2026-08-03T14:01:38+09:00","secondary_source":"Google Finance","entry_verified":true},
+    {"rank":6,"symbol":"9983.T","code":"9983","company_name":"ファーストリテイリング","quantity":100,"entry_price":79030,"entry_value":7903000,"entry_time":"2026-08-03T14:37:00+09:00","entry_source":"Yahoo!ファイナンス日本版（リアルタイム株価表示）","day_high":79140,"day_low":76510,"secondary_price":79020,"secondary_time":"2026-08-03T14:08:39+09:00","secondary_source":"Google Finance","entry_verified":true},
+    {"rank":7,"symbol":"7974.T","code":"7974","company_name":"任天堂","quantity":100,"entry_price":7588,"entry_value":758800,"entry_time":"2026-08-03T14:37:00+09:00","entry_source":"Yahoo!ファイナンス日本版（リアルタイム株価表示）","day_high":7695,"day_low":7414,"secondary_price":7583,"secondary_time":"2026-08-03T14:13:04+09:00","secondary_source":"Google Finance","entry_verified":true},
+    {"rank":8,"symbol":"285A.T","code":"285A","company_name":"キオクシアホールディングス","quantity":100,"entry_price":49190,"entry_value":4919000,"entry_time":"2026-08-03T14:37:00+09:00","entry_source":"Yahoo!ファイナンス日本版（リアルタイム株価表示）","day_high":51990,"day_low":44370,"secondary_price":48830,"secondary_time":"2026-08-03T14:07:34+09:00","secondary_source":"Google Finance","entry_verified":true},
+    {"rank":9,"symbol":"9984.T","code":"9984","company_name":"ソフトバンクグループ","quantity":100,"entry_price":5412,"entry_value":541200,"entry_time":"2026-08-03T14:37:00+09:00","entry_source":"Yahoo!ファイナンス日本版（リアルタイム株価表示）","day_high":5430,"day_low":5060,"secondary_price":5410,"secondary_time":"2026-08-03T14:12:06+09:00","secondary_source":"Google Finance","entry_verified":true},
+    {"rank":10,"symbol":"5706.T","code":"5706","company_name":"三井金属","quantity":100,"entry_price":30840,"entry_value":3084000,"entry_time":"2026-08-03T14:38:00+09:00","entry_source":"Yahoo!ファイナンス日本版（リアルタイム株価表示）","day_high":31270,"day_low":29610,"secondary_price":30940,"secondary_time":"2026-08-03T14:12:49+09:00","secondary_source":"Google Finance","entry_verified":true}
+  ]
+}
