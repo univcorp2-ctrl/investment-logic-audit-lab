@@ -1,7 +1,8 @@
 {
-  "generated_at": "2026-08-03T04:54:03.262894+00:00",
+  "generated_at": "2026-08-03T04:59:20.939470+00:00",
   "status": "failure",
   "exit_code": 1,
+  "mode": "free-staged-liquid-universe",
   "stdout_tail": "",
-  "stderr_tail": "Traceback (most recent call last):\n  File \"[REDACTED-LONG-TOKEN]\", line 6, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File \"[REDACTED-LONG-TOKEN]\", line 295, in main\n    paths = run_jquants_screen(args)\n            ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"[REDACTED-LONG-TOKEN]\", line 198, in run_jquants_screen\n    return run_screen(config)\n           ^^^^^^^^^^^^^^^^^^\n  File \"[REDACTED-LONG-TOKEN]\", line 553, in run_screen\n    raise RuntimeError(\nRuntimeError: J-Quants screening requires master, daily bars, and financial summary data; endpoint status={'equities_master': 'ok:4449', 'equities_daily_bars': 'error:JQuantsProviderError', 'financial_summary': 'error:JQuantsProviderError'}\n"
+  "stderr_tail": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"[REDACTED-LONG-TOKEN]\", line 347, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"[REDACTED-LONG-TOKEN]\", line 340, in main\n    paths = run_free_liquid_screen(config, universe_size=args.universe_size)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"[REDACTED-LONG-TOKEN]\", line 153, in run_free_liquid_screen\n    selected, _ = _select_liquid_universe(\n                  ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"[REDACTED-LONG-TOKEN]\", line 106, in _select_liquid_universe\n    raise RuntimeError(\"No ordinary stock passed the latest-day liquidity filter\")\nRuntimeError: No ordinary stock passed the latest-day liquidity filter\n"
 }
