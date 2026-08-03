@@ -105,7 +105,7 @@ jobs:
           set +e
           python -m investment_audit.jquants_free_screen \
             --as-of 2026-08-03 \
-            --market Prime,Standard,Growth \
+            --market '' \
             --universe-size 15 \
             --top-n 15 \
             --requests-per-minute 5 \
