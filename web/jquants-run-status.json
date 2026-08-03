@@ -1,0 +1,7 @@
+{
+  "generated_at": "2026-08-03T04:54:03.262894+00:00",
+  "status": "failure",
+  "exit_code": 1,
+  "stdout_tail": "",
+  "stderr_tail": "Traceback (most recent call last):\n  File \"[REDACTED-LONG-TOKEN]\", line 6, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File \"[REDACTED-LONG-TOKEN]\", line 295, in main\n    paths = run_jquants_screen(args)\n            ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"[REDACTED-LONG-TOKEN]\", line 198, in run_jquants_screen\n    return run_screen(config)\n           ^^^^^^^^^^^^^^^^^^\n  File \"[REDACTED-LONG-TOKEN]\", line 553, in run_screen\n    raise RuntimeError(\nRuntimeError: J-Quants screening requires master, daily bars, and financial summary data; endpoint status={'equities_master': 'ok:4449', 'equities_daily_bars': 'error:JQuantsProviderError', 'financial_summary': 'error:JQuantsProviderError'}\n"
+}
