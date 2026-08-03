@@ -98,12 +98,21 @@ jobs:
           PY
       - name: Validate API connection
         run: investment-audit jquants-plan-check --plan free --as-of 2026-08-03 --out-dir outputs/jquants
-      - name: Run screen and create redacted status
+      - name: Run staged screen and create redacted status
         id: screen
         shell: bash
         run: |
           set +e
-          investment-audit jquants-screen --plan free --as-of 2026-08-03 --market Prime,Standard,Growth --top-n 100 --min-average-daily-value 100000000 --out-dir outputs/jquants > /tmp/jquants.stdout 2> /tmp/jquants.stderr
+          python -m investment_audit.jquants_free_screen \
+            --as-of 2026-08-03 \
+            --market Prime,Standard,Growth \
+            --universe-size 15 \
+            --top-n 15 \
+            --requests-per-minute 5 \
+            --history-years 2 \
+            --min-average-daily-value 100000000 \
+            --out-dir outputs/jquants \
+            > /tmp/jquants.stdout 2> /tmp/jquants.stderr
           code=$?
           export SCREEN_EXIT_CODE="$code"
           python - <<'PY'
@@ -126,6 +135,7 @@ jobs:
               'generated_at': dt.datetime.now(dt.timezone.utc).isoformat(),
               'status': 'success' if os.environ['SCREEN_EXIT_CODE'] == '0' else 'failure',
               'exit_code': int(os.environ['SCREEN_EXIT_CODE']),
+              'mode': 'free-staged-liquid-universe',
               'stdout_tail': clean(stdout),
               'stderr_tail': clean(stderr),
           }
