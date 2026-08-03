@@ -24,14 +24,79 @@ jobs:
         shell: bash
         run: |
           python - <<'PY'
-          import csv, io, os, re, urllib.request
-          url = f"https://docs.google.com/spreadsheets/d/{os.environ['SHEET_ID']}/export?format=csv&gid=0"
-          with urllib.request.urlopen(url, timeout=30) as response:
-              rows = csv.reader(io.StringIO(response.read().decode('utf-8-sig')))
-              match = next((row for row in rows if any('jquants' in re.sub(r'[^a-z0-9]', '', cell.lower()) for cell in row)), None)
-          key = match[2].strip() if match and len(match) >= 3 else ''
-          if not re.fullmatch(r'[A-Za-z0-9_.~+/=-]{20,200}', key):
-              raise SystemExit('A valid J-Quants API key was not found in the authorized source.')
+          import csv
+          import html
+          import io
+          import os
+          import re
+          import urllib.request
+          from openpyxl import load_workbook
+
+          file_id = os.environ['SHEET_ID']
+          urls = [
+              f'https://drive.google.com/uc?export=download&id={file_id}',
+              f'https://docs.google.com/spreadsheets/d/{file_id}/export?format=xlsx',
+              f'https://docs.google.com/spreadsheets/d/{file_id}/export?format=csv',
+              f'https://docs.google.com/spreadsheets/d/{file_id}/gviz/tq?tqx=out:csv&sheet=Tab',
+              f'https://docs.google.com/spreadsheets/d/{file_id}/edit?usp=drivesdk',
+          ]
+
+          def is_target(value):
+              normalized = re.sub(r'[^a-z0-9]', '', str(value).lower())
+              return 'jquants' in normalized
+
+          def valid_key(value):
+              text = str(value or '').strip()
+              return text if re.fullmatch(r'[A-Za-z0-9_.~+/=-]{20,200}', text) else ''
+
+          def from_xlsx(data):
+              workbook = load_workbook(io.BytesIO(data), read_only=True, data_only=True)
+              for sheet in workbook.worksheets:
+                  for row in sheet.iter_rows(values_only=True):
+                      values = list(row)
+                      if any(is_target(cell) for cell in values):
+                          for cell in values[1:]:
+                              candidate = valid_key(cell)
+                              if candidate:
+                                  return candidate
+              return ''
+
+          def from_text(text):
+              for row in csv.reader(io.StringIO(text)):
+                  if any(is_target(cell) for cell in row):
+                      for cell in row[1:]:
+                          candidate = valid_key(cell)
+                          if candidate:
+                              return candidate
+              plain = html.unescape(text)
+              marker = re.search(r'j\s*[-_]?\s*quants', plain, flags=re.I)
+              if marker:
+                  window = plain[marker.start():marker.start() + 4000]
+                  for candidate in re.findall(r'[A-Za-z0-9_.~+/=-]{30,200}', window):
+                      checked = valid_key(candidate)
+                      if checked and 'jquants' not in checked.lower():
+                          return checked
+              return ''
+
+          key = ''
+          failures = []
+          for url in urls:
+              try:
+                  request = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      data = response.read()
+                  if data.startswith(b'PK\x03\x04'):
+                      key = from_xlsx(data)
+                  else:
+                      key = from_text(data.decode('utf-8-sig', errors='replace'))
+                  if key:
+                      break
+                  failures.append('no matching row')
+              except Exception as exc:
+                  failures.append(type(exc).__name__)
+
+          if not key:
+              raise SystemExit('The authorized J-Quants row could not be read. Attempts: ' + ', '.join(failures))
           print(f'::add-mask::{key}')
           with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as env_file:
               env_file.write(f'JQUANTS_API_KEY={key}\n')
