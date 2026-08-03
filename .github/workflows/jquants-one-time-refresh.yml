@@ -1,0 +1,60 @@
+name: One-time J-Quants refresh
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: jquants-one-time-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install application
+        run: pip install -e '.[jquants]'
+      - name: Load only the user-authorized J-Quants key and mask it
+        env:
+          SHEET_ID: 1q_k5JhznTsOpBHoUFsEivfKVFIUgLkUP
+        shell: bash
+        run: |
+          python - <<'PY'
+          import csv, io, os, re, urllib.request
+          url = f"https://docs.google.com/spreadsheets/d/{os.environ['SHEET_ID']}/export?format=csv&gid=0"
+          with urllib.request.urlopen(url, timeout=30) as response:
+              rows = csv.reader(io.StringIO(response.read().decode('utf-8-sig')))
+              match = next((row for row in rows if any('jquants' in re.sub(r'[^a-z0-9]', '', cell.lower()) for cell in row)), None)
+          key = match[2].strip() if match and len(match) >= 3 else ''
+          if not re.fullmatch(r'[A-Za-z0-9_.~+/=-]{20,200}', key):
+              raise SystemExit('A valid J-Quants API key was not found in the authorized source.')
+          print(f'::add-mask::{key}')
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as env_file:
+              env_file.write(f'JQUANTS_API_KEY={key}\n')
+          PY
+      - name: Validate API connection
+        run: investment-audit jquants-plan-check --plan free --as-of 2026-08-03 --out-dir outputs/jquants
+      - name: Run Free-plan point-in-time screen
+        run: investment-audit jquants-screen --plan free --as-of 2026-08-03 --market Prime,Standard,Growth --top-n 100 --min-average-daily-value 100000000 --out-dir outputs/jquants
+      - name: Publish sanitized ranking
+        shell: bash
+        run: |
+          cp outputs/jquants/ranking.json web/jquants-ranking.json
+          cp outputs/jquants/ranking.csv web/jquants-ranking.csv
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add web/jquants-ranking.json web/jquants-ranking.csv
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: publish sanitized J-Quants ranking [skip ci]'
+            git push
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jquants-screen-${{ github.run_id }}
+          path: outputs/jquants
+          if-no-files-found: error
+          retention-days: 14
