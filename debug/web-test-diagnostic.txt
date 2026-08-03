@@ -1,0 +1,121 @@
+
+> valuescope-japan-web@1.1.1 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: normalizes J-Quants metadata and reasons
+ok 1 - normalizes J-Quants metadata and reasons
+  ---
+  duration_ms: 1.841289
+  type: 'test'
+  ...
+# Subtest: filters and sorts deterministically
+ok 2 - filters and sorts deterministically
+  ---
+  duration_ms: 0.527097
+  type: 'test'
+  ...
+# Subtest: summaries and CSV contain sanitized display columns
+ok 3 - summaries and CSV contain sanitized display columns
+  ---
+  duration_ms: 0.819894
+  type: 'test'
+  ...
+# Subtest: calculates per-position unrealized result
+not ok 4 - calculates per-position unrealized result
+  ---
+  duration_ms: 2.182869
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/demo-trade.test.mjs:1:334'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - 100000
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 100000
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/demo-trade.test.mjs:1:515)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: aggregates portfolio and falls back to entry on unusable quote
+not ok 5 - aggregates portfolio and falls back to entry on unusable quote
+  ---
+  duration_ms: 0.468039
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/demo-trade.test.mjs:1:677'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    NaN !== 300000
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 300000
+  actual: NaN
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/demo-trade.test.mjs:1:1009)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: formats Japanese currency and signed percent
+ok 6 - formats Japanese currency and signed percent
+  ---
+  duration_ms: 29.267148
+  type: 'test'
+  ...
+# Subtest: robust score ranks quality value above trap
+ok 7 - robust score ranks quality value above trap
+  ---
+  duration_ms: 5.431991
+  type: 'test'
+  ...
+# Subtest: missing metrics are not converted to zero
+ok 8 - missing metrics are not converted to zero
+  ---
+  duration_ms: 0.784871
+  type: 'test'
+  ...
+# Subtest: weights must sum to 100
+ok 9 - weights must sum to 100
+  ---
+  duration_ms: 0.448039
+  type: 'test'
+  ...
+# Subtest: csv parser and exporter preserve quoted values
+ok 10 - csv parser and exporter preserve quoted values
+  ---
+  duration_ms: 0.551143
+  type: 'test'
+  ...
+# Subtest: summary reports eligible and median
+ok 11 - summary reports eligible and median
+  ---
+  duration_ms: 2.134878
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 9
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 98.588431
+
+exit_code=1
