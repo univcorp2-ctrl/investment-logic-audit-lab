@@ -1,4 +1,4 @@
-name: J-Quants point-in-time screen
+name: J-Quants screening refresh
 
 on:
   workflow_dispatch:
@@ -17,14 +17,23 @@ on:
         description: Optional YYYY-MM-DD evaluation date
         required: false
         type: string
+      universe_size:
+        description: Number of liquid issues fetched individually on Free
+        required: false
+        default: '15'
+        type: string
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: jquants-screen-refresh
+  cancel-in-progress: false
 
 jobs:
   screen:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     env:
       JQUANTS_API_KEY: ${{ secrets.JQUANTS_API_KEY }}
     steps:
@@ -42,13 +51,46 @@ jobs:
             echo '::error::Configure a rotated JQUANTS_API_KEY repository secret before dispatching.'
             exit 1
           fi
-      - name: Run plan check and screen
+      - name: Validate API connection
         shell: bash
         run: |
           ARGS=(--plan '${{ inputs.plan }}' --out-dir outputs/jquants)
           if [ -n '${{ inputs.as_of }}' ]; then ARGS+=(--as-of '${{ inputs.as_of }}'); fi
           investment-audit jquants-plan-check "${ARGS[@]}"
-          investment-audit jquants-screen "${ARGS[@]}" --top-n 30
+      - name: Run Free staged screen
+        if: inputs.plan == 'free'
+        shell: bash
+        run: |
+          AS_OF_ARGS=()
+          if [ -n '${{ inputs.as_of }}' ]; then AS_OF_ARGS+=(--as-of '${{ inputs.as_of }}'); fi
+          python -m investment_audit.jquants_free_screen \
+            "${AS_OF_ARGS[@]}" \
+            --market '' \
+            --universe-size '${{ inputs.universe_size }}' \
+            --top-n '${{ inputs.universe_size }}' \
+            --requests-per-minute 5 \
+            --history-years 2 \
+            --min-average-daily-value 100000000 \
+            --out-dir outputs/jquants
+      - name: Run paid-plan full screen
+        if: inputs.plan != 'free'
+        shell: bash
+        run: |
+          ARGS=(--plan '${{ inputs.plan }}' --out-dir outputs/jquants --top-n 100 --market Prime,Standard,Growth)
+          if [ -n '${{ inputs.as_of }}' ]; then ARGS+=(--as-of '${{ inputs.as_of }}'); fi
+          investment-audit jquants-screen "${ARGS[@]}"
+      - name: Publish sanitized dashboard data
+        shell: bash
+        run: |
+          cp outputs/jquants/ranking.json web/jquants-ranking.json
+          cp outputs/jquants/ranking.csv web/jquants-ranking.csv
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add web/jquants-ranking.json web/jquants-ranking.csv
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: refresh sanitized J-Quants ranking'
+            git push
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: jquants-ranking-${{ github.run_id }}
