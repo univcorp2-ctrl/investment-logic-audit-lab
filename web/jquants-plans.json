@@ -1,0 +1,64 @@
+{
+  "checked_at": "2026-08-03",
+  "current_plan": "free",
+  "official_links": {
+    "pricing": "https://jpx-jquants.com/en",
+    "rate_limits": "https://jpx-jquants.com/en/spec/rate-limits",
+    "data_matrix": "https://jpx-jquants.com/en/spec/data-spec",
+    "releases": "https://jpx-jquants.com/en/spec/release",
+    "major_shareholders": "https://jpx-jquants.com/en/spec/edinet-major-shareholders",
+    "cross_shareholdings": "https://jpx-jquants.com/en/spec/edinet-cross-shareholdings"
+  },
+  "plans": [
+    {
+      "id": "free",
+      "name": "Free",
+      "monthly_yen": 0,
+      "history": "2年",
+      "delay": "原則12週間遅延",
+      "requests_per_minute": 5,
+      "daily_workflow": "流動性上位の小規模ユニバースを段階取得。日次判断では最新テクニカルを重視。",
+      "research_effect": "接続確認と遅延データ研究向け",
+      "active": true
+    },
+    {
+      "id": "light",
+      "name": "Light",
+      "monthly_yen": 1650,
+      "history": "5年",
+      "delay": "最新データ",
+      "requests_per_minute": 60,
+      "daily_workflow": "日次スクリーニングを現実的な時間で更新。Freeより広い銘柄群を扱いやすい。",
+      "research_effect": "現在のファンダメンタルと5年検証",
+      "active": false
+    },
+    {
+      "id": "standard",
+      "name": "Standard",
+      "monthly_yen": 3300,
+      "history": "10年",
+      "delay": "最新データ",
+      "requests_per_minute": 120,
+      "daily_workflow": "10年の複数相場局面で検証し、EDINET大株主・政策保有／持合関連APIを利用可能。",
+      "research_effect": "本格的なアウト・オブ・サンプル検証",
+      "active": false
+    },
+    {
+      "id": "premium",
+      "name": "Premium",
+      "monthly_yen": 16500,
+      "history": "提供全期間・一部データ20年",
+      "delay": "最新データ",
+      "requests_per_minute": 500,
+      "daily_workflow": "最大スループットで広範囲な研究自動化。EDINET所有関連は最大20年。",
+      "research_effect": "大規模研究と長期履歴",
+      "active": false
+    }
+  ],
+  "tdnet_addon": {
+    "name": "TDnet/Company Disclosure add-on",
+    "status": "not_configured",
+    "note": "2026年に追加された別アドオンです。契約・利用権限はJ-Quantsアカウントと公式データマトリクスで確認してください。"
+  },
+  "recommendation": "現在の画面・日次監視を最新ファンダメンタルで運用する最低候補はLightです。10年の再現性検証まで行うならStandardが適しています。有料データは鮮度と検証力を改善しますが、利益を保証しません。"
+}
