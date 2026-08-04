@@ -1,0 +1,225 @@
+
+> valuescope-japan-web@1.5.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: normalizes J-Quants metadata and reasons
+ok 1 - normalizes J-Quants metadata and reasons
+  ---
+  duration_ms: 1.824486
+  type: 'test'
+  ...
+# Subtest: filters and sorts deterministically
+ok 2 - filters and sorts deterministically
+  ---
+  duration_ms: 0.488683
+  type: 'test'
+  ...
+# Subtest: summaries and CSV contain sanitized display columns
+ok 3 - summaries and CSV contain sanitized display columns
+  ---
+  duration_ms: 0.889423
+  type: 'test'
+  ...
+# Subtest: paper decision labels are explicit
+ok 4 - paper decision labels are explicit
+  ---
+  duration_ms: 0.84722
+  type: 'test'
+  ...
+# Subtest: CSV separates fundamental and technical columns
+ok 5 - CSV separates fundamental and technical columns
+  ---
+  duration_ms: 0.575884
+  type: 'test'
+  ...
+# Subtest: plan impact explains upgrade without promising profit
+ok 6 - plan impact explains upgrade without promising profit
+  ---
+  duration_ms: 0.214081
+  type: 'test'
+  ...
+# Subtest: calculates per-position unrealized result
+ok 7 - calculates per-position unrealized result
+  ---
+  duration_ms: 1.341912
+  type: 'test'
+  ...
+# Subtest: aggregates portfolio and falls back to entry on unusable quote
+ok 8 - aggregates portfolio and falls back to entry on unusable quote
+  ---
+  duration_ms: 0.455993
+  type: 'test'
+  ...
+# Subtest: formats Japanese currency and signed percent
+ok 9 - formats Japanese currency and signed percent
+  ---
+  duration_ms: 31.128935
+  type: 'test'
+  ...
+# Subtest: preset applies detailed thresholds and weights
+ok 10 - preset applies detailed thresholds and weights
+  ---
+  duration_ms: 1.287852
+  type: 'test'
+  ...
+# Subtest: Free conservative preset keeps complete strong data and excludes weak data
+ok 11 - Free conservative preset keeps complete strong data and excludes weak data
+  ---
+  duration_ms: 3.743013
+  type: 'test'
+  ...
+# Subtest: missing policy neutral preserves score and exclude rejects enabled missing field
+ok 12 - missing policy neutral preserves score and exclude rejects enabled missing field
+  ---
+  duration_ms: 0.797215
+  type: 'test'
+  ...
+# Subtest: CSV includes raw metrics and no credentials
+ok 13 - CSV includes raw metrics and no credentials
+  ---
+  duration_ms: 0.809493
+  type: 'test'
+  ...
+# Subtest: high and low direction percentiles reward the correct issue
+ok 14 - high and low direction percentiles reward the correct issue
+  ---
+  duration_ms: 1.997365
+  type: 'test'
+  ...
+# Subtest: raw threshold uses display units and missing exclude is respected
+ok 15 - raw threshold uses display units and missing exclude is respected
+  ---
+  duration_ms: 1.075392
+  type: 'test'
+  ...
+# Subtest: cash flow preset enables FCF metrics and formula explains weights
+ok 16 - cash flow preset enables FCF metrics and formula explains weights
+  ---
+  duration_ms: 0.500551
+  type: 'test'
+  ...
+# Subtest: contributions sum to custom score and CSV is secret-free
+ok 17 - contributions sum to custom score and CSV is secret-free
+  ---
+  duration_ms: 0.69313
+  type: 'test'
+  ...
+# Subtest: performance analytics module loads and preserves missing values
+ok 18 - performance analytics module loads and preserves missing values
+  ---
+  duration_ms: 1.129063
+  type: 'test'
+  ...
+# Subtest: one observation is not converted into fake returns
+ok 19 - one observation is not converted into fake returns
+  ---
+  duration_ms: 2.374971
+  type: 'test'
+  ...
+# Subtest: range filtering preserves observed points only
+ok 20 - range filtering preserves observed points only
+  ---
+  duration_ms: 10.794177
+  type: 'test'
+  ...
+# Subtest: adjustable settings recalculate risk reward and ratios
+ok 21 - adjustable settings recalculate risk reward and ratios
+  ---
+  duration_ms: 2.622533
+  type: 'test'
+  ...
+# Subtest: chart modes and CSV expose all series without secrets
+ok 22 - chart modes and CSV expose all series without secrets
+  ---
+  duration_ms: 0.520351
+  type: 'test'
+  ...
+# Subtest: responsive layer includes iPhone breakpoint and safe areas
+ok 23 - responsive layer includes iPhone breakpoint and safe areas
+  ---
+  duration_ms: 6.426747
+  type: 'test'
+  ...
+# Subtest: responsive script installs viewport indicator and five mobile destinations
+ok 24 - responsive script installs viewport indicator and five mobile destinations
+  ---
+  duration_ms: 4.672186
+  type: 'test'
+  ...
+# Subtest: robust score ranks quality value above trap
+ok 25 - robust score ranks quality value above trap
+  ---
+  duration_ms: 4.043744
+  type: 'test'
+  ...
+# Subtest: missing metrics are not converted to zero
+ok 26 - missing metrics are not converted to zero
+  ---
+  duration_ms: 0.540891
+  type: 'test'
+  ...
+# Subtest: weights must sum to 100
+ok 27 - weights must sum to 100
+  ---
+  duration_ms: 0.482143
+  type: 'test'
+  ...
+# Subtest: csv parser and exporter preserve quoted values
+ok 28 - csv parser and exporter preserve quoted values
+  ---
+  duration_ms: 0.575543
+  type: 'test'
+  ...
+# Subtest: summary reports eligible and median
+ok 29 - summary reports eligible and median
+  ---
+  duration_ms: 1.685608
+  type: 'test'
+  ...
+# Subtest: merges ranking and daily technical data
+ok 30 - merges ranking and daily technical data
+  ---
+  duration_ms: 1.557776
+  type: 'test'
+  ...
+# Subtest: Free safe preset excludes weak record
+ok 31 - Free safe preset excludes weak record
+  ---
+  duration_ms: 2.846559
+  type: 'test'
+  ...
+# Subtest: missing policy neutral produces score while exclude rejects
+ok 32 - missing policy neutral produces score while exclude rejects
+  ---
+  duration_ms: 0.441332
+  type: 'test'
+  ...
+# Subtest: CSV contains separate pillars and no secrets
+ok 33 - CSV contains separate pillars and no secrets
+  ---
+  duration_ms: 0.704306
+  type: 'test'
+  ...
+# Subtest: insufficient history cannot be promoted
+ok 34 - insufficient history cannot be promoted
+  ---
+  duration_ms: 1.328583
+  type: 'test'
+  ...
+# Subtest: research CSV exposes baseline comparison and no secrets
+ok 35 - research CSV exposes baseline comparison and no secrets
+  ---
+  duration_ms: 0.593791
+  type: 'test'
+  ...
+1..35
+# tests 35
+# suites 0
+# pass 35
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 317.317696
+exit_code=0
