@@ -1,17 +1,9 @@
 {
   "schema_version": 1,
   "portfolio_id": "valuescope-demo-20260803-afternoon",
-  "cash": 0.0,
-  "realized_pnl": 0.0,
+  "cash": 15451700.0,
+  "realized_pnl": 623400.0,
   "positions": [
-    {
-      "symbol": "8035.T",
-      "code": "8035",
-      "company_name": "東京エレクトロン",
-      "quantity": 100,
-      "avg_cost": 54720.0,
-      "opened_at": "2026-08-03T14:35:00+09:00"
-    },
     {
       "symbol": "6857.T",
       "code": "6857",
@@ -19,22 +11,6 @@
       "quantity": 100,
       "avg_cost": 31260.0,
       "opened_at": "2026-08-03T14:35:00+09:00"
-    },
-    {
-      "symbol": "5803.T",
-      "code": "5803",
-      "company_name": "フジクラ",
-      "quantity": 100,
-      "avg_cost": 4294.0,
-      "opened_at": "2026-08-03T14:36:00+09:00"
-    },
-    {
-      "symbol": "5016.T",
-      "code": "5016",
-      "company_name": "JX金属",
-      "quantity": 100,
-      "avg_cost": 3827.0,
-      "opened_at": "2026-08-03T14:36:00+09:00"
     },
     {
       "symbol": "6920.T",
@@ -59,30 +35,6 @@
       "quantity": 100,
       "avg_cost": 7588.0,
       "opened_at": "2026-08-03T14:37:00+09:00"
-    },
-    {
-      "symbol": "285A.T",
-      "code": "285A",
-      "company_name": "キオクシアホールディングス",
-      "quantity": 100,
-      "avg_cost": 49190.0,
-      "opened_at": "2026-08-03T14:37:00+09:00"
-    },
-    {
-      "symbol": "9984.T",
-      "code": "9984",
-      "company_name": "ソフトバンクグループ",
-      "quantity": 100,
-      "avg_cost": 5412.0,
-      "opened_at": "2026-08-03T14:37:00+09:00"
-    },
-    {
-      "symbol": "5706.T",
-      "code": "5706",
-      "company_name": "三井金属",
-      "quantity": 100,
-      "avg_cost": 30840.0,
-      "opened_at": "2026-08-03T14:38:00+09:00"
     }
   ],
   "seed_cost_basis": 30722100.0,
