@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PERFORMANCE_GLOSSARY, finiteNumber } from '../performance-analytics-core.js';
+import { METRIC_DEFINITIONS, finite } from '../performance-analytics-core.js';
 
 test('performance analytics module loads and preserves missing values', () => {
-  assert.equal(finiteNumber(null), null);
-  assert.equal(finiteNumber('12.5'), 12.5);
-  assert.equal(PERFORMANCE_GLOSSARY.sharpe_ratio.label, 'シャープレシオ');
+  assert.equal(finite(null), null);
+  assert.equal(finite('12.5'), 12.5);
+  assert.match(METRIC_DEFINITIONS.sharpe_ratio, /年率超過収益/);
 });
