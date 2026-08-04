@@ -1,52 +1,13 @@
-name: Temporary performance test diagnostic
+name: Deprecated performance test diagnostic
 
 on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-
-concurrency:
-  group: performance-test-diagnostic
-  cancel-in-progress: false
+  contents: read
 
 jobs:
-  diagnose:
+  notice:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: web/package-lock.json
-      - name: Capture module and test output
-        shell: bash
-        run: |
-          cd web
-          npm ci
-          {
-            echo '=== node check ==='
-            node --check performance-analytics-core.js
-            echo '=== import ==='
-            node -e "import('./performance-analytics-core.js').then(m=>console.log(Object.keys(m))).catch(e=>{console.error(e.stack);process.exitCode=1})"
-            echo '=== tests ==='
-            npm test
-          } > ../performance-test-diagnostic.txt 2>&1 || true
-      - name: Publish diagnostic
-        shell: bash
-        run: |
-          git pull --rebase origin main
-          mkdir -p debug
-          mv performance-test-diagnostic.txt debug/performance-test-diagnostic.txt
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add -f debug/performance-test-diagnostic.txt
-          if git diff --cached --quiet; then
-            echo 'No diagnostic change.'
-          else
-            git commit -m 'debug: capture performance test output [skip ci]'
-            git push origin main
-          fi
+      - run: echo 'The temporary diagnostic is retired; use web-ci.yml.'
