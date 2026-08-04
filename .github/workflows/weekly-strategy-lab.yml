@@ -27,9 +27,11 @@ jobs:
       - name: Install research extras
         run: pip install -e '.[dev,quantlab]'
       - name: Run focused tests
-        run: pytest tests/test_open_source_strategy_lab.py
+        run: pytest tests/test_open_source_strategy_lab.py tests/test_strategy_lab_availability.py
       - name: Run research comparison
-        run: python -m investment_audit.open_source_strategy_lab --root . | tee strategy-lab-result.json
+        run: |
+          python -m investment_audit.open_source_strategy_lab --root . | tee strategy-lab-result.json
+          python -m investment_audit.strategy_lab_availability --root . | tee strategy-availability-result.json
       - name: Validate research-only output
         run: |
           python - <<'PY'
@@ -38,6 +40,9 @@ jobs:
           payload = json.loads(Path('web/data/strategy-lab/latest.json').read_text(encoding='utf-8'))
           assert payload['purpose'] == 'research_only'
           assert payload['auto_adopt'] is False
+          assert payload['research_candidate'] is None
+          assert payload['adoption_status'] == 'not_eligible_operational_history'
+          assert payload['availability_model']['counterfactual_only'] is True
           assert 'api_key' not in json.dumps(payload).lower()
           PY
       - name: Commit sanitized research report
@@ -64,8 +69,10 @@ jobs:
               print('## Strategy lab\nNo report generated.')
               raise SystemExit
           data = json.loads(path.read_text(encoding='utf-8'))
+          availability = data.get('availability_model', {})
           print('## Open-source strategy lab')
-          print(f"- Observations: {data['observations']}")
+          print(f"- Counterfactual observations: {availability.get('counterfactual_observations', 0)}")
+          print(f"- Operational observations: {availability.get('operational_observations', 0)}")
           print(f"- Walk-forward: {data['walk_forward']['status']}")
           print(f"- Adoption status: {data['adoption_status']}")
           print('- Auto adoption: disabled')
