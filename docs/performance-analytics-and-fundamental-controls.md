@@ -1,35 +1,31 @@
 # Performance analytics and fundamental controls
 
-The analytics layer reports what can be measured from the paper ledger and explicitly suppresses metrics that the available sample cannot support. It never submits a broker order.
+ValueScope Japan separates scheduled paper-trading rules, browser-only analysis settings and browser-only fundamental screening settings. Changing browser settings never changes the scheduled paper rules and never sends an order.
 
-## Minimum samples
+## Clear P/L charts
 
-- Annualized return, volatility, Sharpe, Sortino, Calmar, Omega, gain-to-pain, VaR and CVaR require at least 20 daily return observations.
-- Trade-quality metrics require at least five completed simulated sells with realized P/L.
-- Benchmark alpha, beta, correlation, tracking error and information ratio require 20 aligned benchmark observations.
-- Missing metrics are `null`, never zero, and include a machine-readable status and Japanese reason.
+The P/L page provides Equity, Cumulative P/L, Daily P/L, Drawdown and Portfolio versus 1306.T benchmark views. Ranges are 1W, 1M, 3M, 6M, 1Y and All. Exact observed dates are used; missing dates are not interpolated. A one-observation history is rendered as a point with an insufficient-history message.
 
-The default risk-free rate is zero. Annualization uses 252 trading days.
+## Analysis settings
 
-## Definitions
+The user can change annual risk-free rate, annual target return, annualization days, VaR confidence, scenario target and scenario stop. These settings are stored in localStorage and can be exported or imported as JSON. The scenario Target/Stop reward-risk ratio is an analysis aid only and does not alter the daily monitor.
 
-- Maximum drawdown: the largest peak-to-trough percentage decline in the observed equity curve.
-- Current drawdown: current equity relative to the latest running peak.
-- Ulcer Index: square root of the mean squared percentage drawdown.
-- Historical VaR 95%: the fifth percentile of daily returns. CVaR/Expected Shortfall is the mean return in that tail.
-- Sharpe: annualized excess mean return divided by annualized volatility.
-- Sortino: annualized excess mean return divided by annualized downside deviation.
-- Calmar: CAGR divided by the absolute maximum drawdown.
-- Omega at zero: sum of positive daily returns divided by the absolute sum of negative daily returns.
-- Payoff ratio / risk-reward ratio: average winning completed trade divided by the absolute average losing completed trade. These two labels use the same calculation in this application.
-- Profit factor: gross realized profit divided by gross realized loss.
-- Expectancy: average realized P/L per completed simulated trade.
-- Concentration HHI: sum of squared current position weights.
+## Metrics
 
-## Fundamental detailed controls
+Return: total return, CAGR, latest daily return, realized, unrealized and total P/L.
 
-The browser-only detailed screen allows thresholds for earnings yield, book-to-market, FCF yield, dividend yield, ROE, operating margin, revenue/EPS/FCF growth, data completeness, value-trap risk, negative earnings/FCF years, earnings volatility and debt-to-equity when those fields exist.
+Risk: volatility, downside deviation, maximum/current/average drawdown, drawdown and recovery duration, Ulcer Index, VaR, CVaR, best/worst day, skewness and kurtosis.
 
-Weights are grouped into valuation, quality, growth, stability, balance-sheet risk, data quality and technical confirmation. Missing values can be excluded, treated as neutral for research, or allowed without contributing to the score. Settings stay in browser localStorage and can be exported as JSON.
+Risk-adjusted: Sharpe, Sortino, Calmar, Omega, Information Ratio, Tracking Error, Beta and Alpha.
 
-A short positive result is not evidence of a profitable strategy. The UI labels annualized and trade metrics as unavailable until their sample requirements are met.
+Win/loss: win rate, Profit Factor, Payoff Ratio, expectancy, Reward/Risk and streaks.
+
+Portfolio: trade count, turnover, exposure, cash ratio, largest weight, HHI concentration, effective positions, closed-trade win rate and holding period.
+
+Annualized volatility, Sharpe, Sortino, Omega and tail-risk estimates need 30 daily returns. CAGR, Calmar and benchmark-relative ratios need 126. Below those limits the UI shows the exact required and available observations.
+
+## Detailed fundamental model
+
+The Conditions Screener allows the user to enable, weight and threshold earnings yield, book-to-market, FCF yield, ROE, operating margin, revenue/EPS/FCF growth, margin change, FCF conversion, accrual quality, earnings/FCF stability, negative years, data completeness and value-trap risk.
+
+Metric direction is fixed. Raw values are converted to cross-sectional percentile scores, and each weighted point contribution is shown. Missing values can inherit the global policy or be allowed, neutral 50 or excluded per metric. Presets are Balanced, Cash Flow, High ROE, Financial Stability and Value-Trap Avoidance. Settings remain in the browser and support URL hash, JSON and CSV export.
