@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-03T20:22:33.484892+09:00",
+  "generated_at": "2026-08-04T09:14:19.830250+09:00",
   "paper_only": true,
   "manual_review_required": true,
   "proposals": [
@@ -68,9 +68,9 @@
       "quote": {
         "valid": true,
         "current_price": 49160.0,
-        "quote_time": "2026-08-03T15:30:00+09:00",
-        "verification": "double-checked",
-        "max_difference_pct": 0.0,
+        "quote_time": "2026-08-03T06:30:00.000Z",
+        "verification": "single-source",
+        "max_difference_pct": null,
         "risks": []
       },
       "decision": {
@@ -166,9 +166,9 @@
       "quote": {
         "valid": true,
         "current_price": 3844.0,
-        "quote_time": "2026-08-03T15:30:00+09:00",
-        "verification": "double-checked",
-        "max_difference_pct": 0.0,
+        "quote_time": "2026-08-03T06:30:00.000Z",
+        "verification": "single-source",
+        "max_difference_pct": null,
         "risks": []
       },
       "decision": {
@@ -264,9 +264,9 @@
       "quote": {
         "valid": true,
         "current_price": 30890.0,
-        "quote_time": "2026-08-03T15:30:00+09:00",
-        "verification": "double-checked",
-        "max_difference_pct": 0.0,
+        "quote_time": "2026-08-03T06:30:00.000Z",
+        "verification": "single-source",
+        "max_difference_pct": null,
         "risks": []
       },
       "decision": {
@@ -363,9 +363,9 @@
       "quote": {
         "valid": true,
         "current_price": 4290.0,
-        "quote_time": "2026-08-03T15:30:00+09:00",
-        "verification": "double-checked",
-        "max_difference_pct": 0.0,
+        "quote_time": "2026-08-03T06:30:00.000Z",
+        "verification": "single-source",
+        "max_difference_pct": null,
         "risks": []
       },
       "decision": {
@@ -461,9 +461,9 @@
       "quote": {
         "valid": true,
         "current_price": 40910.0,
-        "quote_time": "2026-08-03T15:30:00+09:00",
-        "verification": "double-checked",
-        "max_difference_pct": 0.0,
+        "quote_time": "2026-08-03T06:30:00.000Z",
+        "verification": "single-source",
+        "max_difference_pct": null,
         "risks": []
       },
       "decision": {
@@ -562,9 +562,9 @@
       "quote": {
         "valid": true,
         "current_price": 54990.0,
-        "quote_time": "2026-08-03T15:30:00+09:00",
-        "verification": "double-checked",
-        "max_difference_pct": 0.0,
+        "quote_time": "2026-08-03T06:30:00.000Z",
+        "verification": "single-source",
+        "max_difference_pct": null,
         "risks": []
       },
       "decision": {
@@ -663,9 +663,9 @@
       "quote": {
         "valid": true,
         "current_price": 5393.0,
-        "quote_time": "2026-08-03T15:30:00+09:00",
-        "verification": "double-checked",
-        "max_difference_pct": 0.0,
+        "quote_time": "2026-08-03T06:30:00.000Z",
+        "verification": "single-source",
+        "max_difference_pct": null,
         "risks": []
       },
       "decision": {
