@@ -12,7 +12,9 @@ const staticFiles = [
   'decision-report.js','decision-report-core.js','decision-report.css','jquants-plans.json',
   'responsive-mode.js','responsive-enhancements.css',
   'screening-lab.js','screening-lab-core.js','screening-lab.css',
+  'fundamental-lab.js','fundamental-lab-core.js','fundamental-lab.css',
   'strategy-lab-view.js','strategy-lab-view-core.js','strategy-lab-view.css',
+  'performance-analytics.js','performance-analytics-core.js','performance-analytics.css',
 ];
 for (const file of staticFiles) await cp(resolve(root, file), resolve(dist, file));
 for (const file of ['jquants-ranking.json','jquants-ranking.csv','live-ranking.json','live-ranking.csv']) {
@@ -26,7 +28,9 @@ for (const marker of [
   '<link rel="stylesheet" href="./demo-trade.css" />',
   '<link rel="stylesheet" href="./decision-report.css" />',
   '<link rel="stylesheet" href="./screening-lab.css" />',
+  '<link rel="stylesheet" href="./fundamental-lab.css" />',
   '<link rel="stylesheet" href="./strategy-lab-view.css" />',
+  '<link rel="stylesheet" href="./performance-analytics.css" />',
   '<link rel="stylesheet" href="./responsive-enhancements.css" />',
 ]) {
   if (!index.includes(marker)) index = index.replace('</head>', `  ${marker}\n  </head>`);
@@ -36,7 +40,9 @@ for (const marker of [
   '<script type="module" src="./demo-trade.js"></script>',
   '<script type="module" src="./decision-report.js"></script>',
   '<script type="module" src="./strategy-lab-view.js"></script>',
+  '<script type="module" src="./performance-analytics.js"></script>',
   '<script type="module" src="./screening-lab.js"></script>',
+  '<script type="module" src="./fundamental-lab.js"></script>',
   '<script type="module" src="./responsive-mode.js"></script>',
 ]) {
   if (!index.includes(marker)) index = index.replace('</body>', `  ${marker}\n  </body>`);
