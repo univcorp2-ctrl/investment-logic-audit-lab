@@ -39,7 +39,7 @@ test('short history gates annualized and tail metrics', () => {
   assert.equal(result.risk_adjusted.sortino_ratio.status,'insufficient_history');
   assert.equal(result.risk.var_95_pct.status,'insufficient_history');
   assert.equal(result.overview.cagr_pct.status,'insufficient_history');
-  assert.equal(result.overview.total_return_pct.value,2);
+  assert.ok(Math.abs(result.overview.total_return_pct.value-2)<1e-9);
 });
 
 test('trade quality calculates payoff risk reward profit factor and expectancy', () => {
@@ -60,7 +60,11 @@ test('trade quality calculates payoff risk reward profit factor and expectancy',
 
 test('position concentration and benchmark metrics remain null-safe', () => {
   const history=[];
-  for(let index=0;index<50;index+=1)history.push({date:`2026-03-${String(index+1).padStart(2,'0')}`,equity:100000+index*100});
+  const start = new Date('2026-03-01T00:00:00Z');
+  for(let index=0;index<50;index+=1){
+    const date = new Date(start.getTime()+index*86400000).toISOString().slice(0,10);
+    history.push({date,equity:100000+index*100});
+  }
   const result=buildPerformanceAnalytics({
     equityHistory:{history},trades:{trades:[]},
     portfolio:{cash:10000,positions:[{symbol:'A.T',code:'A',quantity:100,avg_cost:100},{symbol:'B.T',code:'B',quantity:50,avg_cost:100}]},
