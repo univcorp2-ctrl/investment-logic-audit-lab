@@ -46,20 +46,20 @@ jobs:
             MODE_ARGS+=(--execute-simulation)
           fi
           python -m investment_audit.daily_monitor --root . "${MODE_ARGS[@]}" | tee monitor-result.json
-          python -m investment_audit.performance_analytics --root . | tee analytics-result.json
+          python -m investment_audit.performance_refresh --root . | tee performance-result.json
       - name: Validate sanitized output
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
           report = json.loads(Path('web/data/paper-trading/latest-report.json').read_text(encoding='utf-8'))
+          analytics = json.loads(Path('web/data/paper-trading/performance-analytics.json').read_text(encoding='utf-8'))
           assert report['paper_only'] is True
           assert report['summary']['equity'] >= 0
-          assert 'performance_analytics' in report
-          analytics = report['performance_analytics']
-          assert analytics['risk_free_rate'] == 0
-          assert analytics['groups']['trade_quality']['risk_reward_ratio']['value'] is None or isinstance(analytics['groups']['trade_quality']['risk_reward_ratio']['value'], (int, float))
-          text = Path('web/data/paper-trading/latest-report.json').read_text(encoding='utf-8').lower()
+          assert analytics['schema_version'] == 1
+          assert analytics['reliability']['status'] in {'insufficient_history', 'preliminary', 'usable'}
+          assert isinstance(analytics['chart_series'], list)
+          text = (Path('web/data/paper-trading/latest-report.json').read_text(encoding='utf-8') + Path('web/data/paper-trading/performance-analytics.json').read_text(encoding='utf-8')).lower()
           assert 'api_key' not in text and 'authorization' not in text
           PY
       - name: Commit changed reports
@@ -72,7 +72,7 @@ jobs:
             echo 'No report changes.'
             exit 0
           fi
-          git commit -m 'data: update daily paper portfolio analytics'
+          git commit -m 'data: update daily paper portfolio report'
           git pull --rebase origin main
           git push origin main
       - name: Write workflow summary
@@ -82,12 +82,12 @@ jobs:
           import json
           from pathlib import Path
           path = Path('web/data/paper-trading/latest-report.json')
+          analytics_path = Path('web/data/paper-trading/performance-analytics.json')
           if not path.exists():
               print('## Paper monitor\nNo report generated.')
               raise SystemExit
           report = json.loads(path.read_text(encoding='utf-8'))
           summary = report['summary']
-          analytics = report.get('performance_analytics', {})
           proposals = [row for row in report['decisions'] if row['proposal']['side']]
           print('## Daily paper portfolio monitor')
           print(f"- Tokyo date: {report['trading_date']}")
@@ -97,7 +97,9 @@ jobs:
           print(f"- Skipped: {len(report['skipped'])}")
           print(f"- Equity: ¥{summary['equity']:,.0f}")
           print(f"- Total P/L: ¥{summary['total_pnl']:,.0f}")
-          print(f"- Return observations: {analytics.get('observation_count', 0)}")
-          print(f"- Analytics status: {analytics.get('history_status', 'not_generated')}")
+          if analytics_path.exists():
+              analytics = json.loads(analytics_path.read_text(encoding='utf-8'))
+              print(f"- Analytics reliability: {analytics['reliability']['status']}")
+              print(f"- Return observations: {analytics['reliability']['return_observations']}")
           print('- Real broker orders: never sent')
           PY
