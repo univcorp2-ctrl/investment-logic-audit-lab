@@ -1,0 +1,38 @@
+name: Temporary current web-test diagnostic
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Capture test output
+        shell: bash
+        run: |
+          cd web
+          npm ci
+          set +e
+          npm test > ../current-web-test.txt 2>&1
+          code=$?
+          set -e
+          echo "exit_code=$code" >> ../current-web-test.txt
+      - name: Commit diagnostic text
+        shell: bash
+        run: |
+          mkdir -p debug
+          mv current-web-test.txt debug/current-web-test.txt
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add debug/current-web-test.txt
+          git commit -m 'debug: capture current web test output [skip ci]'
+          git push
