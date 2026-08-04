@@ -1,0 +1,254 @@
+=== node check ===
+=== import ===
+[
+  'CHART_MODES',
+  'DEFAULT_ANALYSIS_SETTINGS',
+  'METRIC_DEFINITIONS',
+  'RANGE_DAYS',
+  'analyticsSeriesToCsv',
+  'chartRows',
+  'filterSeriesByRange',
+  'finite',
+  'recalculateAnalysis',
+  'seriesReturns'
+]
+=== tests ===
+
+> valuescope-japan-web@1.5.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: normalizes J-Quants metadata and reasons
+ok 1 - normalizes J-Quants metadata and reasons
+  ---
+  duration_ms: 2.016231
+  type: 'test'
+  ...
+# Subtest: filters and sorts deterministically
+ok 2 - filters and sorts deterministically
+  ---
+  duration_ms: 0.530351
+  type: 'test'
+  ...
+# Subtest: summaries and CSV contain sanitized display columns
+ok 3 - summaries and CSV contain sanitized display columns
+  ---
+  duration_ms: 0.884314
+  type: 'test'
+  ...
+# Subtest: paper decision labels are explicit
+ok 4 - paper decision labels are explicit
+  ---
+  duration_ms: 1.301744
+  type: 'test'
+  ...
+# Subtest: CSV separates fundamental and technical columns
+ok 5 - CSV separates fundamental and technical columns
+  ---
+  duration_ms: 0.796529
+  type: 'test'
+  ...
+# Subtest: plan impact explains upgrade without promising profit
+ok 6 - plan impact explains upgrade without promising profit
+  ---
+  duration_ms: 0.320389
+  type: 'test'
+  ...
+# Subtest: calculates per-position unrealized result
+ok 7 - calculates per-position unrealized result
+  ---
+  duration_ms: 1.372647
+  type: 'test'
+  ...
+# Subtest: aggregates portfolio and falls back to entry on unusable quote
+ok 8 - aggregates portfolio and falls back to entry on unusable quote
+  ---
+  duration_ms: 0.570637
+  type: 'test'
+  ...
+# Subtest: formats Japanese currency and signed percent
+ok 9 - formats Japanese currency and signed percent
+  ---
+  duration_ms: 43.760623
+  type: 'test'
+  ...
+# Subtest: preset applies detailed thresholds and weights
+ok 10 - preset applies detailed thresholds and weights
+  ---
+  duration_ms: 1.180027
+  type: 'test'
+  ...
+# Subtest: Free conservative preset keeps complete strong data and excludes weak data
+ok 11 - Free conservative preset keeps complete strong data and excludes weak data
+  ---
+  duration_ms: 2.794857
+  type: 'test'
+  ...
+# Subtest: missing policy neutral preserves score and exclude rejects enabled missing field
+ok 12 - missing policy neutral preserves score and exclude rejects enabled missing field
+  ---
+  duration_ms: 0.589682
+  type: 'test'
+  ...
+# Subtest: CSV includes raw metrics and no credentials
+ok 13 - CSV includes raw metrics and no credentials
+  ---
+  duration_ms: 0.666897
+  type: 'test'
+  ...
+# Subtest: high and low direction percentiles reward the correct issue
+ok 14 - high and low direction percentiles reward the correct issue
+  ---
+  duration_ms: 2.692105
+  type: 'test'
+  ...
+# Subtest: raw threshold uses display units and missing exclude is respected
+ok 15 - raw threshold uses display units and missing exclude is respected
+  ---
+  duration_ms: 1.458238
+  type: 'test'
+  ...
+# Subtest: cash flow preset enables FCF metrics and formula explains weights
+ok 16 - cash flow preset enables FCF metrics and formula explains weights
+  ---
+  duration_ms: 0.688679
+  type: 'test'
+  ...
+# Subtest: contributions sum to custom score and CSV is secret-free
+ok 17 - contributions sum to custom score and CSV is secret-free
+  ---
+  duration_ms: 0.772234
+  type: 'test'
+  ...
+# file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/performance-analytics-core.test.mjs:3
+# import { PERFORMANCE_GLOSSARY, finiteNumber } from '../performance-analytics-core.js';
+#          ^^^^^^^^^^^^^^^^^^^^
+# SyntaxError: The requested module '../performance-analytics-core.js' does not provide an export named 'PERFORMANCE_GLOSSARY'
+#     at ModuleJob._instantiate (node:internal/modules/esm/module_job:226:21)
+#     at async ModuleJob.run (node:internal/modules/esm/module_job:335:5)
+#     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+#     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+# Node.js v22.23.1
+# Subtest: tests/performance-analytics-core.test.mjs
+not ok 6 - tests/performance-analytics-core.test.mjs
+  ---
+  duration_ms: 52.26072
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/performance-analytics-core.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: one observation is not converted into fake returns
+ok 19 - one observation is not converted into fake returns
+  ---
+  duration_ms: 2.540351
+  type: 'test'
+  ...
+# Subtest: range filtering preserves observed points only
+ok 20 - range filtering preserves observed points only
+  ---
+  duration_ms: 10.832019
+  type: 'test'
+  ...
+# Subtest: adjustable settings recalculate risk reward and ratios
+ok 21 - adjustable settings recalculate risk reward and ratios
+  ---
+  duration_ms: 1.643033
+  type: 'test'
+  ...
+# Subtest: chart modes and CSV expose all series without secrets
+ok 22 - chart modes and CSV expose all series without secrets
+  ---
+  duration_ms: 0.394388
+  type: 'test'
+  ...
+# Subtest: responsive layer includes iPhone breakpoint and safe areas
+ok 23 - responsive layer includes iPhone breakpoint and safe areas
+  ---
+  duration_ms: 8.235482
+  type: 'test'
+  ...
+# Subtest: responsive script installs viewport indicator and five mobile destinations
+ok 24 - responsive script installs viewport indicator and five mobile destinations
+  ---
+  duration_ms: 2.370333
+  type: 'test'
+  ...
+# Subtest: robust score ranks quality value above trap
+ok 25 - robust score ranks quality value above trap
+  ---
+  duration_ms: 4.534841
+  type: 'test'
+  ...
+# Subtest: missing metrics are not converted to zero
+ok 26 - missing metrics are not converted to zero
+  ---
+  duration_ms: 0.836625
+  type: 'test'
+  ...
+# Subtest: weights must sum to 100
+ok 27 - weights must sum to 100
+  ---
+  duration_ms: 0.660274
+  type: 'test'
+  ...
+# Subtest: csv parser and exporter preserve quoted values
+ok 28 - csv parser and exporter preserve quoted values
+  ---
+  duration_ms: 0.834741
+  type: 'test'
+  ...
+# Subtest: summary reports eligible and median
+ok 29 - summary reports eligible and median
+  ---
+  duration_ms: 2.473606
+  type: 'test'
+  ...
+# Subtest: merges ranking and daily technical data
+ok 30 - merges ranking and daily technical data
+  ---
+  duration_ms: 1.247533
+  type: 'test'
+  ...
+# Subtest: Free safe preset excludes weak record
+ok 31 - Free safe preset excludes weak record
+  ---
+  duration_ms: 2.387566
+  type: 'test'
+  ...
+# Subtest: missing policy neutral produces score while exclude rejects
+ok 32 - missing policy neutral produces score while exclude rejects
+  ---
+  duration_ms: 0.323104
+  type: 'test'
+  ...
+# Subtest: CSV contains separate pillars and no secrets
+ok 33 - CSV contains separate pillars and no secrets
+  ---
+  duration_ms: 0.624588
+  type: 'test'
+  ...
+# Subtest: insufficient history cannot be promoted
+ok 34 - insufficient history cannot be promoted
+  ---
+  duration_ms: 1.012634
+  type: 'test'
+  ...
+# Subtest: research CSV exposes baseline comparison and no secrets
+ok 35 - research CSV exposes baseline comparison and no secrets
+  ---
+  duration_ms: 0.598889
+  type: 'test'
+  ...
+1..35
+# tests 35
+# suites 0
+# pass 34
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 311.930273
