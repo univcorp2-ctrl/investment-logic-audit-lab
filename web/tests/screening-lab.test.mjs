@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { DEFAULT_SCREENING_CONFIG, applyPreset, mergeScreeningData, recomputeScore, screenRecords, screeningRowsToCsv } from '../screening-lab-core.js';
+
+const ranking = { rows:[{code:'1000',company_name:'A',overall_score:70,value_score:80,quality_score:75,growth_stability_score:60,technical_score:55,liquidity_score:80,value_trap_risk:20,data_completeness:70},{code:'2000',company_name:'B',overall_score:50,value_score:45,quality_score:40,growth_stability_score:30,technical_score:30,liquidity_score:50,value_trap_risk:75,data_completeness:30}]};
+const report = { decisions:[{code:'1000',holding:{quantity:100},fundamental:{score:72,value_score:80,quality_score:75,growth_stability_score:60,value_trap_risk:20,data_completeness:70},technical:{score:70,price:120,sma20:110,sma60:100,rsi14:60,momentum20_pct:5,momentum60_pct:10,volatility20_pct:30,drawdown20_pct:-2},decision:{action:'SIM_HOLD',reasons:['strong'],risks:[]}}]};
+
+test('merges ranking and daily technical data',()=>{const rows=mergeScreeningData(ranking,report);assert.equal(rows[0].technical_score,70);assert.equal(rows[0].holding_quantity,100);assert.equal(rows[1].action,'WATCH')});
+test('Free safe preset excludes weak record',()=>{const rows=mergeScreeningData(ranking,report);const config=applyPreset('freeSafe',structuredClone(DEFAULT_SCREENING_CONFIG));const result=screenRecords(rows,config);assert.deepEqual(result.included.map(row=>row.code),['1000']);assert.equal(result.excluded.length,1)});
+test('missing policy neutral produces score while exclude rejects',()=>{const row={fundamental_score:null,value_score:70,quality_score:70,growth_score:60,technical_score:60,liquidity_score:60,value_trap_risk:30};const neutral=recomputeScore(row,{...DEFAULT_SCREENING_CONFIG,missingPolicy:'neutral'});const excluded=recomputeScore(row,{...DEFAULT_SCREENING_CONFIG,missingPolicy:'exclude'});assert.equal(typeof neutral.score,'number');assert.equal(excluded.excluded,true)});
+test('CSV contains separate pillars and no secrets',()=>{const csv=screeningRowsToCsv(screenRecords(mergeScreeningData(ranking,report),DEFAULT_SCREENING_CONFIG).included);assert.match(csv,/fundamental_score/);assert.match(csv,/technical_score/);assert.doesNotMatch(csv,/api[_-]?key/i)});
