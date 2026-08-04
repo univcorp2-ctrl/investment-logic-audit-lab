@@ -1,49 +1,140 @@
-export const PERFORMANCE_CATALOG = Object.freeze({
-  return:{label:'リターン',metrics:{total_return_pct:['累計収益率','Total Return','累計の投資収益率','higher'],daily_return_pct:['日次収益率','Daily Return','直近日の資産変化率','higher'],cumulative_return_pct:['累積収益率','Cumulative','初期元本からの変化率','higher'],cagr_pct:['年率収益率','CAGR','複利ベースの年率換算。短期履歴では非表示','higher'],positive_day_ratio_pct:['上昇日比率','Positive Days','日次収益がプラスだった割合','higher']}},
-  risk:{label:'リスク',metrics:{annualized_volatility_pct:['年率ボラティリティ','Volatility','日次変動の年率換算','lower'],downside_deviation_pct:['下方偏差','Downside Dev','マイナス方向だけの変動率','lower'],max_drawdown_pct:['最大ドローダウン','Max DD','資産ピークから底までの最大下落率','higher'],current_drawdown_pct:['現在ドローダウン','Current DD','直近ピークから現在までの下落率','higher'],ulcer_index:['Ulcer Index','Ulcer','ドローダウンの深さと継続を測る指数','lower'],var_95_pct:['VaR 95%','VaR','過去分布の下位5%の日次損失境界','higher'],cvar_95_pct:['期待ショートフォール','CVaR/ES','VaRを超えた損失日の平均','higher'],best_day_pct:['最高日','Best Day','観測期間の最大日次収益','higher'],worst_day_pct:['最低日','Worst Day','観測期間の最悪日次収益','higher']}},
-  risk_adjusted:{label:'リスク調整後',metrics:{sharpe_ratio:['シャープレシオ','Sharpe','超過収益を総変動率で割る','higher'],sortino_ratio:['ソルティノレシオ','Sortino','超過収益を下方偏差で割る','higher'],calmar_ratio:['カルマーレシオ','Calmar','CAGRを最大DDの絶対値で割る','higher'],omega_ratio:['オメガレシオ','Omega','プラス日収益合計÷マイナス日収益絶対合計','higher'],gain_to_pain_ratio:['Gain-to-Pain','GPR','利益合計÷損失合計の絶対値','higher']}},
-  trade_quality:{label:'トレード品質',metrics:{trade_count:['完了取引数','Trades','決済まで完了したデモ取引数','higher'],win_rate_pct:['勝率','Win Rate','完了取引のうち利益取引の割合','higher'],loss_rate_pct:['敗率','Loss Rate','完了取引のうち損失取引の割合','lower'],average_win:['平均利益','Avg Win','利益取引1件あたりの平均利益','higher'],average_loss:['平均損失','Avg Loss','損失取引1件あたりの平均損失','higher'],payoff_ratio:['ペイオフレシオ','Payoff','平均利益÷平均損失の絶対値','higher'],risk_reward_ratio:['リスクリワード','Risk/Reward','平均利益÷平均損失の絶対値。Payoffと同じ定義','higher'],profit_factor:['プロフィットファクター','Profit Factor','総利益÷総損失の絶対値','higher'],expectancy_per_trade:['期待値／取引','Expectancy','完了取引1件あたりの平均損益','higher'],average_holding_days:['平均保有日数','Holding Days','現在・完了ポジションの平均保有期間','neutral']}},
-  portfolio:{label:'ポートフォリオ',metrics:{turnover_ratio:['売買回転率','Turnover','売買金額÷平均評価額','lower'],gross_exposure_pct:['総エクスポージャー','Gross Exposure','資産に対する保有時価の割合','neutral'],net_exposure_pct:['純エクスポージャー','Net Exposure','ロング－ショートの純保有比率','neutral'],cash_ratio_pct:['現金比率','Cash Ratio','総資産に占める現金割合','neutral'],concentration_hhi:['集中度','HHI','銘柄ウェイト二乗和。高いほど集中','lower'],max_position_weight_pct:['最大銘柄比率','Max Weight','最大ポジションの資産比率','lower'],position_count:['保有銘柄数','Positions','現在の保有銘柄数','neutral'],recovery_factor:['リカバリーファクター','Recovery','累計損益÷最大DD額','higher']}},
-  benchmark:{label:'ベンチマーク',metrics:{beta:['ベータ','Beta','ベンチマーク変動に対する感応度','neutral'],alpha_pct:['アルファ','Alpha','ベータ調整後の年率超過収益','higher'],correlation:['相関係数','Correlation','ベンチマークとの連動性','neutral'],tracking_error_pct:['トラッキングエラー','Tracking Error','ベンチマーク差の日次変動を年率化','lower'],information_ratio:['インフォメーションレシオ','IR','超過収益÷トラッキングエラー','higher'],benchmark_excess_return_pct:['ベンチマーク超過収益','Excess Return','同期間のベンチマークとの差','higher']}},
+export const DEFAULT_ANALYSIS_SETTINGS = Object.freeze({
+  riskFreeRateAnnualPct: 0,
+  targetReturnAnnualPct: 0,
+  annualizationDays: 252,
+  varConfidence: 0.95,
+  scenarioTargetPct: 16,
+  scenarioStopPct: -8,
 });
 
-export const CHART_MODES = Object.freeze([
-  ['equity','資産曲線'],['daily','日次損益'],['cumulative','累積損益'],['drawdown','ドローダウン'],['contribution','銘柄寄与'],['periodic','週次／月次'],
-]);
-export const PERIODS = Object.freeze([['1W',7],['1M',31],['3M',93],['YTD','YTD'],['ALL','ALL']]);
+export const RANGE_DAYS = Object.freeze({
+  '1W': 7,
+  '1M': 31,
+  '3M': 93,
+  '6M': 186,
+  '1Y': 366,
+  ALL: Infinity,
+});
 
-export function flattenMetrics(analytics) {
-  const rows=[];
-  for(const [groupKey,group] of Object.entries(PERFORMANCE_CATALOG)){
-    const values=analytics?.groups?.[groupKey]??{};
-    for(const [key,definition] of Object.entries(group.metrics)){
-      const source=values[key]??{value:null,status:'unavailable',reason:'指標が生成されていません。',unit:null};
-      rows.push({group:groupKey,groupLabel:group.label,key,label:definition[0],abbreviation:definition[1],description:definition[2],direction:definition[3],...source});
-    }
-  }
-  return rows;
+export const CHART_MODES = Object.freeze({
+  equity: { label:'資産額', field:'equity', unit:'JPY' },
+  cumulative_pnl: { label:'累積損益', field:'cumulative_pnl', unit:'JPY' },
+  daily_pnl: { label:'日次損益', field:'daily_pnl', unit:'JPY' },
+  drawdown: { label:'ドローダウン', field:'drawdown_pct', unit:'%' },
+  benchmark: { label:'ベンチマーク比較', field:'cumulative_return_pct', secondary:'benchmark_cumulative_return_pct', unit:'%' },
+});
+
+export const METRIC_DEFINITIONS = Object.freeze({
+  total_return_pct: '投下元本に対する現在までの累積収益率。',
+  cagr_pct: '複利ベースの年率成長率。短い履歴では算出しません。',
+  annualized_volatility_pct: '日次収益率の標準偏差を年率換算した総変動。',
+  downside_deviation_pct: '目標収益を下回った日だけを使う下方変動。',
+  max_drawdown_pct: '過去の最高評価額から最も深く下落した割合。',
+  current_drawdown_pct: '現在の評価額が直近ピークから何％下にあるか。',
+  max_drawdown_duration_days: 'ピークを回復できなかった最長観測日数。',
+  max_recovery_duration_days: 'ドローダウンの谷から元のピークへ戻るまでの最長日数。',
+  ulcer_index: 'ドローダウンの深さと継続を二乗平均で表す下方リスク。',
+  historical_var_pct: '指定信頼水準における過去の日次損失分位点。',
+  cvar_expected_shortfall_pct: 'VaRを超えた悪い日だけの平均損失。',
+  sharpe_ratio: '年率超過収益を総変動で割った値。',
+  sortino_ratio: '年率超過収益を下方変動だけで割った値。',
+  calmar_ratio: 'CAGRを最大ドローダウンの絶対値で割った値。',
+  omega_ratio: '目標を上回る利益総額を下回る損失総額で割った値。',
+  information_ratio: 'ベンチマーク超過収益をTracking Errorで割った値。',
+  tracking_error_pct: 'ベンチマークとの差分収益率の年率標準偏差。',
+  beta: 'ベンチマーク変動に対する感応度。',
+  annualized_alpha_pct: 'Betaで説明できない年率超過収益。',
+  daily_win_rate_pct: '日次収益率がプラスだった日の割合。',
+  payoff_ratio: '平均利益日を平均損失日の絶対値で割った値。',
+  profit_factor: '利益日の収益合計を損失日の損失合計で割った値。',
+  expectancy_pct: '1観測日あたりの平均収益率。',
+  reward_risk_ratio: '平均利益と平均損失の比率。',
+  turnover: '売買金額累計を平均評価額で割った値。',
+  exposure_pct: '評価額のうち株式ポジションに投下されている割合。',
+  cash_ratio_pct: '評価額のうち現金が占める割合。',
+  largest_position_weight_pct: '最大保有銘柄の評価額比率。',
+  hhi_concentration: '保有比率の二乗和。高いほど集中。',
+  effective_positions: 'HHIの逆数で表した実効分散銘柄数。',
+});
+
+export const finite = value => {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const mean = values => values.length ? values.reduce((sum,value)=>sum+value,0) / values.length : null;
+const standardDeviation = values => {
+  if (!values.length) return null;
+  const average = mean(values);
+  return Math.sqrt(values.reduce((sum,value)=>sum+(value-average)**2,0) / values.length);
+};
+const quantile = (values, probability) => {
+  if (!values.length) return null;
+  const sorted=[...values].sort((a,b)=>a-b),index=(sorted.length-1)*probability,lower=Math.floor(index),upper=Math.ceil(index);
+  return lower===upper?sorted[lower]:sorted[lower]+(sorted[upper]-sorted[lower])*(index-lower);
+};
+
+export function filterSeriesByRange(series, range = 'ALL') {
+  const rows = (series ?? []).filter(row => row?.date).sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  if (!rows.length || range === 'ALL' || !Number.isFinite(RANGE_DAYS[range])) return rows;
+  const end = new Date(`${rows.at(-1).date}T00:00:00Z`);
+  const start = new Date(end.getTime() - RANGE_DAYS[range] * 86_400_000);
+  return rows.filter(row => new Date(`${row.date}T00:00:00Z`) >= start);
 }
 
-export function formatAnalyticsValue(metric) {
-  if(metric?.value===null||metric?.value===undefined||metric?.value==='')return'N/A';
-  const value=Number(metric.value);if(!Number.isFinite(value))return String(metric.value);
-  if(metric.unit==='jpy')return new Intl.NumberFormat('ja-JP',{style:'currency',currency:'JPY',maximumFractionDigits:0}).format(value);
-  if(String(metric.unit??'').startsWith('pct'))return`${value>=0?'+':''}${value.toFixed(2)}%`;
-  if(metric.unit==='days')return`${value.toFixed(1)}日`;
-  if(metric.unit==='count')return`${Math.round(value)}`;
-  return value.toFixed(3);
+export function seriesReturns(series) {
+  const rows=(series??[]).filter(row=>finite(row.equity)!==null);
+  const returns=[];
+  for(let index=1;index<rows.length;index+=1){const previous=finite(rows[index-1].equity),current=finite(rows[index].equity);if(previous>0&&current!==null)returns.push(current/previous-1)}
+  return returns;
 }
 
-export function filterSeriesByPeriod(rows, period, now = new Date()) {
-  if(!Array.isArray(rows)||period==='ALL')return rows??[];
-  let start;
-  if(period==='YTD')start=new Date(now.getFullYear(),0,1);
-  else{const days=Number(PERIODS.find(item=>item[0]===period)?.[1]??0);start=new Date(now);start.setDate(start.getDate()-days);}
-  return rows.filter(row=>{const date=new Date(`${row.date}T00:00:00+09:00`);return!Number.isNaN(date.getTime())&&date>=start;});
+const metric = (value, status='ok', reason=null, required=0, available=0, unit=null) => ({ value:finite(value),status,reason,required_observations:required,available_observations:available,unit });
+const unavailable = (label, required, available, unit=null) => metric(null,'unavailable',`${label}には${required}観測が必要です（現在${available}）。`,required,available,unit);
+
+export function recalculateAnalysis(series, settings = DEFAULT_ANALYSIS_SETTINGS) {
+  const returns=seriesReturns(series),count=returns.length,annualization=Math.max(1,Number(settings.annualizationDays)||252),minimum=30,longMinimum=126;
+  const riskFreeDaily=(1+Number(settings.riskFreeRateAnnualPct||0)/100)**(1/annualization)-1;
+  const targetDaily=(1+Number(settings.targetReturnAnnualPct||0)/100)**(1/annualization)-1;
+  const average=mean(returns),std=standardDeviation(returns),excess=returns.map(value=>value-riskFreeDaily),excessMean=mean(excess);
+  const downside=returns.map(value=>Math.min(0,value-targetDaily)),downsideRms=downside.length?Math.sqrt(mean(downside.map(value=>value**2))):null;
+  const sharpe=count>=minimum&&std>0?excessMean/std*Math.sqrt(annualization):null;
+  const sortino=count>=minimum&&downsideRms>0?excessMean/downsideRms*Math.sqrt(annualization):null;
+  const gains=returns.map(value=>Math.max(0,value-targetDaily)).reduce((a,b)=>a+b,0),losses=-returns.map(value=>Math.min(0,value-targetDaily)).reduce((a,b)=>a+b,0);
+  const omega=count>=minimum&&losses>0?gains/losses:null;
+  const confidence=Math.min(.999,Math.max(.5,Number(settings.varConfidence)||.95)),varValue=count>=minimum?quantile(returns,1-confidence):null;
+  const tail=varValue===null?[]:returns.filter(value=>value<=varValue),cvar=count>=minimum&&tail.length?mean(tail):null;
+  const first=finite(series?.[0]?.equity),last=finite(series?.at(-1)?.equity),years=count/annualization,cagr=count>=longMinimum&&first>0&&last>0?(last/first)**(1/years)-1:null;
+  return {
+    risk_adjusted:{
+      sharpe_ratio: count>=minimum?metric(sharpe,sharpe===null?'unavailable':'ok',sharpe===null?'収益率の変動がありません。':null,minimum,count):unavailable('Sharpe Ratio',minimum,count),
+      sortino_ratio: count>=minimum?metric(sortino,sortino===null?'unavailable':'ok',sortino===null?'下方変動がありません。':null,minimum,count):unavailable('Sortino Ratio',minimum,count),
+      omega_ratio: count>=minimum?metric(omega,omega===null?'unavailable':'ok',omega===null?'目標を下回る収益がありません。':null,minimum,count):unavailable('Omega Ratio',minimum,count),
+    },
+    risk:{
+      annualized_volatility_pct: count>=minimum?metric(std*Math.sqrt(annualization)*100,'ok',null,minimum,count,'%'):unavailable('年率ボラティリティ',minimum,count,'%'),
+      downside_deviation_pct: count>=minimum?metric(downsideRms*Math.sqrt(annualization)*100,'ok',null,minimum,count,'%'):unavailable('下方偏差',minimum,count,'%'),
+      historical_var_pct: count>=minimum?metric(varValue*100,'ok',null,minimum,count,'%'):unavailable(`VaR ${Math.round(confidence*100)}%`,minimum,count,'%'),
+      cvar_expected_shortfall_pct: count>=minimum?metric(cvar*100,'ok',null,minimum,count,'%'):unavailable(`CVaR ${Math.round(confidence*100)}%`,minimum,count,'%'),
+    },
+    basic:{
+      cagr_pct: count>=longMinimum?metric(cagr*100,'ok',null,longMinimum,count,'%'):unavailable('CAGR',longMinimum,count,'%'),
+    },
+    scenario:{
+      target_pct:Number(settings.scenarioTargetPct)||0,
+      stop_pct:Number(settings.scenarioStopPct)||0,
+      reward_risk_ratio:Number(settings.scenarioStopPct)<0?Math.abs(Number(settings.scenarioTargetPct)/Number(settings.scenarioStopPct)):null,
+    },
+  };
 }
 
-export function analyticsRowsToCsv(analytics) {
-  const columns=['group','key','label','abbreviation','value','unit','status','reason'];
-  const escape=value=>{const text=String(value??'');return/[",\n]/.test(text)?`"${text.replaceAll('"','""')}"`:text;};
-  return[columns.join(','),...flattenMetrics(analytics).map(row=>columns.map(column=>escape(row[column])).join(','))].join('\n');
+export function chartRows(series, range, mode) {
+  const rows=filterSeriesByRange(series,range),definition=CHART_MODES[mode]??CHART_MODES.equity;
+  return rows.map(row=>({date:row.date,primary:finite(row[definition.field]),secondary:definition.secondary?finite(row[definition.secondary]):null,raw:row}));
+}
+
+export function analyticsSeriesToCsv(series) {
+  const columns=['date','equity','cumulative_pnl','cumulative_return_pct','daily_pnl','daily_return_pct','drawdown_pct','benchmark_cumulative_return_pct'];
+  return [columns.join(','),...(series??[]).map(row=>columns.map(column=>row[column]??'').join(','))].join('\n');
 }
