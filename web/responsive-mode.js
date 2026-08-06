@@ -6,7 +6,7 @@ function targetFor(name) {
     overview: '#top',
     decision: '#investmentDecisionReport',
     screening: '#screeningLab',
-    performance: '#demoTrade',
+    performance: '#performanceAnalytics',
     plans: '#investmentDecisionReport',
   })[name] ?? '#top';
 }
@@ -50,7 +50,6 @@ function installMobileNavigation() {
     if (!button) return;
     const name = button.dataset.target;
     if (name === 'plans') activateDecisionTab('plan');
-    if (name === 'performance') activateDecisionTab('pnl');
     if (name === 'decision') activateDecisionTab('judge');
     const selector = targetFor(name);
     document.querySelector(selector)?.scrollIntoView({ behavior: media.matches ? 'smooth' : 'auto', block: 'start' });
@@ -65,9 +64,7 @@ function convertRankingRows() {
   const labels = ['順位','銘柄','市場・業種','株価','総合','割安','品質','テクニカル','流動性','Trap','充足率','判定'];
   const apply = () => {
     body.querySelectorAll('tr').forEach(row => {
-      [...row.children].forEach((cell, index) => {
-        cell.dataset.label = labels[index] ?? '';
-      });
+      [...row.children].forEach((cell, index) => { cell.dataset.label = labels[index] ?? ''; });
     });
   };
   apply();
