@@ -1,39 +1,36 @@
 from __future__ import annotations
 
+import argparse
 import datetime as dt
+import json
 import math
-from dataclasses import asdict, dataclass
-from typing import Any, Iterable, Mapping, Sequence
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
+import requests
+
+BENCHMARK_URL = (
+    "https://query2.finance.yahoo.com/v8/finance/chart/{symbol}"
+    "?interval=1d&range=2y&includePrePost=false&events=div%2Csplits"
+)
 
 
 @dataclass(frozen=True)
-class PerformanceConfig:
-    annualization_days: int = 252
-    risk_free_rate_annual_pct: float = 0.0
-    target_return_annual_pct: float = 0.0
-    var_confidence: float = 0.95
-    min_annualized_returns: int = 30
-    min_long_horizon_returns: int = 126
+class AnalyticsConfig:
+    annualization: int = 252
+    min_basic_observations: int = 5
+    min_distribution_observations: int = 20
+    min_annualized_observations: int = 60
+    var_level: float = 0.95
+    risk_free_rate_annual: float = 0.0
     benchmark_symbol: str = "1306.T"
-
-    def __post_init__(self) -> None:
-        if self.annualization_days < 1:
-            raise ValueError("annualization_days must be positive")
-        if not 0.5 < self.var_confidence < 1.0:
-            raise ValueError("var_confidence must be between 0.5 and 1")
-        if self.min_annualized_returns < 2:
-            raise ValueError("min_annualized_returns must be at least 2")
-        if self.min_long_horizon_returns < self.min_annualized_returns:
-            raise ValueError("min_long_horizon_returns must be >= min_annualized_returns")
+    benchmark_name: str = "TOPIX連動型上場投資信託 (1306.T proxy)"
 
 
-Metric = dict[str, Any]
-
-
-def _finite(value: Any) -> float | None:
+def _number(value: Any) -> float | None:
     if value is None or value is pd.NA:
         return None
     try:
@@ -43,485 +40,474 @@ def _finite(value: Any) -> float | None:
     return parsed if math.isfinite(parsed) else None
 
 
-def _metric(
-    value: float | int | None,
-    *,
-    available: int,
-    required: int = 0,
-    status: str = "ok",
-    reason: str | None = None,
-    unit: str | None = None,
-) -> Metric:
-    parsed = _finite(value)
-    if value is None or (isinstance(value, float) and parsed is None):
-        parsed = None
-    elif isinstance(value, int):
-        parsed = int(value)
-    return {
-        "value": parsed,
-        "status": status,
-        "reason": reason,
-        "required_observations": required,
-        "available_observations": available,
-        "unit": unit,
-    }
+def _safe(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {str(key): _safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_safe(item) for item in value]
+    if isinstance(value, (pd.Timestamp, dt.datetime, dt.date)):
+        return value.isoformat()
+    if isinstance(value, (np.integer,)):
+        return int(value)
+    if isinstance(value, (np.floating, float)):
+        return None if not math.isfinite(float(value)) else float(value)
+    if value is pd.NA:
+        return None
+    return value
 
 
-def _unavailable(reason: str, *, available: int, required: int, unit: str | None = None) -> Metric:
-    return _metric(
-        None,
-        available=available,
-        required=required,
-        status="unavailable",
-        reason=reason,
-        unit=unit,
-    )
+def _load_json(path: Path, default: Any) -> Any:
+    if not path.exists():
+        return default
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _history_frame(history: Sequence[Mapping[str, Any]]) -> pd.DataFrame:
-    if not history:
-        return pd.DataFrame(columns=["equity", "realized_pnl", "unrealized_pnl", "total_pnl"])
-    frame = pd.DataFrame(history).copy()
-    if "date" not in frame or "equity" not in frame:
-        return pd.DataFrame(columns=["equity", "realized_pnl", "unrealized_pnl", "total_pnl"])
-    frame["date"] = pd.to_datetime(frame["date"], errors="coerce")
-    frame["equity"] = pd.to_numeric(frame["equity"], errors="coerce")
-    frame = frame.loc[frame["date"].notna() & frame["equity"].gt(0)].copy()
-    if frame.empty:
-        return pd.DataFrame(columns=["equity", "realized_pnl", "unrealized_pnl", "total_pnl"])
-    for column in ("realized_pnl", "unrealized_pnl", "total_pnl"):
-        frame[column] = pd.to_numeric(frame.get(column), errors="coerce")
-    frame["date"] = frame["date"].dt.tz_localize(None).dt.normalize()
-    return frame.sort_values("date", kind="stable").drop_duplicates("date", keep="last").set_index("date")
+def _write_json(path: Path, payload: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(_safe(payload), ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
 
 
-def _benchmark_series(benchmark_history: Any) -> pd.Series:
-    if benchmark_history is None:
-        return pd.Series(dtype=float)
-    if isinstance(benchmark_history, pd.Series):
-        series = benchmark_history.copy()
-    elif isinstance(benchmark_history, pd.DataFrame):
-        column = "close" if "close" in benchmark_history else benchmark_history.columns[0]
-        series = pd.to_numeric(benchmark_history[column], errors="coerce")
-    else:
-        frame = pd.DataFrame(benchmark_history)
-        if frame.empty or "date" not in frame:
-            return pd.Series(dtype=float)
-        value_column = "close" if "close" in frame else "value" if "value" in frame else None
-        if value_column is None:
-            return pd.Series(dtype=float)
-        frame["date"] = pd.to_datetime(frame["date"], errors="coerce")
-        frame[value_column] = pd.to_numeric(frame[value_column], errors="coerce")
-        frame = frame.loc[frame["date"].notna() & frame[value_column].notna()]
-        series = frame.set_index("date")[value_column]
-    if series.empty:
-        return pd.Series(dtype=float)
-    index = pd.to_datetime(series.index, errors="coerce")
-    valid = ~pd.isna(index)
-    series = pd.Series(pd.to_numeric(series.to_numpy(), errors="coerce"), index=index)
-    series = series.loc[valid & series.notna()]
-    if series.empty:
-        return pd.Series(dtype=float)
-    if isinstance(series.index, pd.DatetimeIndex) and series.index.tz is not None:
-        series.index = series.index.tz_convert("Asia/Tokyo").tz_localize(None)
-    series.index = pd.DatetimeIndex(series.index).normalize()
-    return series.sort_index().groupby(level=0).last()
-
-
-def _drawdown_details(equity: pd.Series) -> tuple[pd.Series, dict[str, int | None]]:
-    if equity.empty:
-        return pd.Series(dtype=float), {
-            "max_duration": None,
-            "current_duration": None,
-            "max_recovery": None,
-        }
-    drawdown = equity / equity.cummax() - 1.0
-    current = 0
-    maximum = 0
-    episode_start: int | None = None
-    trough_index: int | None = None
-    max_recovery: int | None = None
-    episode_min = 0.0
-    for index, value in enumerate(drawdown.to_numpy(dtype=float)):
-        if value < -1e-15:
-            current += 1
-            maximum = max(maximum, current)
-            if episode_start is None:
-                episode_start = index
-                episode_min = value
-                trough_index = index
-            elif value < episode_min:
-                episode_min = value
-                trough_index = index
-        else:
-            if episode_start is not None and trough_index is not None:
-                recovery = index - trough_index
-                max_recovery = recovery if max_recovery is None else max(max_recovery, recovery)
-            current = 0
-            episode_start = None
-            trough_index = None
-            episode_min = 0.0
-    return drawdown, {
-        "max_duration": maximum,
-        "current_duration": current,
-        "max_recovery": max_recovery,
-    }
-
-
-def _longest_streak(values: Iterable[bool]) -> int:
-    longest = 0
+def _consecutive(values: pd.Series, predicate: Any) -> int:
+    best = 0
     current = 0
     for value in values:
-        current = current + 1 if value else 0
-        longest = max(longest, current)
-    return longest
+        if predicate(float(value)):
+            current += 1
+            best = max(best, current)
+        else:
+            current = 0
+    return best
 
 
-def _metric_or_insufficient(
-    value: float | None,
-    *,
-    available: int,
-    required: int,
-    label: str,
-    unit: str | None = None,
-) -> Metric:
-    if available < required:
-        return _unavailable(
-            f"{label}には{required}観測が必要です（現在{available}）。",
-            available=available,
-            required=required,
-            unit=unit,
-        )
-    if value is None or not math.isfinite(value):
-        return _unavailable(
-            f"{label}の分母または必要な変動がありません。",
-            available=available,
-            required=required,
-            unit=unit,
-        )
-    return _metric(value, available=available, required=required, unit=unit)
+def _metric(value: float | None, status: str = "ok", note: str | None = None) -> dict[str, Any]:
+    return {"value": value, "status": status, "note": note}
 
 
-def _closed_trade_statistics(
-    trades: Sequence[Mapping[str, Any]],
-    seed_positions: Sequence[Mapping[str, Any]],
-) -> dict[str, Any]:
-    seeds = {
-        str(position.get("symbol")): {
-            "cost": _finite(position.get("entry_price") or position.get("avg_cost")),
-            "opened_at": position.get("entry_time") or position.get("opened_at"),
+def _insufficient(required: int, actual: int) -> dict[str, Any]:
+    return _metric(None, "insufficient_history", f"{required}営業日以上を推奨。現在{actual}日。")
+
+
+def _returns_from_history(history: pd.DataFrame, seed_cost_basis: float | None) -> pd.Series:
+    if history.empty:
+        return pd.Series(dtype=float)
+    reported = pd.to_numeric(history.get("daily_return_pct"), errors="coerce") / 100.0
+    if reported.notna().any():
+        return reported.dropna()
+    equity = pd.to_numeric(history["equity"], errors="coerce")
+    returns = equity.pct_change(fill_method=None)
+    if seed_cost_basis and seed_cost_basis > 0 and not equity.empty and pd.notna(equity.iloc[0]):
+        returns.iloc[0] = float(equity.iloc[0]) / seed_cost_basis - 1.0
+    return returns.dropna()
+
+
+def _drawdown_series(history: pd.DataFrame, seed_cost_basis: float | None) -> pd.Series:
+    if history.empty:
+        return pd.Series(dtype=float)
+    equity = pd.to_numeric(history["equity"], errors="coerce").dropna()
+    if equity.empty:
+        return pd.Series(dtype=float)
+    if seed_cost_basis and seed_cost_basis > 0:
+        base_date = equity.index[0] - pd.Timedelta(days=1)
+        equity = pd.concat([pd.Series([seed_cost_basis], index=[base_date]), equity])
+    running_peak = equity.cummax()
+    return equity / running_peak - 1.0
+
+
+def _drawdown_details(drawdown: pd.Series, equity: pd.Series) -> dict[str, Any]:
+    if drawdown.empty or equity.empty:
+        return {
+            "max_drawdown_pct": None,
+            "current_drawdown_pct": None,
+            "peak_date": None,
+            "trough_date": None,
+            "recovery_date": None,
+            "drawdown_duration_periods": 0,
+            "recovery_duration_periods": None,
+            "time_under_water_periods": 0,
         }
-        for position in seed_positions
+    aligned = drawdown.reindex(equity.index).fillna(0.0)
+    trough_date = aligned.idxmin()
+    max_dd = float(aligned.loc[trough_date])
+    pre = equity.loc[:trough_date]
+    peak_value = float(pre.max())
+    peak_candidates = pre[pre == peak_value]
+    peak_date = peak_candidates.index[-1]
+    after = equity.loc[trough_date:]
+    recovered = after[after >= peak_value]
+    recovery_date = recovered.index[0] if not recovered.empty else None
+    drawdown_duration = max(0, int(equity.index.get_loc(trough_date) - equity.index.get_loc(peak_date)))
+    recovery_duration = None
+    if recovery_date is not None:
+        recovery_duration = max(0, int(equity.index.get_loc(recovery_date) - equity.index.get_loc(trough_date)))
+    underwater = aligned < 0
+    time_under_water = int(underwater.sum())
+    return {
+        "max_drawdown_pct": max_dd * 100,
+        "current_drawdown_pct": float(aligned.iloc[-1]) * 100,
+        "peak_date": peak_date,
+        "trough_date": trough_date,
+        "recovery_date": recovery_date,
+        "drawdown_duration_periods": drawdown_duration,
+        "recovery_duration_periods": recovery_duration,
+        "time_under_water_periods": time_under_water,
     }
-    returns: list[float] = []
-    holding_days: list[int] = []
-    for trade in trades:
-        if str(trade.get("side")) not in {"SIM_SELL", "SELL"}:
-            continue
-        seed = seeds.get(str(trade.get("symbol")))
-        price = _finite(trade.get("price"))
-        if not seed or not seed["cost"] or price is None:
-            continue
-        returns.append(price / float(seed["cost"]) - 1.0)
-        try:
-            opened = pd.Timestamp(seed["opened_at"]).date()
-            closed = pd.Timestamp(trade.get("date")).date()
-            holding_days.append(max(0, (closed - opened).days))
-        except (TypeError, ValueError):
-            pass
-    return {"returns": returns, "holding_days": holding_days}
 
 
-def analyze_performance(
-    history: Sequence[Mapping[str, Any]],
-    trades: Sequence[Mapping[str, Any]],
-    positions: Sequence[Mapping[str, Any]],
-    summary: Mapping[str, Any],
-    *,
-    seed_positions: Sequence[Mapping[str, Any]] = (),
-    benchmark_history: Any = None,
-    benchmark_error: str | None = None,
-    config: PerformanceConfig = PerformanceConfig(),
-    generated_at: str | None = None,
+def _fetch_benchmark(symbol: str, timeout: float = 20.0) -> pd.Series:
+    response = requests.get(
+        BENCHMARK_URL.format(symbol=symbol),
+        timeout=timeout,
+        headers={"Accept": "application/json", "User-Agent": "ValueScopeAnalytics/1.0"},
+    )
+    response.raise_for_status()
+    result = (response.json().get("chart", {}).get("result") or [None])[0]
+    if not isinstance(result, dict):
+        return pd.Series(dtype=float)
+    timestamps = result.get("timestamp") or []
+    quote = ((result.get("indicators") or {}).get("quote") or [{}])[0]
+    adjusted = ((result.get("indicators") or {}).get("adjclose") or [{}])[0]
+    closes = adjusted.get("adjclose") or quote.get("close") or []
+    rows: dict[pd.Timestamp, float] = {}
+    for index, timestamp in enumerate(timestamps):
+        close = _number(closes[index] if index < len(closes) else None)
+        if close is None:
+            continue
+        date = pd.Timestamp(timestamp, unit="s", tz="UTC").tz_convert("Asia/Tokyo").normalize().tz_localize(None)
+        rows[date] = close
+    return pd.Series(rows, dtype=float).sort_index()
+
+
+def _benchmark_metrics(portfolio_returns: pd.Series, benchmark_prices: pd.Series, config: AnalyticsConfig) -> dict[str, Any]:
+    empty = {
+        "name": config.benchmark_name,
+        "symbol": config.benchmark_symbol,
+        "paired_observations": 0,
+        "total_return_pct": _metric(None, "unavailable", "ベンチマーク履歴がありません。"),
+        "excess_return_pct": _metric(None, "unavailable"),
+        "beta": _metric(None, "unavailable"),
+        "alpha_annual_pct": _metric(None, "unavailable"),
+        "tracking_error_pct": _metric(None, "unavailable"),
+        "information_ratio": _metric(None, "unavailable"),
+        "correlation": _metric(None, "unavailable"),
+        "up_capture_pct": _metric(None, "unavailable"),
+        "down_capture_pct": _metric(None, "unavailable"),
+    }
+    if portfolio_returns.empty or benchmark_prices.empty:
+        return empty
+    benchmark_returns = benchmark_prices.pct_change(fill_method=None).dropna()
+    portfolio = portfolio_returns.copy()
+    portfolio.index = pd.to_datetime(portfolio.index).tz_localize(None).normalize()
+    benchmark_returns.index = pd.to_datetime(benchmark_returns.index).tz_localize(None).normalize()
+    paired = pd.concat([portfolio.rename("portfolio"), benchmark_returns.rename("benchmark")], axis=1).dropna()
+    n = len(paired)
+    empty["paired_observations"] = n
+    if n == 0:
+        return empty
+    benchmark_total = float((1 + paired["benchmark"]).prod() - 1.0)
+    portfolio_total = float((1 + paired["portfolio"]).prod() - 1.0)
+    empty["total_return_pct"] = _metric(benchmark_total * 100)
+    empty["excess_return_pct"] = _metric((portfolio_total - benchmark_total) * 100)
+    if n < config.min_distribution_observations:
+        for key in ("beta", "alpha_annual_pct", "tracking_error_pct", "information_ratio", "correlation", "up_capture_pct", "down_capture_pct"):
+            empty[key] = _insufficient(config.min_distribution_observations, n)
+        return empty
+    benchmark_var = float(paired["benchmark"].var(ddof=0))
+    beta = float(paired.cov(ddof=0).loc["portfolio", "benchmark"] / benchmark_var) if benchmark_var > 0 else None
+    daily_alpha = float(paired["portfolio"].mean() - (beta or 0.0) * paired["benchmark"].mean()) if beta is not None else None
+    active = paired["portfolio"] - paired["benchmark"]
+    tracking = float(active.std(ddof=0) * math.sqrt(config.annualization))
+    info = float(active.mean() * config.annualization / tracking) if tracking > 0 else None
+    corr = float(paired["portfolio"].corr(paired["benchmark"]))
+    up = paired[paired["benchmark"] > 0]
+    down = paired[paired["benchmark"] < 0]
+    up_capture = float(up["portfolio"].mean() / up["benchmark"].mean() * 100) if not up.empty and up["benchmark"].mean() != 0 else None
+    down_capture = float(down["portfolio"].mean() / down["benchmark"].mean() * 100) if not down.empty and down["benchmark"].mean() != 0 else None
+    empty.update(
+        {
+            "beta": _metric(beta),
+            "alpha_annual_pct": _metric(None if daily_alpha is None else daily_alpha * config.annualization * 100),
+            "tracking_error_pct": _metric(tracking * 100),
+            "information_ratio": _metric(info),
+            "correlation": _metric(corr),
+            "up_capture_pct": _metric(up_capture),
+            "down_capture_pct": _metric(down_capture),
+        }
+    )
+    return empty
+
+
+def calculate_performance_analytics(
+    history_rows: list[dict[str, Any]],
+    latest_report: dict[str, Any],
+    portfolio_state: dict[str, Any],
+    trades: list[dict[str, Any]],
+    benchmark_prices: pd.Series | None = None,
+    config: AnalyticsConfig = AnalyticsConfig(),
 ) -> dict[str, Any]:
-    frame = _history_frame(history)
-    observations = len(frame)
-    equity = pd.to_numeric(frame.get("equity", pd.Series(dtype=float)), errors="coerce").dropna()
-    returns = equity.pct_change(fill_method=None).dropna()
-    return_count = len(returns)
-    drawdown, durations = _drawdown_details(equity)
-    initial_equity = _finite(summary.get("seed_cost_basis"))
-    if initial_equity is None:
-        initial_equity = _finite(equity.iloc[0]) if not equity.empty else None
-    final_equity = _finite(summary.get("equity"))
-    if final_equity is None:
-        final_equity = _finite(equity.iloc[-1]) if not equity.empty else None
-    total_return = (
-        (final_equity / initial_equity - 1.0) * 100
-        if initial_equity and final_equity is not None
-        else None
-    )
-    latest_daily_return = _finite(returns.iloc[-1] * 100) if not returns.empty else None
+    history = pd.DataFrame(history_rows)
+    if not history.empty:
+        history["date"] = pd.to_datetime(history["date"], errors="coerce")
+        history = history.dropna(subset=["date"]).drop_duplicates("date", keep="last").sort_values("date").set_index("date")
+    seed = _number(portfolio_state.get("seed_cost_basis"))
+    if seed is None:
+        seed = 30_722_100.0
+    returns = _returns_from_history(history, seed)
+    n = len(returns)
+    equity = pd.to_numeric(history.get("equity", pd.Series(dtype=float)), errors="coerce").dropna()
+    if seed and not equity.empty:
+        base_date = equity.index[0] - pd.Timedelta(days=1)
+        equity_with_base = pd.concat([pd.Series([seed], index=[base_date]), equity])
+    else:
+        equity_with_base = equity
+    drawdown = _drawdown_series(history, seed)
+    dd = _drawdown_details(drawdown, equity_with_base)
+    latest_summary = latest_report.get("summary", {})
+    total_return = _number(latest_summary.get("cumulative_return_pct"))
+    if total_return is None and seed and not equity.empty:
+        total_return = (float(equity.iloc[-1]) / seed - 1.0) * 100
+    best_day = float(returns.max() * 100) if not returns.empty else None
+    worst_day = float(returns.min() * 100) if not returns.empty else None
+    wins = returns[returns > 0]
+    losses = returns[returns < 0]
+    avg_win = float(wins.mean() * 100) if not wins.empty else None
+    avg_loss = float(losses.mean() * 100) if not losses.empty else None
+    payoff = float(wins.mean() / abs(losses.mean())) if not wins.empty and not losses.empty and losses.mean() != 0 else None
+    profit_factor = float(wins.sum() / abs(losses.sum())) if not wins.empty and not losses.empty and losses.sum() != 0 else None
+    expectancy = float(returns.mean() * 100) if not returns.empty else None
+    gain_to_pain = float(returns.sum() / abs(losses.sum())) if not losses.empty and losses.sum() != 0 else None
+    omega = float(wins.sum() / abs(losses.sum())) if n >= config.min_distribution_observations and not losses.empty and losses.sum() != 0 else None
 
-    risk_free_daily = (1 + config.risk_free_rate_annual_pct / 100) ** (1 / config.annualization_days) - 1
-    target_daily = (1 + config.target_return_annual_pct / 100) ** (1 / config.annualization_days) - 1
-    excess = returns - risk_free_daily
-    annualized_vol = float(returns.std(ddof=0) * math.sqrt(config.annualization_days) * 100) if return_count else None
-    annualized_excess = float(excess.mean() * config.annualization_days * 100) if return_count else None
-    sharpe = (
-        float(excess.mean() / returns.std(ddof=0) * math.sqrt(config.annualization_days))
-        if return_count and returns.std(ddof=0) > 0
-        else None
-    )
-    downside = (returns - target_daily).clip(upper=0)
-    downside_deviation = (
-        float(math.sqrt(float((downside.pow(2)).mean())) * math.sqrt(config.annualization_days) * 100)
-        if return_count
-        else None
-    )
-    sortino = (
-        float(excess.mean() / math.sqrt(float(downside.pow(2).mean())) * math.sqrt(config.annualization_days))
-        if return_count and float(downside.pow(2).mean()) > 0
-        else None
-    )
-    years = return_count / config.annualization_days
-    cagr = (
-        ((final_equity / initial_equity) ** (1 / years) - 1.0) * 100
-        if initial_equity and final_equity and years > 0
-        else None
-    )
-    max_drawdown = float(drawdown.min() * 100) if not drawdown.empty else None
-    current_drawdown = float(drawdown.iloc[-1] * 100) if not drawdown.empty else None
-    average_drawdown = float(drawdown.mean() * 100) if not drawdown.empty else None
-    ulcer_index = float(math.sqrt(float((drawdown.mul(100).pow(2)).mean()))) if not drawdown.empty else None
-    calmar = (
-        cagr / abs(max_drawdown)
-        if cagr is not None and max_drawdown is not None and max_drawdown < 0
-        else None
-    )
-    gains_over_target = (returns - target_daily).clip(lower=0).sum()
-    losses_under_target = -(returns - target_daily).clip(upper=0).sum()
-    omega = float(gains_over_target / losses_under_target) if losses_under_target > 0 else None
+    distribution_ok = n >= config.min_distribution_observations
+    annual_ok = n >= config.min_annualized_observations
+    volatility = float(returns.std(ddof=0) * math.sqrt(config.annualization) * 100) if distribution_ok else None
+    downside = returns[returns < 0]
+    downside_deviation = float(downside.std(ddof=0) * math.sqrt(config.annualization) * 100) if distribution_ok and len(downside) >= 2 else None
+    mean_annual = float(returns.mean() * config.annualization) if annual_ok else None
+    risk_free = config.risk_free_rate_annual
+    sharpe = None
+    if annual_ok and volatility and volatility > 0 and mean_annual is not None:
+        sharpe = (mean_annual - risk_free) / (volatility / 100)
+    sortino = None
+    if annual_ok and downside_deviation and downside_deviation > 0 and mean_annual is not None:
+        sortino = (mean_annual - risk_free) / (downside_deviation / 100)
+    cagr = None
+    if annual_ok and seed and not equity.empty:
+        years = n / config.annualization
+        if years > 0 and float(equity.iloc[-1]) > 0:
+            cagr = (float(equity.iloc[-1]) / seed) ** (1 / years) - 1.0
+    calmar = None
+    if cagr is not None and dd["max_drawdown_pct"] is not None and dd["max_drawdown_pct"] < 0:
+        calmar = cagr / abs(dd["max_drawdown_pct"] / 100)
+    recovery_factor = None
+    if total_return is not None and dd["max_drawdown_pct"] is not None and dd["max_drawdown_pct"] < 0:
+        recovery_factor = total_return / abs(dd["max_drawdown_pct"])
+    ulcer = float(math.sqrt(float(((drawdown.clip(upper=0) * 100) ** 2).mean()))) if distribution_ok and not drawdown.empty else None
+    pain_index = float(abs(drawdown.clip(upper=0).mean()) * 100) if distribution_ok and not drawdown.empty else None
+    historical_var = None
+    historical_cvar = None
+    skew = None
+    kurtosis = None
+    if distribution_ok:
+        quantile = float(returns.quantile(1 - config.var_level))
+        historical_var = quantile * 100
+        tail = returns[returns <= quantile]
+        historical_cvar = float(tail.mean() * 100) if not tail.empty else None
+        skew = float(returns.skew())
+        kurtosis = float(returns.kurt())
 
-    var_return: float | None = None
-    cvar_return: float | None = None
-    if return_count:
-        var_return = float(returns.quantile(1 - config.var_confidence) * 100)
-        tail = returns.loc[returns <= returns.quantile(1 - config.var_confidence)]
-        cvar_return = float(tail.mean() * 100) if not tail.empty else None
+    statuses = {
+        "annualized": "ok" if annual_ok else "insufficient_history",
+        "distribution": "ok" if distribution_ok else "insufficient_history",
+        "basic": "ok" if n >= config.min_basic_observations else "insufficient_history",
+    }
+    annual_note = None if annual_ok else f"Sharpe・Sortino・CAGR・Calmarは{config.min_annualized_observations}営業日以上で表示。現在{n}日。"
+    distribution_note = None if distribution_ok else f"Volatility・VaR・CVaR等は{config.min_distribution_observations}営業日以上で表示。現在{n}日。"
 
-    winners = returns.loc[returns > 0]
-    losers = returns.loc[returns < 0]
-    flats = returns.loc[returns == 0]
-    average_win = float(winners.mean() * 100) if not winners.empty else None
-    average_loss = float(losers.mean() * 100) if not losers.empty else None
-    payoff = average_win / abs(average_loss) if average_win is not None and average_loss not in (None, 0) else None
-    profit_factor = float(winners.sum() / abs(losers.sum())) if not losers.empty and losers.sum() != 0 else None
-    expectancy = float(returns.mean() * 100) if return_count else None
-
-    benchmark = _benchmark_series(benchmark_history)
-    benchmark_metrics_reason = benchmark_error
-    aligned_portfolio = pd.Series(dtype=float)
-    aligned_benchmark = pd.Series(dtype=float)
-    if not benchmark.empty and not equity.empty:
-        benchmark_on_dates = benchmark.reindex(equity.index, method="ffill")
-        benchmark_returns = benchmark_on_dates.pct_change(fill_method=None)
-        joined = pd.concat([returns.rename("portfolio"), benchmark_returns.rename("benchmark")], axis=1).dropna()
-        if not joined.empty:
-            aligned_portfolio = joined["portfolio"]
-            aligned_benchmark = joined["benchmark"]
-    benchmark_count = len(aligned_portfolio)
-    tracking_error = None
-    information_ratio = None
-    beta = None
-    alpha = None
-    if benchmark_count:
-        active = aligned_portfolio - aligned_benchmark
-        active_std = float(active.std(ddof=0))
-        tracking_error = active_std * math.sqrt(config.annualization_days) * 100
-        if active_std > 0:
-            information_ratio = float(active.mean() / active_std * math.sqrt(config.annualization_days))
-        benchmark_variance = float(aligned_benchmark.var(ddof=0))
-        if benchmark_variance > 0:
-            beta = float(aligned_portfolio.cov(aligned_benchmark, ddof=0) / benchmark_variance)
-            benchmark_excess = aligned_benchmark - risk_free_daily
-            portfolio_excess = aligned_portfolio - risk_free_daily
-            alpha = float((portfolio_excess.mean() - beta * benchmark_excess.mean()) * config.annualization_days * 100)
-    elif benchmark_metrics_reason is None:
-        benchmark_metrics_reason = "ポートフォリオ日付とベンチマーク日付の共通観測がありません。"
-
-    position_values: list[float] = []
-    for position in positions:
-        quantity = _finite(position.get("quantity")) or 0.0
-        price = _finite(position.get("current_price") or position.get("price") or position.get("avg_cost"))
-        if quantity > 0 and price is not None and price >= 0:
-            position_values.append(quantity * price)
-    cash = _finite(summary.get("cash")) or 0.0
-    market_value = sum(position_values)
-    portfolio_equity = _finite(summary.get("equity")) or cash + market_value
-    weights = [value / portfolio_equity for value in position_values] if portfolio_equity > 0 else []
-    hhi = sum(weight * weight for weight in weights) if weights else None
-    effective_positions = 1 / hhi if hhi and hhi > 0 else None
-    exposure = market_value / portfolio_equity * 100 if portfolio_equity > 0 else None
-    cash_ratio = cash / portfolio_equity * 100 if portfolio_equity > 0 else None
-    largest_weight = max(weights) * 100 if weights else None
-
-    trade_values = [abs(_finite(trade.get("value")) or 0.0) for trade in trades]
-    average_equity = float(equity.mean()) if not equity.empty else portfolio_equity
-    turnover = sum(trade_values) / average_equity if average_equity > 0 else None
-    closed = _closed_trade_statistics(trades, seed_positions)
-    closed_returns = closed["returns"]
-    holding_days = closed["holding_days"]
-
-    preliminary_status = "insufficient_history" if return_count < config.min_annualized_returns else "preliminary" if return_count < config.min_long_horizon_returns else "usable"
-    latest_status = "preliminary" if observations < 2 else "ok"
-
-    basic = {
-        "observations": _metric(observations, available=observations, unit="days", status="ok"),
-        "initial_equity": _metric(initial_equity, available=observations, unit="JPY", status=latest_status),
-        "final_equity": _metric(final_equity, available=observations, unit="JPY", status=latest_status),
-        "realized_pnl": _metric(_finite(summary.get("realized_pnl")), available=observations, unit="JPY", status=latest_status),
-        "unrealized_pnl": _metric(_finite(summary.get("unrealized_pnl")), available=observations, unit="JPY", status=latest_status),
-        "total_pnl": _metric(_finite(summary.get("total_pnl")), available=observations, unit="JPY", status=latest_status),
-        "total_return_pct": _metric(total_return, available=observations, unit="%", status=latest_status, reason="評価額と投下元本から算出。"),
-        "latest_daily_return_pct": _metric_or_insufficient(latest_daily_return, available=return_count, required=1, label="日次収益率", unit="%"),
-        "cagr_pct": _metric_or_insufficient(cagr, available=return_count, required=config.min_long_horizon_returns, label="CAGR", unit="%"),
+    performance = {
+        "total_return_pct": _metric(total_return),
+        "total_pnl": _metric(_number(latest_summary.get("total_pnl"))),
+        "realized_pnl": _metric(_number(latest_summary.get("realized_pnl"))),
+        "unrealized_pnl": _metric(_number(latest_summary.get("unrealized_pnl"))),
+        "cagr_pct": _metric(None if cagr is None else cagr * 100) if annual_ok else _insufficient(config.min_annualized_observations, n),
+        "best_day_pct": _metric(best_day),
+        "worst_day_pct": _metric(worst_day),
+        "average_daily_return_pct": _metric(expectancy),
     }
     risk = {
-        "annualized_volatility_pct": _metric_or_insufficient(annualized_vol, available=return_count, required=config.min_annualized_returns, label="年率ボラティリティ", unit="%"),
-        "downside_deviation_pct": _metric_or_insufficient(downside_deviation, available=return_count, required=config.min_annualized_returns, label="下方偏差", unit="%"),
-        "max_drawdown_pct": _metric(max_drawdown, available=observations, required=1, unit="%", status=latest_status, reason="観測済み評価額のピークからの最大下落。"),
-        "current_drawdown_pct": _metric(current_drawdown, available=observations, required=1, unit="%", status=latest_status),
-        "average_drawdown_pct": _metric(average_drawdown, available=observations, required=1, unit="%", status=latest_status),
-        "max_drawdown_duration_days": _metric(durations["max_duration"], available=observations, required=1, unit="days", status=latest_status),
-        "current_drawdown_duration_days": _metric(durations["current_duration"], available=observations, required=1, unit="days", status=latest_status),
-        "max_recovery_duration_days": _metric(durations["max_recovery"], available=observations, required=2, unit="days", status="ok" if durations["max_recovery"] is not None else "unavailable", reason=None if durations["max_recovery"] is not None else "回復完了したドローダウンがありません。"),
-        "ulcer_index": _metric(ulcer_index, available=observations, required=1, status=latest_status),
-        "historical_var_pct": _metric_or_insufficient(var_return, available=return_count, required=config.min_annualized_returns, label=f"VaR {config.var_confidence:.0%}", unit="%"),
-        "cvar_expected_shortfall_pct": _metric_or_insufficient(cvar_return, available=return_count, required=config.min_annualized_returns, label=f"CVaR {config.var_confidence:.0%}", unit="%"),
-        "best_day_pct": _metric_or_insufficient(float(returns.max() * 100) if return_count else None, available=return_count, required=1, label="最良日", unit="%"),
-        "worst_day_pct": _metric_or_insufficient(float(returns.min() * 100) if return_count else None, available=return_count, required=1, label="最悪日", unit="%"),
-        "skewness": _metric_or_insufficient(float(returns.skew()) if return_count >= 3 else None, available=return_count, required=config.min_annualized_returns, label="歪度"),
-        "excess_kurtosis": _metric_or_insufficient(float(returns.kurt()) if return_count >= 4 else None, available=return_count, required=config.min_annualized_returns, label="超過尖度"),
+        "annualized_volatility_pct": _metric(volatility) if distribution_ok else _insufficient(config.min_distribution_observations, n),
+        "downside_deviation_pct": _metric(downside_deviation) if distribution_ok else _insufficient(config.min_distribution_observations, n),
+        "max_drawdown_pct": _metric(dd["max_drawdown_pct"]),
+        "current_drawdown_pct": _metric(dd["current_drawdown_pct"]),
+        "ulcer_index": _metric(ulcer) if distribution_ok else _insufficient(config.min_distribution_observations, n),
+        "pain_index_pct": _metric(pain_index) if distribution_ok else _insufficient(config.min_distribution_observations, n),
+        "historical_var_95_pct": _metric(historical_var) if distribution_ok else _insufficient(config.min_distribution_observations, n),
+        "historical_cvar_95_pct": _metric(historical_cvar) if distribution_ok else _insufficient(config.min_distribution_observations, n),
+        "skewness": _metric(skew) if distribution_ok else _insufficient(config.min_distribution_observations, n),
+        "excess_kurtosis": _metric(kurtosis) if distribution_ok else _insufficient(config.min_distribution_observations, n),
     }
-    risk_adjusted = {
-        "annualized_excess_return_pct": _metric_or_insufficient(annualized_excess, available=return_count, required=config.min_annualized_returns, label="年率超過収益", unit="%"),
-        "sharpe_ratio": _metric_or_insufficient(sharpe, available=return_count, required=config.min_annualized_returns, label="Sharpe Ratio"),
-        "sortino_ratio": _metric_or_insufficient(sortino, available=return_count, required=config.min_annualized_returns, label="Sortino Ratio"),
-        "calmar_ratio": _metric_or_insufficient(calmar, available=return_count, required=config.min_long_horizon_returns, label="Calmar Ratio"),
-        "omega_ratio": _metric_or_insufficient(omega, available=return_count, required=config.min_annualized_returns, label="Omega Ratio"),
-        "information_ratio": _metric_or_insufficient(information_ratio, available=benchmark_count, required=config.min_long_horizon_returns, label="Information Ratio"),
-        "tracking_error_pct": _metric_or_insufficient(tracking_error, available=benchmark_count, required=config.min_long_horizon_returns, label="Tracking Error", unit="%"),
-        "beta": _metric_or_insufficient(beta, available=benchmark_count, required=config.min_long_horizon_returns, label="Beta"),
-        "annualized_alpha_pct": _metric_or_insufficient(alpha, available=benchmark_count, required=config.min_long_horizon_returns, label="年率Alpha", unit="%"),
-    }
-    if benchmark_metrics_reason and benchmark_count < config.min_long_horizon_returns:
-        for key in ("information_ratio", "tracking_error_pct", "beta", "annualized_alpha_pct"):
-            risk_adjusted[key]["reason"] = f"{risk_adjusted[key]['reason']} {benchmark_metrics_reason}".strip()
-
-    win_loss = {
-        "positive_days": _metric(len(winners), available=return_count, required=1, unit="days", status="ok" if return_count else "unavailable", reason=None if return_count else "日次収益率がありません。"),
-        "negative_days": _metric(len(losers), available=return_count, required=1, unit="days", status="ok" if return_count else "unavailable", reason=None if return_count else "日次収益率がありません。"),
-        "flat_days": _metric(len(flats), available=return_count, required=1, unit="days", status="ok" if return_count else "unavailable", reason=None if return_count else "日次収益率がありません。"),
-        "daily_win_rate_pct": _metric_or_insufficient(float(len(winners) / return_count * 100) if return_count else None, available=return_count, required=1, label="日次勝率", unit="%"),
-        "average_winning_day_pct": _metric_or_insufficient(average_win, available=return_count, required=1, label="平均利益日", unit="%"),
-        "average_losing_day_pct": _metric_or_insufficient(average_loss, available=return_count, required=1, label="平均損失日", unit="%"),
-        "payoff_ratio": _metric_or_insufficient(payoff, available=return_count, required=2, label="Payoff Ratio"),
-        "profit_factor": _metric_or_insufficient(profit_factor, available=return_count, required=2, label="Profit Factor"),
-        "expectancy_pct": _metric_or_insufficient(expectancy, available=return_count, required=1, label="期待値", unit="% per day"),
-        "reward_risk_ratio": _metric_or_insufficient(payoff, available=return_count, required=2, label="Reward/Risk Ratio"),
-        "longest_winning_streak": _metric(_longest_streak(returns.gt(0).tolist()) if return_count else None, available=return_count, required=1, unit="days", status="ok" if return_count else "unavailable", reason=None if return_count else "日次収益率がありません。"),
-        "longest_losing_streak": _metric(_longest_streak(returns.lt(0).tolist()) if return_count else None, available=return_count, required=1, unit="days", status="ok" if return_count else "unavailable", reason=None if return_count else "日次収益率がありません。"),
+    adjusted = {
+        "sharpe_ratio": _metric(sharpe, "ok", annual_note) if annual_ok else _insufficient(config.min_annualized_observations, n),
+        "sortino_ratio": _metric(sortino, "ok", annual_note) if annual_ok else _insufficient(config.min_annualized_observations, n),
+        "calmar_ratio": _metric(calmar, "ok", annual_note) if annual_ok else _insufficient(config.min_annualized_observations, n),
+        "recovery_factor": _metric(recovery_factor),
+        "gain_to_pain_ratio": _metric(gain_to_pain, "ok" if n >= config.min_basic_observations else "insufficient_history"),
+        "omega_ratio": _metric(omega) if distribution_ok else _insufficient(config.min_distribution_observations, n),
+        "risk_reward_ratio": _metric(payoff, "ok" if payoff is not None else "insufficient_wins_losses", "平均プラス日 / 平均マイナス日の絶対値"),
     }
     trading = {
-        "trade_count": _metric(len(trades), available=len(trades), unit="trades"),
-        "turnover": _metric(turnover, available=len(trades), unit="x equity", status="ok"),
-        "exposure_pct": _metric(exposure, available=len(position_values), unit="%", status="ok" if portfolio_equity > 0 else "unavailable", reason=None if portfolio_equity > 0 else "評価額がありません。"),
-        "cash_ratio_pct": _metric(cash_ratio, available=len(position_values), unit="%", status="ok" if portfolio_equity > 0 else "unavailable", reason=None if portfolio_equity > 0 else "評価額がありません。"),
-        "largest_position_weight_pct": _metric(largest_weight, available=len(position_values), unit="%", status="ok" if weights else "unavailable", reason=None if weights else "保有ポジションがありません。"),
-        "hhi_concentration": _metric(hhi, available=len(position_values), status="ok" if weights else "unavailable", reason=None if weights else "保有ポジションがありません。"),
-        "effective_positions": _metric(effective_positions, available=len(position_values), status="ok" if effective_positions is not None else "unavailable", reason=None if effective_positions is not None else "保有ポジションがありません。"),
-        "closed_trade_win_rate_pct": _metric(float(sum(value > 0 for value in closed_returns) / len(closed_returns) * 100) if closed_returns else None, available=len(closed_returns), required=1, unit="%", status="ok" if closed_returns else "unavailable", reason=None if closed_returns else "決済済み取引の取得価格と売却価格が不足しています。"),
-        "average_holding_period_days": _metric(float(np.mean(holding_days)) if holding_days else None, available=len(holding_days), required=1, unit="days", status="ok" if holding_days else "unavailable", reason=None if holding_days else "保有開始日と決済日の組み合わせがありません。"),
+        "win_rate_pct": _metric(float((returns > 0).mean() * 100) if n else None),
+        "loss_rate_pct": _metric(float((returns < 0).mean() * 100) if n else None),
+        "payoff_ratio": _metric(payoff, "ok" if payoff is not None else "insufficient_wins_losses"),
+        "profit_factor": _metric(profit_factor, "ok" if profit_factor is not None else "insufficient_wins_losses"),
+        "expectancy_pct": _metric(expectancy),
+        "average_win_pct": _metric(avg_win),
+        "average_loss_pct": _metric(avg_loss),
+        "max_consecutive_wins": _metric(float(_consecutive(returns, lambda value: value > 0)) if n else None),
+        "max_consecutive_losses": _metric(float(_consecutive(returns, lambda value: value < 0)) if n else None),
+        "trade_count": _metric(float(len(trades))),
+        "turnover_today": _metric(_number(latest_summary.get("turnover_today"))),
     }
 
-    seed = initial_equity or (_finite(equity.iloc[0]) if not equity.empty else None)
-    benchmark_on_dates = benchmark.reindex(equity.index, method="ffill") if not benchmark.empty and not equity.empty else pd.Series(dtype=float)
-    benchmark_base = _finite(benchmark_on_dates.dropna().iloc[0]) if not benchmark_on_dates.dropna().empty else None
-    chart_series: list[dict[str, Any]] = []
-    for index, value in equity.items():
-        row = frame.loc[index]
-        cumulative_pnl = _finite(row.get("total_pnl"))
-        if cumulative_pnl is None and seed is not None:
-            cumulative_pnl = float(value - seed)
-        cumulative_return = _finite(row.get("cumulative_return_pct"))
-        if cumulative_return is None and seed:
-            cumulative_return = float((value / seed - 1) * 100)
-        previous = equity.shift(1).loc[index]
-        daily_pnl = None if pd.isna(previous) else float(value - previous)
-        daily_return_pct = None if pd.isna(previous) else float((value / previous - 1) * 100)
-        benchmark_cumulative = None
-        if benchmark_base and index in benchmark_on_dates.index:
-            benchmark_value = _finite(benchmark_on_dates.loc[index])
-            if benchmark_value is not None:
-                benchmark_cumulative = float((benchmark_value / benchmark_base - 1) * 100)
-        chart_series.append(
+    benchmark = _benchmark_metrics(returns, benchmark_prices if benchmark_prices is not None else pd.Series(dtype=float), config)
+
+    equity_series: list[dict[str, Any]] = []
+    daily_pnl_series: list[dict[str, Any]] = []
+    drawdown_series: list[dict[str, Any]] = []
+    previous_total_pnl = 0.0
+    if not history.empty:
+        history_dd = _drawdown_series(history, seed)
+        for date, row in history.iterrows():
+            total_pnl = _number(row.get("total_pnl")) or 0.0
+            equity_series.append(
+                {
+                    "date": date.date().isoformat(),
+                    "equity": _number(row.get("equity")),
+                    "total_pnl": total_pnl,
+                    "cumulative_return_pct": _number(row.get("cumulative_return_pct")),
+                }
+            )
+            daily_pnl_series.append(
+                {
+                    "date": date.date().isoformat(),
+                    "daily_pnl": total_pnl - previous_total_pnl,
+                    "daily_return_pct": _number(row.get("daily_return_pct")),
+                }
+            )
+            previous_total_pnl = total_pnl
+            dd_value = history_dd.get(date)
+            drawdown_series.append({"date": date.date().isoformat(), "drawdown_pct": None if dd_value is None else float(dd_value) * 100})
+
+    contributions: list[dict[str, Any]] = []
+    for decision in latest_report.get("decisions", []):
+        holding = decision.get("holding", {})
+        quantity = int(_number(holding.get("quantity")) or 0)
+        avg_cost = _number(holding.get("avg_cost"))
+        current = _number(decision.get("technical", {}).get("price"))
+        quote_valid = decision.get("quote", {}).get("valid") is True
+        if quantity <= 0 or avg_cost is None:
+            continue
+        valuation = current if quote_valid and current is not None else avg_cost
+        entry_value = avg_cost * quantity
+        current_value = valuation * quantity
+        pnl = current_value - entry_value
+        contributions.append(
             {
-                "date": pd.Timestamp(index).date().isoformat(),
-                "equity": float(value),
-                "cumulative_pnl": cumulative_pnl,
-                "cumulative_return_pct": cumulative_return,
-                "daily_pnl": daily_pnl,
-                "daily_return_pct": daily_return_pct,
-                "drawdown_pct": float(drawdown.loc[index] * 100),
-                "benchmark_cumulative_return_pct": benchmark_cumulative,
+                "code": decision.get("code"),
+                "company_name": decision.get("company_name"),
+                "quantity": quantity,
+                "entry_value": entry_value,
+                "current_value": current_value,
+                "pnl": pnl,
+                "return_pct": pnl / entry_value * 100 if entry_value else None,
+                "weight_pct": current_value / float(latest_summary.get("equity") or 1.0) * 100,
+                "quote_valid": quote_valid,
             }
         )
+    contributions.sort(key=lambda item: abs(float(item.get("pnl") or 0.0)), reverse=True)
 
+    warnings = [note for note in (annual_note, distribution_note) if note]
+    if n < config.min_basic_observations:
+        warnings.append(f"現在の実績は{n}営業日で、勝率・Risk/Reward・Profit Factorも参考値です。")
     return {
         "schema_version": 1,
-        "generated_at": generated_at or dt.datetime.now(dt.timezone.utc).isoformat(),
-        "config": asdict(config),
-        "reliability": {
-            "status": preliminary_status,
-            "equity_observations": observations,
-            "return_observations": return_count,
-            "annualized_metrics_minimum": config.min_annualized_returns,
-            "long_horizon_metrics_minimum": config.min_long_horizon_returns,
-            "message": (
-                "年率指標を評価するには履歴が不足しています。"
-                if preliminary_status == "insufficient_history"
-                else "年率指標は暫定値です。"
-                if preliminary_status == "preliminary"
-                else "最低履歴要件を満たしています。"
-            ),
+        "generated_at": dt.datetime.now(dt.timezone.utc),
+        "paper_only": True,
+        "sample": {
+            "observations": n,
+            "start_date": history.index.min() if not history.empty else None,
+            "end_date": history.index.max() if not history.empty else None,
+            "seed_cost_basis": seed,
+            "current_equity": _number(latest_summary.get("equity")),
+            "status": statuses,
         },
-        "period": {
-            "start": frame.index.min().date().isoformat() if not frame.empty else None,
-            "end": frame.index.max().date().isoformat() if not frame.empty else None,
+        "performance": performance,
+        "risk": risk,
+        "risk_adjusted": adjusted,
+        "trading_quality": trading,
+        "drawdown_details": dd,
+        "benchmark": benchmark,
+        "series": {
+            "equity": equity_series,
+            "daily_pnl": daily_pnl_series,
+            "drawdown": drawdown_series,
+            "contributions": contributions,
         },
-        "metrics": {
-            "basic": basic,
-            "risk": risk,
-            "risk_adjusted": risk_adjusted,
-            "win_loss": win_loss,
-            "trading_portfolio": trading,
-        },
-        "benchmark": {
-            "symbol": config.benchmark_symbol,
-            "observations": benchmark_count,
-            "status": "ok" if benchmark_count else "unavailable",
-            "reason": benchmark_metrics_reason,
-        },
-        "chart_series": chart_series,
+        "warnings": warnings,
         "definitions": {
-            "sharpe_ratio": "年率超過収益を総変動で割った値。",
-            "sortino_ratio": "年率超過収益を下方変動だけで割った値。",
-            "calmar_ratio": "CAGRを最大ドローダウンの絶対値で割った値。",
-            "omega_ratio": "目標収益を上回る利益総額を下回る損失総額で割った値。",
-            "profit_factor": "利益日の収益合計を損失日の損失合計で割った値。",
-            "payoff_ratio": "平均利益日の収益を平均損失日の絶対値で割った値。",
-            "ulcer_index": "ドローダウンの深さと継続を二乗平均で表す下方リスク指標。",
-            "hhi_concentration": "保有比率の二乗和。高いほど集中しています。",
+            "risk_reward_ratio": "平均プラス日 / 平均マイナス日の絶対値",
+            "profit_factor": "プラス日リターン合計 / マイナス日リターン合計の絶対値",
+            "gain_to_pain_ratio": "全期間リターン合計 / マイナス日リターン合計の絶対値",
+            "ulcer_index": "ドローダウン率の二乗平均平方根",
+            "historical_var_95_pct": "過去分布の下位5%点。負の値ほど1日損失リスクが大きい",
+            "historical_cvar_95_pct": "VaR95%以下の損失日の平均",
         },
     }
+
+
+def generate_performance_analytics(root: Path, config: AnalyticsConfig = AnalyticsConfig()) -> dict[str, Any]:
+    data_dir = root / "web" / "data" / "paper-trading"
+    history_payload = _load_json(data_dir / "equity-history.json", {"history": []})
+    latest_report = _load_json(data_dir / "latest-report.json", {})
+    portfolio = _load_json(data_dir / "portfolio.json", {})
+    trades_payload = _load_json(data_dir / "trades.json", {"trades": []})
+    benchmark_prices = pd.Series(dtype=float)
+    benchmark_error: str | None = None
+    try:
+        benchmark_prices = _fetch_benchmark(config.benchmark_symbol)
+    except (requests.RequestException, ValueError, KeyError) as exc:
+        benchmark_error = type(exc).__name__
+    payload = calculate_performance_analytics(
+        history_payload.get("history", []),
+        latest_report,
+        portfolio,
+        trades_payload.get("trades", []),
+        benchmark_prices,
+        config,
+    )
+    if benchmark_error:
+        payload["benchmark"]["fetch_error"] = benchmark_error
+    _write_json(data_dir / "performance-metrics.json", payload)
+    return payload
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Generate comprehensive paper portfolio analytics")
+    parser.add_argument("--root", type=Path, default=Path.cwd())
+    args = parser.parse_args(argv)
+    payload = generate_performance_analytics(args.root)
+    print(
+        json.dumps(
+            {
+                "observations": payload["sample"]["observations"],
+                "total_return_pct": payload["performance"]["total_return_pct"]["value"],
+                "max_drawdown_pct": payload["risk"]["max_drawdown_pct"]["value"],
+                "sharpe_status": payload["risk_adjusted"]["sharpe_ratio"]["status"],
+            },
+            ensure_ascii=False,
+        )
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
