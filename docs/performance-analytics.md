@@ -1,29 +1,21 @@
 # Portfolio performance analytics
 
-The paper monitor publishes `web/data/paper-trading/performance-analytics.json`. It is analysis-only and never changes the simulation rules or sends a broker order.
+The paper portfolio dashboard separates four chart views: equity curve, daily P/L, drawdown and per-position contribution. A period selector supports all history, 1M, 3M, 6M and 1Y views. Current validated quotes are appended as a live mark without rewriting daily history.
 
-## History requirements
+## Metrics shown
 
-A single equity observation can show current P/L and portfolio concentration, but it cannot define a daily return. Annualized volatility, Sharpe, Sortino, Omega, VaR and CVaR require at least 30 daily returns. CAGR, Calmar, Alpha, Beta, Information Ratio and Tracking Error require at least 126 aligned returns. Values below those limits are `null` with a Japanese explanation and the required/available observation counts.
+Return: cumulative return, total/realized/unrealized P/L, CAGR, average daily return, best and worst day.
 
-## Definitions
+Risk: annualized volatility, downside deviation, maximum and current drawdown, Ulcer Index, Pain Index, historical VaR 95%, historical CVaR 95%, skewness and excess kurtosis.
 
-- Total return: final equity divided by invested seed capital minus one.
-- Sharpe ratio: annualized excess return divided by total annualized volatility.
-- Sortino ratio: annualized excess return divided by downside deviation.
-- Calmar ratio: CAGR divided by the absolute maximum drawdown.
-- Omega ratio: returns above the configured target divided by returns below it.
-- Maximum drawdown: the largest peak-to-trough decline in the observed equity series.
-- Ulcer Index: root mean square of percentage drawdowns.
-- Historical VaR/CVaR: lower-tail historical daily return quantile and the mean beyond that quantile.
-- Profit Factor: sum of positive daily returns divided by the absolute sum of negative daily returns.
-- Payoff/Reward-Risk: average positive daily return divided by the absolute average negative daily return.
-- HHI concentration: sum of squared current position weights; its reciprocal is the effective number of positions.
+Risk-adjusted: Sharpe, Sortino, Calmar, Recovery Factor, Gain-to-Pain, Omega, and Risk/Reward defined as average positive day divided by the absolute average negative day.
 
-## Benchmark
+Trading quality: win/loss rates, Payoff Ratio, Profit Factor, Expectancy, average win/loss, longest win/loss streak, event count and turnover.
 
-The default benchmark is `1306.T`, a TOPIX-linked ETF available through the same public daily chart adapter. Dates are aligned using the latest benchmark observation available on or before each portfolio date; future benchmark prices are never backfilled. A fetch failure leaves benchmark metrics unavailable without failing the daily report.
+Benchmark: excess return, beta, annualized alpha, tracking error, Information Ratio, correlation, up capture and down capture against 1306.T as a TOPIX proxy when sufficient paired observations exist.
 
-## Chart series
+## History safeguards
 
-The JSON contains exact observed dates only: equity, cumulative P/L, cumulative return, daily P/L, daily return, drawdown and benchmark cumulative return. Missing dates are not interpolated. One observation is rendered as a point with an insufficient-history message rather than as an invented line.
+The app does not annualize a few days of performance. Distribution metrics normally require at least 20 daily observations; Sharpe, Sortino, CAGR and Calmar require at least 60. Until then, the UI displays `算定待ち` and the required sample size.
+
+Maximum drawdown includes the drawdown depth, peak date, trough date, recovery date, peak-to-trough duration, recovery duration and total underwater periods.
