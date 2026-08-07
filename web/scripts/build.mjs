@@ -1,5 +1,6 @@
 import { cp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+
 const root = resolve(import.meta.dirname, '..');
 const dist = resolve(root, 'dist');
 await rm(dist, { recursive:true, force:true });
@@ -18,6 +19,8 @@ const staticFiles = [
   'app-shell-core.js','app-shell.js','app-shell.css','app-shell-polish.css',
   'adaptive-shell.js','adaptive-shell.css',
   'parameter-control-core.js','parameter-control.js','parameter-control.css','font-boot.js','readability.css','mobile-overflow-guard.css','parameter-readable.css',
+  'parameter-category-core.js','parameter-category.js','parameter-category.css',
+  'phone-flow-core.js','phone-flow.js','phone-flow.css',
 ];
 for (const file of staticFiles) await cp(resolve(root, file), resolve(dist, file));
 for (const file of ['jquants-ranking.json','jquants-ranking.csv','live-ranking.json','live-ranking.csv']) {
@@ -39,6 +42,8 @@ for (const marker of [
   '<link rel="stylesheet" href="./readability.css" />',
   '<link rel="stylesheet" href="./mobile-overflow-guard.css" />',
   '<link rel="stylesheet" href="./parameter-readable.css" />',
+  '<link rel="stylesheet" href="./parameter-category.css" />',
+  '<link rel="stylesheet" href="./phone-flow.css" />',
 ]) {
   if (!index.includes(marker)) index = index.replace('</head>', `  ${marker}\n  </head>`);
 }
@@ -56,6 +61,8 @@ for (const marker of [
   '<script type="module" src="./adaptive-shell.js"></script>',
   '<script type="module" src="./fast-data-bootstrap.js"></script>',
   '<script type="module" src="./parameter-control.js"></script>',
+  '<script type="module" src="./parameter-category.js"></script>',
+  '<script type="module" src="./phone-flow.js"></script>',
 ]) {
   if (!index.includes(marker)) index = index.replace('</body>', `  ${marker}\n  </body>`);
 }
