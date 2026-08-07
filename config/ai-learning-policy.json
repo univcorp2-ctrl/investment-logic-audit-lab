@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "mode": "guarded_auto",
+  "random_seed": 42,
+  "minimum_training_days": 126,
+  "minimum_matured_rows": 500,
+  "minimum_securities": 8,
+  "minimum_oos_folds": 3,
+  "minimum_oos_days": 42,
+  "train_days": 126,
+  "test_days": 21,
+  "purge_days": 1,
+  "top_fraction": 0.3,
+  "objective_weights": {
+    "return": 0.4,
+    "drawdown": 0.3,
+    "stability": 0.2,
+    "turnover_penalty": 0.1
+  },
+  "auto_apply": {
+    "minimum_confidence": 0.75,
+    "minimum_sharpe_improvement": 0.15,
+    "maximum_total_return_disadvantage_pct": 1.0,
+    "minimum_parameter_stability": 0.7,
+    "maximum_relative_change": 0.1,
+    "maximum_turnover": 8.0
+  },
+  "rollback": {
+    "evaluation_days": 10,
+    "maximum_underperformance_pct": 2.0,
+    "maximum_drawdown_worsening_pct": 2.0
+  },
+  "paper_only": true
+}
