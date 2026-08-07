@@ -21,7 +21,8 @@ export function appendLiveEquity(rows, quotePayload, entryBasis) {
   if (current === null) return result;
   const generated = quotePayload.generated_at ? new Date(quotePayload.generated_at) : new Date();
   const label = generated.toISOString();
-  const cumulative = entryBasis ? (current / entryBasis - 1) * 100 : null;
+  const rawCumulative = entryBasis ? (current / entryBasis - 1) * 100 : null;
+  const cumulative = rawCumulative === null ? null : Math.round(rawCumulative * 1_000_000) / 1_000_000;
   result.push({ date: label, label:'現在', equity:current, total_pnl:entryBasis ? current-entryBasis : null, cumulative_return_pct:cumulative, live:true });
   return result;
 }
