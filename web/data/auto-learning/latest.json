@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-08T00:00:00+00:00",
+  "model": "gated-walk-forward-rule-selection-v1",
+  "mode": "learning_only",
+  "paper_only": true,
+  "real_order_allowed": false,
+  "candidate": {
+    "strategy": null,
+    "objective_score": null,
+    "metrics": {},
+    "baseline_excess_pct": null,
+    "sharpe_improvement": null,
+    "drawdown_worsening_pct": null,
+    "proposed_overrides": {},
+    "parameter_categories": {
+      "Fundamental": {},
+      "Technical": {},
+      "Risk": {}
+    }
+  },
+  "active": {
+    "approved": false,
+    "mode": "baseline",
+    "strategy": null,
+    "overrides": {},
+    "paper_only": true,
+    "real_order_allowed": false,
+    "reason": "運用可能な履歴が不足しているため既定デモルールを使用"
+  },
+  "gates": [],
+  "gate_summary": {
+    "passed": 0,
+    "total": 10,
+    "all_passed": false,
+    "failed": ["operational_observations"]
+  },
+  "confirmation": {
+    "current": 0,
+    "required": 2
+  },
+  "observations": {
+    "operational": 0,
+    "required_operational": 169,
+    "oos": 0,
+    "required_oos": 42
+  },
+  "next_action": "履歴を蓄積し、既定ルールで監視を継続",
+  "disclaimer": "自動学習は将来利益を保証しません。過学習を避けるため実注文へは接続しません。"
+}
