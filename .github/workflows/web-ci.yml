@@ -4,12 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - "web/**"
-      - ".github/workflows/web-ci.yml"
+      - 'web/**'
+      - '.github/workflows/web-ci.yml'
   pull_request:
     paths:
-      - "web/**"
-      - ".github/workflows/web-ci.yml"
+      - 'web/**'
+      - '.github/workflows/web-ci.yml'
 
 permissions:
   contents: read
@@ -17,11 +17,12 @@ permissions:
 jobs:
   web:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
           cache-dependency-path: web/package-lock.json
       - name: Install
@@ -36,3 +37,21 @@ jobs:
       - name: Production build
         working-directory: web
         run: npm run build
+      - name: Install Playwright Chromium
+        working-directory: web
+        run: |
+          npm install --no-save --package-lock=false @playwright/test@1.61.1
+          npx playwright install --with-deps chromium
+      - name: E2E — PC, iPad, iPhone
+        working-directory: web
+        run: npm run e2e
+      - name: Upload E2E artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-e2e-${{ github.run_id }}
+          path: |
+            web/playwright-report
+            web/test-results
+          if-no-files-found: warn
+          retention-days: 14
