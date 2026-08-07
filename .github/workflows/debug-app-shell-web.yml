@@ -1,4 +1,4 @@
-name: Temporary app shell web diagnostic
+name: Temporary loading performance diagnostic
 
 on:
   workflow_dispatch:
@@ -17,23 +17,23 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Capture unit-test output
+      - name: Capture tests
         shell: bash
         run: |
           cd web
           npm ci
           set +e
-          npm test > ../app-shell-test-output.txt 2>&1
+          npm test > ../loading-test-output.txt 2>&1
           code=$?
           set -e
-          echo "exit_code=$code" >> ../app-shell-test-output.txt
-      - name: Commit diagnostic output
+          echo "exit_code=$code" >> ../loading-test-output.txt
+      - name: Commit sanitized output
         shell: bash
         run: |
           mkdir -p debug
-          mv app-shell-test-output.txt debug/app-shell-test-output.txt
+          mv loading-test-output.txt debug/loading-test-output.txt
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add debug/app-shell-test-output.txt
-          git commit -m 'debug: capture app shell web test output [skip ci]'
+          git add debug/loading-test-output.txt
+          git commit -m 'debug: capture loading test output [skip ci]'
           git push
