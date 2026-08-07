@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "approved": false,
+  "mode": "baseline",
+  "strategy": null,
+  "overrides": {},
+  "effective_from": null,
+  "expires_at": null,
+  "paper_only": true,
+  "real_order_allowed": false,
+  "reason": "安全ゲート未通過のため既定デモルールを使用"
+}
