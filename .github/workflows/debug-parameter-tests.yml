@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   diagnose:
@@ -30,13 +30,10 @@ jobs:
           set -e
           echo "lint_exit_code=$lint_code" >> ../parameter-test-output.txt
           echo "test_exit_code=$test_code" >> ../parameter-test-output.txt
-      - name: Commit output
-        shell: bash
-        run: |
-          mkdir -p debug
-          mv parameter-test-output.txt debug/parameter-test-output.txt
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add debug/parameter-test-output.txt
-          git commit -m 'debug: capture parameter lint output [skip ci]'
-          git push
+      - name: Upload diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: parameter-test-output-${{ github.run_id }}
+          path: parameter-test-output.txt
+          if-no-files-found: error
+          retention-days: 2
