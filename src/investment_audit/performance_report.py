@@ -8,7 +8,7 @@ from typing import Any
 import pandas as pd
 import requests
 
-from .performance_analytics import PerformanceConfig, analyze_performance
+from .performance_analytics_compat import PerformanceConfig, analyze_performance
 
 BENCHMARK_SYMBOL = "1306.T"
 BENCHMARK_URL = (
@@ -86,7 +86,6 @@ def build_performance_report(
     history = _load(data_dir / "equity-history.json", {"history": []}).get("history", [])
     trades = _load(data_dir / "trades.json", {"trades": []}).get("trades", [])
     demo = _load(root / "web" / "demo-portfolio.json", {"positions": []})
-
     decision_map = {
         str(item.get("symbol")): item
         for item in latest.get("decisions", [])
@@ -97,7 +96,6 @@ def build_performance_report(
         item = decision_map.get(str(position.get("symbol")), {})
         current_price = item.get("technical", {}).get("price")
         positions.append({**position, "current_price": current_price})
-
     summary = {
         **latest.get("summary", {}),
         "cash": portfolio.get("cash", latest.get("summary", {}).get("cash", 0.0)),
@@ -109,7 +107,6 @@ def build_performance_report(
         benchmark = benchmark_loader(config.benchmark_symbol)
     except (requests.RequestException, ValueError, KeyError, TypeError) as exc:
         benchmark_error = f"{type(exc).__name__}: benchmark data unavailable"
-
     analytics = analyze_performance(
         history,
         trades,
