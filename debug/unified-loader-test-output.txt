@@ -1,0 +1,481 @@
+
+> valuescope-japan-web@2.2.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: two-mode boundary assigns 767 to iPhone and 768 to large mode
+ok 1 - two-mode boundary assigns 767 to iPhone and 768 to large mode
+  ---
+  duration_ms: 9.224887
+  type: 'test'
+  ...
+# Subtest: large navigation has six destinations and iPhone navigation has five
+ok 2 - large navigation has six destinations and iPhone navigation has five
+  ---
+  duration_ms: 4.830585
+  type: 'test'
+  ...
+# Subtest: stable section IDs, safe areas and accessible tap targets are present
+ok 3 - stable section IDs, safe areas and accessible tap targets are present
+  ---
+  duration_ms: 4.880428
+  type: 'test'
+  ...
+# Subtest: advanced content uses disclosures and paper-only status remains visible
+ok 4 - advanced content uses disclosures and paper-only status remains visible
+  ---
+  duration_ms: 2.867838
+  type: 'test'
+  ...
+# Subtest: production build loads the adaptive shell last
+ok 5 - production build loads the adaptive shell last
+  ---
+  duration_ms: 9.379223
+  type: 'test'
+  ...
+# Subtest: adaptive shell keeps separate large and iPhone navigation
+ok 6 - adaptive shell keeps separate large and iPhone navigation
+  ---
+  duration_ms: 3.644649
+  type: 'test'
+  ...
+# Subtest: phone tables are converted to labelled cards with details
+ok 7 - phone tables are converted to labelled cards with details
+  ---
+  duration_ms: 3.08813
+  type: 'test'
+  ...
+# Subtest: CSS contains dedicated desktop tablet and phone modes
+ok 8 - CSS contains dedicated desktop tablet and phone modes
+  ---
+  duration_ms: 7.569452
+  type: 'test'
+  ...
+# Subtest: shell source exposes all five primary views
+ok 9 - shell source exposes all five primary views
+  ---
+  duration_ms: 2.604195
+  type: 'test'
+  ...
+# Subtest: viewport modes separate phone tablet and desktop
+ok 10 - viewport modes separate phone tablet and desktop
+  ---
+  duration_ms: 1.319435
+  type: 'test'
+  ...
+# Subtest: view routing preserves screening configuration hash
+ok 11 - view routing preserves screening configuration hash
+  ---
+  duration_ms: 0.505224
+  type: 'test'
+  ...
+# Subtest: direct anchors map to their primary view
+ok 12 - direct anchors map to their primary view
+  ---
+  duration_ms: 0.436987
+  type: 'test'
+  ...
+# Subtest: phone always uses comfortable density
+ok 13 - phone always uses comfortable density
+  ---
+  duration_ms: 0.228216
+  type: 'test'
+  ...
+# Subtest: section map groups existing dynamic modules once
+ok 14 - section map groups existing dynamic modules once
+  ---
+  duration_ms: 1.778663
+  type: 'test'
+  ...
+# Subtest: normalizes J-Quants metadata and reasons
+ok 15 - normalizes J-Quants metadata and reasons
+  ---
+  duration_ms: 1.977805
+  type: 'test'
+  ...
+# Subtest: filters and sorts deterministically
+ok 16 - filters and sorts deterministically
+  ---
+  duration_ms: 0.568122
+  type: 'test'
+  ...
+# Subtest: summaries and CSV contain sanitized display columns
+ok 17 - summaries and CSV contain sanitized display columns
+  ---
+  duration_ms: 0.945947
+  type: 'test'
+  ...
+# Subtest: normalizes transient cache-busting parameters while preserving compact mode
+ok 18 - normalizes transient cache-busting parameters while preserving compact mode
+  ---
+  duration_ms: 1.871677
+  type: 'test'
+  ...
+# Subtest: builds an immediate saved quote fallback from daily report and demo entries
+ok 19 - builds an immediate saved quote fallback from daily report and demo entries
+  ---
+  duration_ms: 1.416797
+  type: 'test'
+  ...
+# Subtest: quote and portfolio requests share one canonical compact key
+ok 20 - quote and portfolio requests share one canonical compact key
+  ---
+  duration_ms: 1.441122
+  type: 'test'
+  ...
+# Subtest: static JSON cache busting is removed while stable parameters remain
+ok 21 - static JSON cache busting is removed while stable parameters remain
+  ---
+  duration_ms: 0.391883
+  type: 'test'
+  ...
+# Subtest: portfolio status is derived from a compact quote payload
+ok 22 - portfolio status is derived from a compact quote payload
+  ---
+  duration_ms: 0.622543
+  type: 'test'
+  ...
+# Subtest: stale age and static summary remain explicit
+ok 23 - stale age and static summary remain explicit
+  ---
+  duration_ms: 3.510478
+  type: 'test'
+  ...
+# Subtest: paper decision labels are explicit
+ok 24 - paper decision labels are explicit
+  ---
+  duration_ms: 1.316109
+  type: 'test'
+  ...
+# Subtest: CSV separates fundamental and technical columns
+ok 25 - CSV separates fundamental and technical columns
+  ---
+  duration_ms: 0.858114
+  type: 'test'
+  ...
+# Subtest: plan impact explains upgrade without promising profit
+ok 26 - plan impact explains upgrade without promising profit
+  ---
+  duration_ms: 0.336569
+  type: 'test'
+  ...
+# Subtest: calculates per-position unrealized result
+ok 27 - calculates per-position unrealized result
+  ---
+  duration_ms: 1.723489
+  type: 'test'
+  ...
+# Subtest: aggregates portfolio and falls back to entry on unusable quote
+ok 28 - aggregates portfolio and falls back to entry on unusable quote
+  ---
+  duration_ms: 0.498692
+  type: 'test'
+  ...
+# Subtest: formats Japanese currency and signed percent
+ok 29 - formats Japanese currency and signed percent
+  ---
+  duration_ms: 51.955121
+  type: 'test'
+  ...
+# Subtest: canonical key removes cache busters and unifies quote consumers
+ok 30 - canonical key removes cache busters and unifies quote consumers
+  ---
+  duration_ms: 1.449228
+  type: 'test'
+  ...
+# Subtest: full quote payload can be normalized for compact consumers
+ok 31 - full quote payload can be normalized for compact consumers
+  ---
+  duration_ms: 0.693115
+  type: 'test'
+  ...
+# Subtest: preset applies detailed thresholds and weights
+ok 32 - preset applies detailed thresholds and weights
+  ---
+  duration_ms: 1.340955
+  type: 'test'
+  ...
+# Subtest: Free conservative preset keeps complete strong data and excludes weak data
+ok 33 - Free conservative preset keeps complete strong data and excludes weak data
+  ---
+  duration_ms: 3.949999
+  type: 'test'
+  ...
+# Subtest: missing policy neutral preserves score and exclude rejects enabled missing field
+ok 34 - missing policy neutral preserves score and exclude rejects enabled missing field
+  ---
+  duration_ms: 0.901334
+  type: 'test'
+  ...
+# Subtest: CSV includes raw metrics and no credentials
+ok 35 - CSV includes raw metrics and no credentials
+  ---
+  duration_ms: 0.950245
+  type: 'test'
+  ...
+# Subtest: high and low direction percentiles reward the correct issue
+ok 36 - high and low direction percentiles reward the correct issue
+  ---
+  duration_ms: 2.935073
+  type: 'test'
+  ...
+# Subtest: raw threshold uses display units and missing exclude is respected
+ok 37 - raw threshold uses display units and missing exclude is respected
+  ---
+  duration_ms: 1.582737
+  type: 'test'
+  ...
+# Subtest: cash flow preset enables FCF metrics and formula explains weights
+ok 38 - cash flow preset enables FCF metrics and formula explains weights
+  ---
+  duration_ms: 0.766993
+  type: 'test'
+  ...
+# Subtest: contributions sum to custom score and CSV is secret-free
+ok 39 - contributions sum to custom score and CSV is secret-free
+  ---
+  duration_ms: 0.833447
+  type: 'test'
+  ...
+# Subtest: raw fundamental metrics are converted to percentages
+ok 40 - raw fundamental metrics are converted to percentages
+  ---
+  duration_ms: 1.708111
+  type: 'test'
+  ...
+# Subtest: quality preset filters weak company
+ok 41 - quality preset filters weak company
+  ---
+  duration_ms: 1.907744
+  type: 'test'
+  ...
+# Subtest: missing exclude rejects missing ROE when ROE threshold is active
+ok 42 - missing exclude rejects missing ROE when ROE threshold is active
+  ---
+  duration_ms: 1.999716
+  type: 'test'
+  ...
+# Subtest: composite respects user weights
+ok 43 - composite respects user weights
+  ---
+  duration_ms: 0.361064
+  type: 'test'
+  ...
+# Subtest: fetch coordinator is loaded before quote-consuming modules
+ok 44 - fetch coordinator is loaded before quote-consuming modules
+  ---
+  duration_ms: 7.849172
+  type: 'test'
+  ...
+# Subtest: coordinator contains immediate saved fallback and one background live request
+ok 45 - coordinator contains immediate saved fallback and one background live request
+  ---
+  duration_ms: 2.926818
+  type: 'test'
+  ...
+# Subtest: quote function has bounded concurrency stable cache and partial response
+ok 46 - quote function has bounded concurrency stable cache and partial response
+  ---
+  duration_ms: 1.582998
+  type: 'test'
+  ...
+# Subtest: performance analytics module loads and preserves missing values
+ok 47 - performance analytics module loads and preserves missing values
+  ---
+  duration_ms: 1.69135
+  type: 'test'
+  ...
+# Subtest: one observation is not converted into fake returns
+ok 48 - one observation is not converted into fake returns
+  ---
+  duration_ms: 1.685278
+  type: 'test'
+  ...
+# Subtest: range filtering preserves observed points only
+ok 49 - range filtering preserves observed points only
+  ---
+  duration_ms: 9.640661
+  type: 'test'
+  ...
+# Subtest: adjustable settings recalculate risk reward and ratios
+ok 50 - adjustable settings recalculate risk reward and ratios
+  ---
+  duration_ms: 1.52535
+  type: 'test'
+  ...
+# Subtest: chart modes and CSV expose all series without secrets
+ok 51 - chart modes and CSV expose all series without secrets
+  ---
+  duration_ms: 0.365613
+  type: 'test'
+  ...
+# Subtest: period filter keeps recent points
+ok 52 - period filter keeps recent points
+  ---
+  duration_ms: 2.015074
+  type: 'test'
+  ...
+# Subtest: live equity is appended using entry basis
+ok 53 - live equity is appended using entry basis
+  ---
+  duration_ms: 0.66343
+  type: 'test'
+  ...
+# Subtest: metric state preserves insufficient history
+ok 54 - metric state preserves insufficient history
+  ---
+  duration_ms: 0.290062
+  type: 'test'
+  ...
+# Subtest: contribution view prefers live quote P&L
+ok 55 - contribution view prefers live quote P&L
+  ---
+  duration_ms: 0.268011
+  type: 'test'
+  ...
+# Subtest: chart bounds include zero when requested
+ok 56 - chart bounds include zero when requested
+  ---
+  duration_ms: 0.285544
+  type: 'test'
+  ...
+# Subtest: shared data client is inserted before quote-consuming scripts
+not ok 57 - shared data client is inserted before quote-consuming scripts
+  ---
+  duration_ms: 11.53819
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/performance-loading.test.mjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(client >= 0)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/performance-loading.test.mjs:15:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: data client provides one shared quote request timeout and saved fallback
+ok 58 - data client provides one shared quote request timeout and saved fallback
+  ---
+  duration_ms: 3.737242
+  type: 'test'
+  ...
+# Subtest: static fallback is available before live quote completion
+ok 59 - static fallback is available before live quote completion
+  ---
+  duration_ms: 1.335184
+  type: 'test'
+  ...
+# Subtest: quote API uses bounded concurrency, source timeouts and partial output
+ok 60 - quote API uses bounded concurrency, source timeouts and partial output
+  ---
+  duration_ms: 8.812072
+  type: 'test'
+  ...
+# Subtest: coordinator is injected before consumers and adaptive shell last
+ok 61 - coordinator is injected before consumers and adaptive shell last
+  ---
+  duration_ms: 1.810002
+  type: 'test'
+  ...
+# Subtest: responsive layer includes iPhone breakpoint and safe areas
+ok 62 - responsive layer includes iPhone breakpoint and safe areas
+  ---
+  duration_ms: 5.396151
+  type: 'test'
+  ...
+# Subtest: responsive script installs viewport indicator and five mobile destinations
+ok 63 - responsive script installs viewport indicator and five mobile destinations
+  ---
+  duration_ms: 1.404094
+  type: 'test'
+  ...
+# Subtest: risk diagnostics module loads with stable default limits
+ok 64 - risk diagnostics module loads with stable default limits
+  ---
+  duration_ms: 0.830943
+  type: 'test'
+  ...
+# Subtest: robust score ranks quality value above trap
+ok 65 - robust score ranks quality value above trap
+  ---
+  duration_ms: 5.890886
+  type: 'test'
+  ...
+# Subtest: missing metrics are not converted to zero
+ok 66 - missing metrics are not converted to zero
+  ---
+  duration_ms: 0.88872
+  type: 'test'
+  ...
+# Subtest: weights must sum to 100
+ok 67 - weights must sum to 100
+  ---
+  duration_ms: 0.568082
+  type: 'test'
+  ...
+# Subtest: csv parser and exporter preserve quoted values
+ok 68 - csv parser and exporter preserve quoted values
+  ---
+  duration_ms: 0.707842
+  type: 'test'
+  ...
+# Subtest: summary reports eligible and median
+ok 69 - summary reports eligible and median
+  ---
+  duration_ms: 2.43552
+  type: 'test'
+  ...
+# Subtest: merges ranking and daily technical data
+ok 70 - merges ranking and daily technical data
+  ---
+  duration_ms: 1.721095
+  type: 'test'
+  ...
+# Subtest: Free safe preset excludes weak record
+ok 71 - Free safe preset excludes weak record
+  ---
+  duration_ms: 3.647174
+  type: 'test'
+  ...
+# Subtest: missing policy neutral produces score while exclude rejects
+ok 72 - missing policy neutral produces score while exclude rejects
+  ---
+  duration_ms: 0.457976
+  type: 'test'
+  ...
+# Subtest: CSV contains separate pillars and no secrets
+ok 73 - CSV contains separate pillars and no secrets
+  ---
+  duration_ms: 0.862822
+  type: 'test'
+  ...
+# Subtest: insufficient history cannot be promoted
+ok 74 - insufficient history cannot be promoted
+  ---
+  duration_ms: 1.176187
+  type: 'test'
+  ...
+# Subtest: research CSV exposes baseline comparison and no secrets
+ok 75 - research CSV exposes baseline comparison and no secrets
+  ---
+  duration_ms: 0.516986
+  type: 'test'
+  ...
+1..75
+# tests 75
+# suites 0
+# pass 74
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 656.108308
+exit_code=1
