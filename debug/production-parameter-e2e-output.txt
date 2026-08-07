@@ -1,0 +1,297 @@
+
+> valuescope-japan-web@2.3.2 e2e:production
+> E2E_SUITE=production playwright test -c playwright.config.mjs
+
+
+Running 4 tests using 1 worker
+
+[1A[2K[1/4] e2e/production-parameter-control.spec.mjs:21:3 › production PC: parameter controls and readable typography
+[1A[2K[2/4] e2e/production-parameter-control.spec.mjs:21:3 › production PC: parameter controls and readable typography (retry #1)
+[1A[2K  1) e2e/production-parameter-control.spec.mjs:21:3 › production PC: parameter controls and readable typography 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m12[39m
+    Received:    [31m11.2[39m
+
+      49 |       };
+      50 |     });
+    > 51 |     expect(typography.minimumFont).toBeGreaterThanOrEqual(12);
+         |                                    ^
+      52 |     if (viewport.width <= 767) expect(typography.minimumControlHeight).toBeGreaterThanOrEqual(44);
+      53 |     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(2);
+      54 |     expect(consoleErrors.filter(message => !/quote|network|fetch|favicon/i.test(message))).toEqual([]);
+        at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/production-parameter-control.spec.mjs:51:36
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-cdc6d-ols-and-readable-typography/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-cdc6d-ols-and-readable-typography/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-parameter-contr-cdc6d-ols-and-readable-typography/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-cdc6d-ols-and-readable-typography/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-parameter-contr-cdc6d-ols-and-readable-typography/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m12[39m
+    Received:    [31m11.2[39m
+
+      49 |       };
+      50 |     });
+    > 51 |     expect(typography.minimumFont).toBeGreaterThanOrEqual(12);
+         |                                    ^
+      52 |     if (viewport.width <= 767) expect(typography.minimumControlHeight).toBeGreaterThanOrEqual(44);
+      53 |     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(2);
+      54 |     expect(consoleErrors.filter(message => !/quote|network|fetch|favicon/i.test(message))).toEqual([]);
+        at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/production-parameter-control.spec.mjs:51:36
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-cdc6d-ols-and-readable-typography-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-cdc6d-ols-and-readable-typography-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-parameter-contr-cdc6d-ols-and-readable-typography-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-cdc6d-ols-and-readable-typography-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-parameter-contr-cdc6d-ols-and-readable-typography-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[3/4] e2e/production-parameter-control.spec.mjs:21:3 › production iPad landscape: parameter controls and readable typography
+[1A[2K[4/4] e2e/production-parameter-control.spec.mjs:21:3 › production iPad landscape: parameter controls and readable typography (retry #1)
+[1A[2K  2) e2e/production-parameter-control.spec.mjs:21:3 › production iPad landscape: parameter controls and readable typography 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m12[39m
+    Received:    [31m11.2[39m
+
+      49 |       };
+      50 |     });
+    > 51 |     expect(typography.minimumFont).toBeGreaterThanOrEqual(12);
+         |                                    ^
+      52 |     if (viewport.width <= 767) expect(typography.minimumControlHeight).toBeGreaterThanOrEqual(44);
+      53 |     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(2);
+      54 |     expect(consoleErrors.filter(message => !/quote|network|fetch|favicon/i.test(message))).toEqual([]);
+        at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/production-parameter-control.spec.mjs:51:36
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-63ef4-ols-and-readable-typography/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-63ef4-ols-and-readable-typography/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-parameter-contr-63ef4-ols-and-readable-typography/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-63ef4-ols-and-readable-typography/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-parameter-contr-63ef4-ols-and-readable-typography/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m12[39m
+    Received:    [31m11.2[39m
+
+      49 |       };
+      50 |     });
+    > 51 |     expect(typography.minimumFont).toBeGreaterThanOrEqual(12);
+         |                                    ^
+      52 |     if (viewport.width <= 767) expect(typography.minimumControlHeight).toBeGreaterThanOrEqual(44);
+      53 |     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(2);
+      54 |     expect(consoleErrors.filter(message => !/quote|network|fetch|favicon/i.test(message))).toEqual([]);
+        at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/production-parameter-control.spec.mjs:51:36
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-63ef4-ols-and-readable-typography-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-63ef4-ols-and-readable-typography-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-parameter-contr-63ef4-ols-and-readable-typography-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-63ef4-ols-and-readable-typography-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-parameter-contr-63ef4-ols-and-readable-typography-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[5/4] (retries) e2e/production-parameter-control.spec.mjs:21:3 › production iPad portrait: parameter controls and readable typography
+[1A[2K[6/4] (retries) e2e/production-parameter-control.spec.mjs:21:3 › production iPad portrait: parameter controls and readable typography (retry #1)
+[1A[2K  3) e2e/production-parameter-control.spec.mjs:21:3 › production iPad portrait: parameter controls and readable typography 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m12[39m
+    Received:    [31m11.2[39m
+
+      49 |       };
+      50 |     });
+    > 51 |     expect(typography.minimumFont).toBeGreaterThanOrEqual(12);
+         |                                    ^
+      52 |     if (viewport.width <= 767) expect(typography.minimumControlHeight).toBeGreaterThanOrEqual(44);
+      53 |     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(2);
+      54 |     expect(consoleErrors.filter(message => !/quote|network|fetch|favicon/i.test(message))).toEqual([]);
+        at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/production-parameter-control.spec.mjs:51:36
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-0ce90-ols-and-readable-typography/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-0ce90-ols-and-readable-typography/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-parameter-contr-0ce90-ols-and-readable-typography/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-0ce90-ols-and-readable-typography/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-parameter-contr-0ce90-ols-and-readable-typography/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m12[39m
+    Received:    [31m11.2[39m
+
+      49 |       };
+      50 |     });
+    > 51 |     expect(typography.minimumFont).toBeGreaterThanOrEqual(12);
+         |                                    ^
+      52 |     if (viewport.width <= 767) expect(typography.minimumControlHeight).toBeGreaterThanOrEqual(44);
+      53 |     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(2);
+      54 |     expect(consoleErrors.filter(message => !/quote|network|fetch|favicon/i.test(message))).toEqual([]);
+        at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/production-parameter-control.spec.mjs:51:36
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-0ce90-ols-and-readable-typography-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-0ce90-ols-and-readable-typography-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-parameter-contr-0ce90-ols-and-readable-typography-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-0ce90-ols-and-readable-typography-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-parameter-contr-0ce90-ols-and-readable-typography-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[7/4] (retries) e2e/production-parameter-control.spec.mjs:21:3 › production iPhone: parameter controls and readable typography
+[1A[2K[8/4] (retries) e2e/production-parameter-control.spec.mjs:21:3 › production iPhone: parameter controls and readable typography (retry #1)
+[1A[2K  4) e2e/production-parameter-control.spec.mjs:21:3 › production iPhone: parameter controls and readable typography 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m12[39m
+    Received:    [31m11.2[39m
+
+      49 |       };
+      50 |     });
+    > 51 |     expect(typography.minimumFont).toBeGreaterThanOrEqual(12);
+         |                                    ^
+      52 |     if (viewport.width <= 767) expect(typography.minimumControlHeight).toBeGreaterThanOrEqual(44);
+      53 |     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(2);
+      54 |     expect(consoleErrors.filter(message => !/quote|network|fetch|favicon/i.test(message))).toEqual([]);
+        at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/production-parameter-control.spec.mjs:51:36
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-7e268-ols-and-readable-typography/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-7e268-ols-and-readable-typography/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-parameter-contr-7e268-ols-and-readable-typography/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-7e268-ols-and-readable-typography/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-parameter-contr-7e268-ols-and-readable-typography/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m12[39m
+    Received:    [31m11.2[39m
+
+      49 |       };
+      50 |     });
+    > 51 |     expect(typography.minimumFont).toBeGreaterThanOrEqual(12);
+         |                                    ^
+      52 |     if (viewport.width <= 767) expect(typography.minimumControlHeight).toBeGreaterThanOrEqual(44);
+      53 |     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(2);
+      54 |     expect(consoleErrors.filter(message => !/quote|network|fetch|favicon/i.test(message))).toEqual([]);
+        at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/production-parameter-control.spec.mjs:51:36
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-7e268-ols-and-readable-typography-retry1/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-7e268-ols-and-readable-typography-retry1/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/production-parameter-contr-7e268-ols-and-readable-typography-retry1/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/production-parameter-contr-7e268-ols-and-readable-typography-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/production-parameter-contr-7e268-ols-and-readable-typography-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K  4 failed
+    e2e/production-parameter-control.spec.mjs:21:3 › production PC: parameter controls and readable typography 
+    e2e/production-parameter-control.spec.mjs:21:3 › production iPad landscape: parameter controls and readable typography 
+    e2e/production-parameter-control.spec.mjs:21:3 › production iPad portrait: parameter controls and readable typography 
+    e2e/production-parameter-control.spec.mjs:21:3 › production iPhone: parameter controls and readable typography 
+exit_code=1
