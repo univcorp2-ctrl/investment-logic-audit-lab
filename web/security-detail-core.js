@@ -1,10 +1,76 @@
-export const finiteNumber=value=>{if(value===null||value===undefined||value==='')return null;const parsed=Number(value);return Number.isFinite(parsed)?parsed:null};
-export function normalizeSecurityCode(value){const raw=String(value??'').trim().toUpperCase().replace(/\.T$/,'');if(/^[0-9]{5}$/.test(raw)&&raw.endsWith('0'))return raw.slice(0,-1);return /^[0-9]{4}$/.test(raw)||/^[0-9]{3}[A-Z]$/.test(raw)?raw:''}
-export function sma(values,window){const result=new Array(values.length).fill(null);let sum=0,valid=0;for(let i=0;i<values.length;i+=1){const current=finiteNumber(values[i]);if(current!==null){sum+=current;valid+=1}if(i>=window){const removed=finiteNumber(values[i-window]);if(removed!==null){sum-=removed;valid-=1}}if(i>=window-1&&valid===window)result[i]=sum/window}return result}
-export function rsi(values,window=14){if(values.length<=window)return null;const recent=values.slice(-(window+1)).map(finiteNumber);if(recent.some(value=>value===null))return null;let gains=0,losses=0;for(let i=1;i<recent.length;i+=1){const delta=recent[i]-recent[i-1];if(delta>0)gains+=delta;else losses-=delta}if(losses===0)return 100;const rs=(gains/window)/(losses/window);return 100-100/(1+rs)}
-export function enrichCandles(rows=[]){const cleaned=rows.map(row=>({date:row.date,open:finiteNumber(row.open),high:finiteNumber(row.high),low:finiteNumber(row.low),close:finiteNumber(row.close),volume:finiteNumber(row.volume)})).filter(row=>row.date&&[row.open,row.high,row.low,row.close].every(value=>value!==null)).sort((a,b)=>String(a.date).localeCompare(String(b.date)));const closes=cleaned.map(row=>row.close),sma20=sma(closes,20),sma60=sma(closes,60);return cleaned.map((row,index)=>({...row,sma20:sma20[index],sma60:sma60[index]}))}
-export function filterCandles(rows,period='1y'){const counts={ '3m':66,'6m':132,'1y':260 };return enrichCandles(rows).slice(-(counts[period]??260))}
-export function latestIndicators(rows=[]){const candles=enrichCandles(rows);if(!candles.length)return{price:null,sma20:null,sma60:null,rsi14:null,momentum20_pct:null,momentum60_pct:null,volatility20_pct:null,drawdown20_pct:null};const closes=candles.map(row=>row.close),last=closes.at(-1),returns=closes.slice(-21).map((value,index,array)=>index?value/array[index-1]-1:null).filter(value=>value!==null),mean=returns.length?returns.reduce((a,b)=>a+b,0)/returns.length:0,variance=returns.length?returns.reduce((sum,value)=>sum+(value-mean)**2,0)/returns.length:0,peak=Math.max(...closes.slice(-20));return{price:last,sma20:candles.at(-1).sma20,sma60:candles.at(-1).sma60,rsi14:rsi(closes),momentum20_pct:closes.length>=21?(last/closes.at(-21)-1)*100:null,momentum60_pct:closes.length>=61?(last/closes.at(-61)-1)*100:null,volatility20_pct:returns.length>=10?Math.sqrt(variance)*Math.sqrt(252)*100:null,drawdown20_pct:peak>0?(last/peak-1)*100:null}}
-export function compatibleGrowth(current,prior,key){const now=finiteNumber(current?.[key]),before=finiteNumber(prior?.[key]);if(now===null||before===null||before===0)return null;if(current?.period_type&&prior?.period_type&&current.period_type!==prior.period_type)return null;return(now/before-1)*100}
-export function securityHash(hash,code){const params=new URLSearchParams(String(hash??'').replace(/^#/,''));const normalized=normalizeSecurityCode(code);if(normalized)params.set('security',normalized);else params.delete('security');return`#${params.toString()}`}
-export function reasonGroups(payload={}){const recommendation=payload.recommendation??{};return{fundamental:{positive:recommendation.fundamental_reasons_positive??[],risks:recommendation.fundamental_risks??[]},technical:{positive:recommendation.technical_reasons_positive??[],risks:recommendation.technical_risks??[]}}}
+export const DETAIL_TABS = Object.freeze([
+  { key:'overview', label:'推奨理由' },
+  { key:'financials', label:'決算・財務' },
+  { key:'news', label:'開示・ニュース' },
+  { key:'chart', label:'チャート' },
+]);
+
+export function normalizeSecurityCode(value = '') {
+  const text = String(value).trim().toUpperCase().replace(/\.T$/, '');
+  return text.length === 5 && text.endsWith('0') ? text.slice(0, -1) : text;
+}
+
+export function extractSecurityCode(text, securities = []) {
+  const source = String(text ?? '');
+  for (const security of securities) {
+    const code = normalizeSecurityCode(security.code);
+    if (source.includes(code) || source.includes(security.company_name ?? '')) return code;
+  }
+  const match = source.match(/(?:^|\D)(\d{4}|\d{3}[A-Z])(?:\D|$)/i);
+  return match ? normalizeSecurityCode(match[1]) : null;
+}
+
+export function recommendationLabel(action) {
+  return ({ SIM_BUY:'買い候補', SIM_HOLD:'保有継続', SIM_SELL:'売却候補', WATCH:'監視', NO_DATA:'データ不足' })[action] ?? String(action ?? '不明');
+}
+
+export function sliceChartBars(bars = [], range = '6m') {
+  const size = ({ '3m':66, '6m':132, '1y':260 })[range] ?? 132;
+  return bars.slice(-size);
+}
+
+export function chartGeometry(bars = [], width = 900, height = 320) {
+  const clean = bars.filter(bar => [bar.open, bar.high, bar.low, bar.close].every(value => Number.isFinite(Number(value))));
+  if (!clean.length) return { bars:[], min:0, max:1, x:()=>0, y:()=>0, bodyWidth:4 };
+  const values = clean.flatMap(bar => [Number(bar.low), Number(bar.high), Number(bar.sma20), Number(bar.sma60)]).filter(Number.isFinite);
+  const minRaw = Math.min(...values);
+  const maxRaw = Math.max(...values);
+  const padding = Math.max(1, (maxRaw - minRaw) * .06);
+  const min = minRaw - padding;
+  const max = maxRaw + padding;
+  const left = 58;
+  const right = width - 18;
+  const top = 18;
+  const bottom = height - 42;
+  const x = index => left + (clean.length === 1 ? 0 : index / (clean.length - 1) * (right - left));
+  const y = value => bottom - (Number(value) - min) / Math.max(.000001, max - min) * (bottom - top);
+  return { bars:clean, min, max, x, y, bodyWidth:Math.max(2, Math.min(8, (right - left) / clean.length * .55)), width, height, left, right, top, bottom };
+}
+
+export function reasonGroups(detail = {}) {
+  const recommendation = detail.recommendation ?? {};
+  return {
+    fundamental: {
+      score: recommendation.fundamental?.score ?? detail.scores?.overall_score,
+      positive: recommendation.fundamental?.positive_reasons ?? [],
+      risks: recommendation.fundamental?.risk_reasons ?? [],
+      missing: recommendation.fundamental?.missing ?? [],
+    },
+    technical: {
+      score: recommendation.technical?.score ?? detail.scores?.technical_score,
+      regime: recommendation.technical?.regime,
+      positive: recommendation.technical?.positive_reasons ?? [],
+      risks: recommendation.technical?.risk_reasons ?? [],
+    },
+  };
+}
+
+export function pickDisclosure(record = {}) {
+  const get = (...keys) => keys.map(key => record[key]).find(value => value !== undefined && value !== null && value !== '');
+  return {
+    title: get('title','Title','DiscTitle','DocumentTitle','document_title') ?? '適時開示',
+    url: get('url','URL','DocumentURL','document_url','file_url') ?? null,
+    published_at: get('published_at','date','Date','DiscDate','DisclosedDate') ?? null,
+    category: get('category','Category','TypeOfDocument','document_type') ?? 'TDnet',
+  };
+}
