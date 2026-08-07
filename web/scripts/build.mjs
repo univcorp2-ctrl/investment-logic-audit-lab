@@ -21,6 +21,7 @@ const staticFiles = [
   'parameter-control-core.js','parameter-control.js','parameter-control.css','font-boot.js','readability.css','mobile-overflow-guard.css','parameter-readable.css',
   'parameter-category-core.js','parameter-category.js','parameter-category.css',
   'phone-flow-core.js','phone-flow.js','phone-flow.css',
+  'security-detail-core.js','security-detail.js','security-detail.css',
 ];
 for (const file of staticFiles) await cp(resolve(root, file), resolve(dist, file));
 for (const file of ['jquants-ranking.json','jquants-ranking.csv','live-ranking.json','live-ranking.csv']) {
@@ -44,6 +45,7 @@ for (const marker of [
   '<link rel="stylesheet" href="./parameter-readable.css" />',
   '<link rel="stylesheet" href="./parameter-category.css" />',
   '<link rel="stylesheet" href="./phone-flow.css" />',
+  '<link rel="stylesheet" href="./security-detail.css" />',
 ]) {
   if (!index.includes(marker)) index = index.replace('</head>', `  ${marker}\n  </head>`);
 }
@@ -63,6 +65,7 @@ for (const marker of [
   '<script type="module" src="./parameter-control.js"></script>',
   '<script type="module" src="./parameter-category.js"></script>',
   '<script type="module" src="./phone-flow.js"></script>',
+  '<script type="module" src="./security-detail.js"></script>',
 ]) {
   if (!index.includes(marker)) index = index.replace('</body>', `  ${marker}\n  </body>`);
 }
