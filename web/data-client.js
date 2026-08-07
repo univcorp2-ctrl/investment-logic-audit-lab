@@ -1,165 +1,226 @@
-(() => {
-  const nativeFetch = window.fetch.bind(window);
-  const inflight = new Map();
-  const memory = new Map();
-  const LAST_QUOTE_KEY = 'valuescope-last-compact-quote-v2';
-  const STATIC_TTL = 30000;
-  const QUOTE_TIMEOUT = 4000;
+import {
+  buildSavedQuotePayload,
+  deriveCompactQuotePayload,
+  isForcedQuoteRefresh,
+  normalizeDataUrl,
+  portfolioStatusText,
+  requestKind,
+} from './data-client-core.js';
 
-  const normalize = input => {
-    const url = new URL(typeof input === 'string' ? input : input.url, location.href);
-    if (url.pathname === '/api/quotes' || url.pathname === '/api/portfolio-status') return `${url.origin}/api/quotes?compact=1`;
-    if (url.pathname.endsWith('.json')) return `${url.origin}${url.pathname}`;
-    url.searchParams.delete('ts');
-    url.searchParams.delete('refresh');
-    url.searchParams.delete('_');
-    return url.toString();
+const nativeFetch = window.fetch.bind(window);
+const responseCache = new Map();
+const inFlight = new Map();
+const subscribers = new Set();
+const STATIC_TTL_MS = 60_000;
+const QUOTE_TTL_MS = 55_000;
+const NETWORK_TIMEOUT_MS = 8_000;
+let fallbackBundlePromise = null;
+let liveQuotePromise = null;
+let liveFull = null;
+let liveCompact = null;
+let liveExpiresAt = 0;
+
+function snapshotToResponse(snapshot, extraHeaders = {}) {
+  const headers = new Headers(snapshot.headers);
+  for (const [key, value] of Object.entries(extraHeaders)) headers.set(key, value);
+  return new Response(snapshot.body.slice(0), {
+    status: snapshot.status,
+    statusText: snapshot.statusText,
+    headers,
+  });
+}
+
+async function responseSnapshot(response) {
+  return {
+    body: await response.arrayBuffer(),
+    status: response.status,
+    statusText: response.statusText,
+    headers: [...response.headers.entries()],
   };
+}
 
-  const withTimeout = async (url, init = {}, timeoutMs = 4000) => {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(new DOMException('Timeout', 'TimeoutError')), timeoutMs);
-    try { return await nativeFetch(url, { ...init, signal: controller.signal }); }
-    finally { clearTimeout(timer); }
-  };
+function timeoutSignal(timeoutMs, upstreamSignal) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(new DOMException('Request timed out', 'TimeoutError')), timeoutMs);
+  if (upstreamSignal) {
+    if (upstreamSignal.aborted) controller.abort(upstreamSignal.reason);
+    else upstreamSignal.addEventListener('abort', () => controller.abort(upstreamSignal.reason), { once: true });
+  }
+  return { signal: controller.signal, clear: () => clearTimeout(timer) };
+}
 
-  const cloneResponse = cached => new Response(cached.body, { status: cached.status, statusText: cached.statusText, headers: cached.headers });
-
-  const readCachedQuote = () => {
+async function cachedNetworkFetch(url, init = {}, ttlMs = STATIC_TTL_MS, timeoutMs = NETWORK_TIMEOUT_MS) {
+  const key = `${String(init.method ?? 'GET').toUpperCase()} ${url}`;
+  const cached = responseCache.get(key);
+  if (cached && cached.expiresAt > Date.now()) return snapshotToResponse(cached.snapshot, { 'X-ValueScope-Cache': 'memory' });
+  if (inFlight.has(key)) return snapshotToResponse(await inFlight.get(key), { 'X-ValueScope-Cache': 'deduplicated' });
+  const request = (async () => {
+    const timed = timeoutSignal(timeoutMs, init.signal);
     try {
-      const value = JSON.parse(sessionStorage.getItem(LAST_QUOTE_KEY) ?? 'null');
-      if (!value?.payload) return null;
-      return { ...value.payload, fallback: true, stale_age_seconds: Math.max(0, Math.floor((Date.now() - Number(value.saved_at || 0)) / 1000)) };
-    } catch { return null; }
-  };
-
-  const saveQuote = payload => {
-    try { sessionStorage.setItem(LAST_QUOTE_KEY, JSON.stringify({ saved_at: Date.now(), payload })); } catch { /* optional storage */ }
-  };
-
-  const fetchPayload = async (key, init, timeoutMs, cacheMs) => {
-    const cached = memory.get(key);
-    if (cached && Date.now() - cached.savedAt < cacheMs) return cached.payload;
-    if (inflight.has(key)) return inflight.get(key);
-    const promise = (async () => {
-      const response = await withTimeout(key, { ...init, cache: 'no-cache', headers: { Accept: 'application/json', ...(init?.headers ?? {}) } }, timeoutMs);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const payload = await response.json();
-      memory.set(key, { savedAt: Date.now(), payload });
-      return payload;
-    })().finally(() => inflight.delete(key));
-    inflight.set(key, promise);
-    return promise;
-  };
-
-  const sharedFetch = async (input, init = {}) => {
-    const requestUrl = new URL(typeof input === 'string' ? input : input.url, location.href);
-    const isQuote = requestUrl.pathname === '/api/quotes';
-    const isPortfolio = requestUrl.pathname === '/api/portfolio-status';
-    const isStaticJson = requestUrl.origin === location.origin && requestUrl.pathname.endsWith('.json');
-    if (!isQuote && !isPortfolio && !isStaticJson) return nativeFetch(input, init);
-
-    if (isQuote || isPortfolio) {
-      let payload;
-      try {
-        payload = await fetchPayload(`${location.origin}/api/quotes?compact=1`, init, QUOTE_TIMEOUT, 45000);
-        saveQuote(payload);
-        window.dispatchEvent(new CustomEvent('valuescope:quotes', { detail: payload }));
-      } catch (error) {
-        payload = readCachedQuote();
-        if (!payload) throw error;
-        window.dispatchEvent(new CustomEvent('valuescope:quote-fallback', { detail: payload }));
-      }
-      if (isPortfolio) {
-        const offset = Math.max(0, Number.parseInt(requestUrl.searchParams.get('offset') ?? '0', 10) || 0);
-        const limit = Math.min(10, Math.max(1, Number.parseInt(requestUrl.searchParams.get('limit') ?? '10', 10) || 10));
-        const portfolio = payload.portfolio ?? {};
-        const positions = (payload.positions ?? payload.quotes ?? []).slice(offset, offset + limit);
-        const lines = [
-          `generated_at\t${payload.generated_at ?? ''}`,
-          `total\t${portfolio.total_entry_value ?? ''}\t${portfolio.total_current_value ?? ''}\t${portfolio.total_unrealized_pnl ?? ''}\t${portfolio.total_return_pct ?? ''}\t${portfolio.winners ?? ''}\t${portfolio.losers ?? ''}\t${portfolio.unchanged ?? ''}\t${portfolio.usable_quotes ?? ''}\t${portfolio.double_checked ?? ''}`,
-          `range\t${offset}\t${offset + positions.length}`,
-          'code\tname\tentry\tcurrent\tpnl\treturn_pct\tverification\tusable\tquote_time\tmax_diff_pct',
-          ...positions.map(position => [position.code, position.name ?? position.company_name, position.entry_price, position.current_price, position.unrealized_pnl, position.return_pct, position.verification, position.usable, position.quote_time, position.max_difference_pct].map(value => value ?? '').join('\t')),
-        ];
-        return new Response(`${lines.join('\n')}\n`, { status: 200, headers: { 'Content-Type': 'text/plain; charset=utf-8', 'X-ValueScope-Shared': '1' } });
-      }
-      const bothShapes = { ...payload, quotes: payload.quotes ?? payload.positions ?? [], positions: payload.positions ?? payload.quotes ?? [] };
-      return new Response(JSON.stringify(bothShapes), { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8', 'X-ValueScope-Shared': '1' } });
+      const response = await nativeFetch(url, { ...init, signal: timed.signal, cache: 'no-cache' });
+      const snapshot = await responseSnapshot(response);
+      if (response.ok) responseCache.set(key, { snapshot, expiresAt: Date.now() + ttlMs });
+      return snapshot;
+    } catch (error) {
+      if (cached) return cached.snapshot;
+      throw error;
+    } finally {
+      timed.clear();
+      inFlight.delete(key);
     }
+  })();
+  inFlight.set(key, request);
+  return snapshotToResponse(await request, { 'X-ValueScope-Cache': 'network' });
+}
 
-    const key = normalize(input);
-    const cached = memory.get(key);
-    if (cached?.response && Date.now() - cached.savedAt < STATIC_TTL) return cloneResponse(cached.response);
-    if (inflight.has(key)) return cloneResponse(await inflight.get(key));
-    const promise = (async () => {
-      const response = await withTimeout(key, { ...init, cache: 'no-cache' }, 3500);
-      const body = await response.text();
-      const responseData = { body, status: response.status, statusText: response.statusText, headers: [...response.headers.entries()] };
-      if (response.ok) memory.set(key, { savedAt: Date.now(), response: responseData });
-      return responseData;
-    })().finally(() => inflight.delete(key));
-    inflight.set(key, promise);
-    return cloneResponse(await promise);
-  };
+async function jsonFromStatic(path, fallback) {
+  try {
+    const response = await cachedNetworkFetch(new URL(path, location.href).toString(), { headers: { Accept: 'application/json' } });
+    if (!response.ok) return fallback;
+    return await response.json();
+  } catch {
+    return fallback;
+  }
+}
 
-  window.fetch = sharedFetch;
-  window.ValueScopeData = {
-    fetchJson: async (path, options = {}) => {
-      const response = await sharedFetch(path, options);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return response.json();
-    },
-    idle: callback => ('requestIdleCallback' in window ? requestIdleCallback(callback, { timeout: 1000 }) : setTimeout(callback, 0)),
-    lastQuote: readCachedQuote,
-    inflightCount: () => inflight.size,
-  };
+async function fallbackBundle() {
+  if (!fallbackBundlePromise) {
+    fallbackBundlePromise = Promise.all([
+      jsonFromStatic('./data/paper-trading/latest-report.json', {}),
+      jsonFromStatic('./demo-portfolio.json', { positions: [] }),
+    ]).then(([report, demo]) => ({ report, demo }));
+  }
+  return fallbackBundlePromise;
+}
 
-  const money = value => Number.isFinite(Number(value)) ? new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(Number(value)) : '–';
-  const percent = value => Number.isFinite(Number(value)) ? `${Number(value) >= 0 ? '+' : ''}${Number(value).toFixed(2)}%` : '–';
-  const signed = value => `${Number(value) >= 0 ? '+' : ''}${money(value)}`;
+function notifyQuotes(payload) {
+  for (const subscriber of subscribers) {
+    try { subscriber(payload); } catch { /* isolate subscribers */ }
+  }
+  window.dispatchEvent(new CustomEvent('valuescope:quotes', { detail: payload }));
+}
 
-  const applyStaticSummary = summary => {
-    const apply = () => {
-      const total = document.querySelector('#uxTotalPnl');
-      if (!total) return false;
-      total.textContent = summary.totalPnl === null ? '–' : signed(summary.totalPnl);
-      document.querySelector('#uxTotalReturn').textContent = percent(summary.totalReturnPct);
-      document.querySelector('#uxUnrealizedPnl').textContent = summary.unrealizedPnl === null ? '–' : signed(summary.unrealizedPnl);
-      document.querySelector('#uxCurrentDd').textContent = percent(summary.currentDrawdownPct);
-      document.querySelector('#uxRiskState').textContent = '日次確定値';
-      document.querySelector('#uxDataState').textContent = String(summary.plan ?? 'Free');
-      document.querySelector('#uxFreshness').textContent = summary.cutoff ? `cutoff ${summary.cutoff}` : 'cutoff不明';
-      total.className = Number(summary.totalPnl) < 0 ? 'negative' : 'positive';
-      document.querySelector('#uxUnrealizedPnl').className = Number(summary.unrealizedPnl) < 0 ? 'negative' : 'positive';
-      return true;
-    };
-    if (apply()) return;
-    const observer = new MutationObserver(() => { if (apply()) observer.disconnect(); });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
-    setTimeout(() => observer.disconnect(), 5000);
-  };
+async function fetchLiveQuotes(force = false) {
+  if (!force && liveFull && liveExpiresAt > Date.now()) return liveFull;
+  if (liveQuotePromise) return liveQuotePromise;
+  liveQuotePromise = (async () => {
+    const timed = timeoutSignal(NETWORK_TIMEOUT_MS);
+    try {
+      const path = force ? '/api/quotes?force=1' : '/api/quotes';
+      const response = await nativeFetch(path, { signal: timed.signal, headers: { Accept: 'application/json' }, cache: 'no-cache' });
+      if (!response.ok) throw new Error(`quotes HTTP ${response.status}`);
+      const payload = await response.json();
+      liveFull = payload;
+      liveCompact = deriveCompactQuotePayload(payload);
+      liveExpiresAt = Date.now() + QUOTE_TTL_MS;
+      notifyQuotes(payload);
+      return payload;
+    } finally {
+      timed.clear();
+      liveQuotePromise = null;
+    }
+  })();
+  return liveQuotePromise;
+}
 
-  const staticFirst = () => {
-    const state = { report: null, metrics: null };
-    const update = () => {
-      const report = state.report;
-      const metrics = state.metrics;
-      if (!report && !metrics) return;
-      const summary = report?.summary ?? {};
-      applyStaticSummary({
-        totalPnl: Number.isFinite(Number(summary.total_pnl)) ? Number(summary.total_pnl) : null,
-        totalReturnPct: Number.isFinite(Number(summary.cumulative_return_pct)) ? Number(summary.cumulative_return_pct) : null,
-        unrealizedPnl: Number.isFinite(Number(summary.unrealized_pnl)) ? Number(summary.unrealized_pnl) : null,
-        currentDrawdownPct: Number.isFinite(Number(metrics?.risk?.current_drawdown_pct?.value)) ? Number(metrics.risk.current_drawdown_pct.value) : null,
-        plan: report?.fundamental_source?.plan?.name ?? report?.fundamental_source?.plan ?? 'Free',
-        cutoff: report?.fundamental_source?.effective_data_cutoff ?? null,
+function backgroundLiveRefresh() {
+  const schedule = window.requestIdleCallback ?? (callback => setTimeout(callback, 250));
+  schedule(() => { fetchLiveQuotes(false).catch(() => {}); }, { timeout: 1500 });
+}
+
+async function quoteResponse(url, force) {
+  const compact = url.searchParams.get('compact') === '1';
+  if (force) {
+    try {
+      const full = await fetchLiveQuotes(true);
+      return Response.json(compact ? deriveCompactQuotePayload(full) : full, { headers: { 'X-ValueScope-Data': 'live' } });
+    } catch { /* saved fallback below */ }
+  }
+  if (liveFull && liveExpiresAt > Date.now()) {
+    return Response.json(compact ? liveCompact : liveFull, { headers: { 'X-ValueScope-Data': 'live-cache' } });
+  }
+  const { report, demo } = await fallbackBundle();
+  const fallback = buildSavedQuotePayload(report, demo, compact);
+  backgroundLiveRefresh();
+  return Response.json(fallback, { headers: { 'X-ValueScope-Data': 'saved-fallback', 'Cache-Control': 'no-store' } });
+}
+
+async function portfolioStatusResponse(url) {
+  const { report, demo } = await fallbackBundle();
+  const compact = liveCompact && liveExpiresAt > Date.now()
+    ? liveCompact
+    : buildSavedQuotePayload(report, demo, true);
+  const offset = Math.max(0, Number.parseInt(url.searchParams.get('offset') ?? '0', 10) || 0);
+  const limit = Math.min(10, Math.max(1, Number.parseInt(url.searchParams.get('limit') ?? '10', 10) || 10));
+  backgroundLiveRefresh();
+  return new Response(portfolioStatusText(compact, offset, limit), {
+    headers: { 'Content-Type': 'text/plain; charset=utf-8', 'X-ValueScope-Data': liveCompact ? 'live-cache' : 'saved-fallback' },
+  });
+}
+
+async function patchedFetch(input, init = {}) {
+  const method = String(init.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
+  if (method !== 'GET') return nativeFetch(input, init);
+  const original = new URL(typeof input === 'string' ? input : input.url, location.href);
+  if (original.origin !== location.origin) return nativeFetch(input, init);
+  const kind = requestKind(original, location.href);
+  if (kind === 'quotes') return quoteResponse(original, isForcedQuoteRefresh(original, location.href));
+  if (kind === 'portfolio-status') return portfolioStatusResponse(original);
+  if (kind === 'static-json') {
+    const normalized = normalizeDataUrl(original, location.href);
+    return cachedNetworkFetch(normalized, init, STATIC_TTL_MS);
+  }
+  return nativeFetch(input, init);
+}
+
+function installCoalescedMutationObserver() {
+  if (window.__valuescopeMutationObserverInstalled || !window.MutationObserver) return;
+  const NativeObserver = window.MutationObserver;
+  window.MutationObserver = class CoalescedMutationObserver {
+    constructor(callback) {
+      let queued = false;
+      let buffered = [];
+      this.native = new NativeObserver((records, observer) => {
+        buffered.push(...records);
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => {
+          queued = false;
+          const batch = buffered;
+          buffered = [];
+          callback(batch, observer);
+        });
       });
-    };
-    sharedFetch('./data/paper-trading/latest-report.json').then(response => response.ok ? response.json() : null).then(value => { state.report = value; update(); }).catch(() => {});
-    sharedFetch('./data/paper-trading/performance-metrics.json').then(response => response.ok ? response.json() : null).then(value => { state.metrics = value; update(); }).catch(() => {});
+    }
+    observe(target, options) { return this.native.observe(target, options); }
+    disconnect() { return this.native.disconnect(); }
+    takeRecords() { return this.native.takeRecords(); }
   };
+  window.__valuescopeMutationObserverInstalled = true;
+}
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', staticFirst, { once: true });
-  else staticFirst();
-})();
+window.fetch = patchedFetch;
+installCoalescedMutationObserver();
+window.ValueScopeData = Object.freeze({
+  getRanking: () => jsonFromStatic('./jquants-ranking.json', { rows: [], metadata: {} }),
+  getDailyReport: () => jsonFromStatic('./data/paper-trading/latest-report.json', null),
+  getPerformanceMetrics: () => jsonFromStatic('./data/paper-trading/performance-metrics.json', null),
+  getDiagnostics: () => jsonFromStatic('./data/paper-trading/drawdown-diagnostics.json', null),
+  getDemoPortfolio: () => jsonFromStatic('./demo-portfolio.json', { positions: [] }),
+  getQuotes: async (compact = true) => {
+    if (liveFull && liveExpiresAt > Date.now()) return compact ? liveCompact : liveFull;
+    const { report, demo } = await fallbackBundle();
+    backgroundLiveRefresh();
+    return buildSavedQuotePayload(report, demo, compact);
+  },
+  refreshQuotes: async (compact = true) => {
+    const full = await fetchLiveQuotes(true);
+    return compact ? deriveCompactQuotePayload(full) : full;
+  },
+  subscribeQuotes(callback) {
+    subscribers.add(callback);
+    return () => subscribers.delete(callback);
+  },
+});
+
+fallbackBundle().catch(() => {});
