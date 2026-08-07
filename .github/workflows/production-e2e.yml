@@ -9,7 +9,7 @@ permissions:
 jobs:
   production-smoke:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -17,18 +17,19 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Install app dependencies
+      - name: Install application
         working-directory: web
         run: npm ci
-      - name: Install Playwright runner
+      - name: Install Playwright test runner
         working-directory: web
         run: |
-          npm install --no-save --package-lock=false @playwright/test@1.61.1
+          npm install --no-save --package-lock=false @playwright/test@1.55.0
           npx playwright install --with-deps chromium
-      - name: Run production E2E on PC, iPad, and iPhone viewports
+      - name: Run production E2E on PC, iPad and iPhone
         working-directory: web
         env:
           BASE_URL: https://valuescope-japan.pages.dev
+          E2E_SUITE: production
         run: npm run e2e:production
       - name: Upload Playwright artifacts
         if: always()
