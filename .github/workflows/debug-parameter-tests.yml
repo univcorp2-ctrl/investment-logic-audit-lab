@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   diagnose:
@@ -12,6 +12,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -30,10 +32,22 @@ jobs:
           set -e
           echo "lint_exit_code=$lint_code" >> ../parameter-test-output.txt
           echo "test_exit_code=$test_code" >> ../parameter-test-output.txt
+      - name: Commit unique diagnostic output
+        shell: bash
+        run: |
+          mkdir -p debug
+          target="debug/parameter-test-output-${GITHUB_RUN_ID}.txt"
+          mv parameter-test-output.txt "$target"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add "$target"
+          git commit -m "debug: parameter test output ${GITHUB_RUN_ID} [skip ci]"
+          git pull --rebase origin main
+          git push origin main
       - name: Upload diagnostic
         uses: actions/upload-artifact@v4
         with:
           name: parameter-test-output-${{ github.run_id }}
-          path: parameter-test-output.txt
+          path: debug/parameter-test-output-${{ github.run_id }}.txt
           if-no-files-found: error
           retention-days: 2
