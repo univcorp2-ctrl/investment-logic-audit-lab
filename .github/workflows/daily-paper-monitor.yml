@@ -36,8 +36,8 @@ jobs:
       - name: Install
         run: pip install -e '.[dev]'
       - name: Run focused tests
-        run: pytest tests/test_daily_monitor.py tests/test_performance_analytics.py tests/test_drawdown_diagnostics.py
-      - name: Generate daily paper report
+        run: pytest tests/test_daily_monitor.py tests/test_performance_analytics.py tests/test_drawdown_diagnostics.py tests/test_adaptive_parameter_learner.py
+      - name: Generate adaptive daily paper report
         id: monitor
         shell: bash
         run: |
@@ -45,7 +45,7 @@ jobs:
           if [ '${{ github.event_name }}' = 'schedule' ] || [ '${{ inputs.mode }}' = 'simulate' ]; then
             MODE_ARGS+=(--execute-simulation)
           fi
-          python -m investment_audit.daily_monitor --root . "${MODE_ARGS[@]}" | tee monitor-result.json
+          python -m investment_audit.adaptive_daily_monitor --root . "${MODE_ARGS[@]}" | tee monitor-result.json
           python -m investment_audit.performance_analytics --root . | tee performance-result.json
           python -m investment_audit.drawdown_diagnostics --root . | tee diagnostics-result.json
       - name: Validate sanitized output
@@ -59,6 +59,8 @@ jobs:
           assert report['paper_only'] is True
           assert metrics['paper_only'] is True
           assert diagnostics['paper_only'] is True
+          assert report['adaptive_learning']['paper_only'] is True
+          assert report['adaptive_learning']['mode'] in {'baseline', 'adaptive-paper'}
           assert diagnostics['stability_plan']['observations'] >= 0
           text = ''.join(Path(path).read_text(encoding='utf-8') for path in [
               'web/data/paper-trading/latest-report.json',
@@ -66,6 +68,7 @@ jobs:
               'web/data/paper-trading/drawdown-diagnostics.json',
           ]).lower()
           assert 'api_key' not in text and 'authorization' not in text
+          assert 'real_order_allowed": true' not in text
           PY
       - name: Commit changed reports
         shell: bash
@@ -77,7 +80,7 @@ jobs:
             echo 'No report changes.'
             exit 0
           fi
-          git commit -m 'data: update daily paper portfolio report'
+          git commit -m 'data: update adaptive daily paper report'
           git pull --rebase origin main
           git push origin main
       - name: Write workflow summary
@@ -89,16 +92,18 @@ jobs:
           report = json.loads(Path('web/data/paper-trading/latest-report.json').read_text(encoding='utf-8')) if Path('web/data/paper-trading/latest-report.json').exists() else {}
           metrics = json.loads(Path('web/data/paper-trading/performance-metrics.json').read_text(encoding='utf-8')) if Path('web/data/paper-trading/performance-metrics.json').exists() else {}
           diagnostics = json.loads(Path('web/data/paper-trading/drawdown-diagnostics.json').read_text(encoding='utf-8')) if Path('web/data/paper-trading/drawdown-diagnostics.json').exists() else {}
-          print('## Daily paper portfolio monitor')
+          print('## Daily adaptive paper portfolio monitor')
           if report:
               summary = report['summary']
+              learning = report.get('adaptive_learning', {})
               print(f"- Tokyo date: {report['trading_date']}")
               print(f"- Equity: ¥{summary['equity']:,.0f}")
               print(f"- Total P/L: ¥{summary['total_pnl']:,.0f}")
+              print(f"- Learning mode: {learning.get('mode', 'baseline')}")
+              print(f"- Active learned strategy: {learning.get('strategy') or 'none'}")
           if metrics:
               print(f"- Analytics observations: {metrics['sample']['observations']}")
           if diagnostics:
               print(f"- Diagnosed causes: {len(diagnostics['causes'])}")
-              print(f"- Stability status: {diagnostics['stability_plan']['status']}")
           print('- Real broker orders: never sent')
           PY
