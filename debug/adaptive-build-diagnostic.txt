@@ -1,0 +1,7 @@
+
+> valuescope-japan-web@1.6.0 build
+> node scripts/build.mjs
+
+Built ValueScope Japan into web/dist
+
+exit_code=0
