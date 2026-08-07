@@ -1,0 +1,84 @@
+name: Weekly guarded adaptive learning
+
+on:
+  schedule:
+    - cron: '30 2 * * 6'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-adaptive-learning
+  cancel-in-progress: false
+
+jobs:
+  learn:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install learner
+        run: pip install -e '.[dev,ml]'
+      - name: Guardrail tests
+        run: pytest tests/test_adaptive_learning.py
+      - name: Train and compare
+        run: python -m investment_audit.adaptive_learning train --root . | tee adaptive-learning-result.json
+      - name: Validate paper-only output
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          latest = json.loads(Path('web/data/adaptive-learning/latest.json').read_text(encoding='utf-8'))
+          active = json.loads(Path('config/adaptive-paper-strategy.json').read_text(encoding='utf-8'))
+          assert latest['paper_only'] is True
+          assert active['paper_only'] is True
+          assert latest['mode'] in {'collect_only', 'proposal_only', 'guarded_auto'}
+          if latest['applied']:
+              assert latest['oos'] and all(latest['oos']['apply_gates'].values())
+              assert active['approved'] is True
+          text = json.dumps(latest).lower() + json.dumps(active).lower()
+          assert 'api_key' not in text and 'authorization' not in text
+          PY
+      - name: Commit sanitized learning state
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add config/adaptive-paper-strategy.json web/data/adaptive-learning
+          if git diff --cached --quiet; then
+            echo 'No adaptive-learning changes.'
+            exit 0
+          fi
+          git commit -m 'data: update guarded adaptive paper strategy'
+          git pull --rebase origin main
+          git push origin main
+      - name: Summary
+        if: always()
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          path = Path('web/data/adaptive-learning/latest.json')
+          if not path.exists():
+              print('## Adaptive learning\nNo result generated.')
+              raise SystemExit
+          data = json.loads(path.read_text(encoding='utf-8'))
+          actual = data['gates']['actual']
+          required = data['gates']['required']
+          print('## Guarded adaptive learning')
+          print(f"- Mode: {data['mode']}")
+          print(f"- Status: {data['status']}")
+          print(f"- Matured rows: {actual['matured_rows']} / {required['matured_rows']}")
+          print(f"- Trading days: {actual['training_days']} / {required['training_days']}")
+          print(f"- Securities: {actual['securities']} / {required['securities']}")
+          print(f"- Applied: {data['applied']}")
+          print(f"- Active config version: {data['active_config_version']}")
+          print('- Scope: paper/demo strategy only')
+          PY
