@@ -1,225 +1,597 @@
 
-> valuescope-japan-web@1.5.0 test
+> valuescope-japan-web@2.2.0 test
 > node --test tests/*.test.mjs
 
 TAP version 13
-# Subtest: normalizes J-Quants metadata and reasons
-ok 1 - normalizes J-Quants metadata and reasons
+# Subtest: two-mode boundary assigns 767 to iPhone and 768 to large mode
+ok 1 - two-mode boundary assigns 767 to iPhone and 768 to large mode
   ---
-  duration_ms: 1.824486
+  duration_ms: 9.347287
+  type: 'test'
+  ...
+# Subtest: large navigation has six destinations and iPhone navigation has five
+ok 2 - large navigation has six destinations and iPhone navigation has five
+  ---
+  duration_ms: 2.630357
+  type: 'test'
+  ...
+# Subtest: stable section IDs, safe areas and accessible tap targets are present
+ok 3 - stable section IDs, safe areas and accessible tap targets are present
+  ---
+  duration_ms: 2.898526
+  type: 'test'
+  ...
+# Subtest: advanced content uses disclosures and paper-only status remains visible
+ok 4 - advanced content uses disclosures and paper-only status remains visible
+  ---
+  duration_ms: 1.375087
+  type: 'test'
+  ...
+# Subtest: production build loads the adaptive shell last
+not ok 5 - production build loads the adaptive shell last
+  ---
+  duration_ms: 9.575046
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/app-shell-build.test.mjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /adaptive-shell\.css/. Input:
+    
+    "import { cp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';\n" +
+      "import { resolve } from 'node:path';\n" +
+      '\n' +
+      "const root = resolve(import.meta.dirname, '..');\n" +
+      "const dist = resolve(root, 'dist');\n" +
+      'await rm(dist, { recursive: true, force: true });\n' +
+      'await mkdir(dist, { recursive: true });\n' +
+      '\n' +
+      'const staticFiles = [\n' +
+      "  'index.html','styles.css','app.js','dashboard.js','scoring.js','demo-data.js',\n" +
+      "  'data-client.js','data-client-core.js',\n" +
+      "  'summary-fix.js','demo-trade.js','demo-trade-core.js','demo-trade.css','demo-portfolio.json',\n" +
+      "  'performance-dashboard.js','performance-dashboard-core.js','performance-dashboard.css',\n" +
+      "  'risk-diagnostics.js','risk-diagnostics-core.js','risk-diagnostics.css',\n" +
+      "  'decision-report.js','decision-report-core.js','decision-report.css','jquants-plans.json',\n" +
+      "  'responsive-mode.js','responsive-enhancements.css',\n" +
+      "  'screening-lab.js','screening-lab-core.js','screening-lab.css',\n" +
+      "  'fundamental-tuning.js','fundamental-tuning-core.js','fundamental-tuning.css',\n" +
+      "  'strategy-lab-view.js','strategy-lab-view-core.js','strategy-lab-view.css',\n" +
+      "  'app-shell-core.js','app-shell.js','app-shell.css','app-shell-polish.css',\n" +
+      '];\n' +
+      'for (const file of staticFiles) await cp(resolve(root, file), resolve(dist, file));\n' +
+      "for (const file of ['jquants-ranking.json','jquants-ranking.csv','live-ranking.json','live-ranking.csv']) {\n" +
+      '  try { await stat(resolve(root, file)); await cp(resolve(root, file), resolve(dist, file)); } catch { /* optional generated file */ }\n' +
+      '}\n' +
+      "try { await stat(resolve(root, 'data')); await cp(resolve(root, 'data'), resolve(dist, 'data'), { recursive: true }); } catch { /* first build */ }\n" +
+      '\n' +
+      "const indexPath = resolve(dist, 'index.html');\n" +
+      "let index = await readFile(indexPath, 'utf-8');\n" +
+      'for (const marker of [\n' +
+      `  '<link rel="stylesheet" href="./demo-trade.css" />',\n` +
+      `  '<link rel="stylesheet" href="./performance-dashboard.css" />',\n` +
+      `  '<link rel="stylesheet" href="./risk-diagnostics.css" />',\n` +
+      `  '<link rel="stylesheet" href="./decision-report.css" />',\n` +
+      `  '<link rel="stylesheet" href="./screening-lab.css" />',\n` +
+      `  '<link rel="stylesheet" href="./fundamental-tuning.css" />',\n` +
+      `  '<link rel="stylesheet" href="./strategy-lab-view.css" />',\n` +
+      `  '<link rel="stylesheet" href="./app-shell.css" />',\n` +
+      `  '<link rel="stylesheet" href="./app-shell-polish.css" />',\n` +
+      ']) {\n' +
+      "  if (!index.includes(marker)) index = index.replace('</head>', `  ${marker}\\n  </head>`);\n" +
+      '}\n' +
+      'for (const marker of [\n' +
+      `  '<script type="module" src="./data-client.js"></script>',\n` +
+      `  '<script type="module" src="./summary-fix.js"></script>',\n` +
+      `  '<script type="module" src="./demo-trade.js"></script>',\n` +
+      `  '<script type="module" src="./performance-dashboard.js"></script>',\n` +
+      `  '<script type="module" src="./risk-diagnostics.js"></script>',\n` +
+      `  '<script type="module" src="./decision-report.js"></script>',\n` +
+      `  '<script type="module" src="./strategy-lab-view.js"></script>',\n` +
+      `  '<script type="module" src="./screening-lab.js"></script>',\n` +
+      `  '<script type="module" src="./fundamental-tuning.js"></script>',\n` +
+      `  '<script type="module" src="./app-shell.js"></script>',\n` +
+      ']) {\n' +
+      "  if (!index.includes(marker)) index = index.replace('</body>', `  ${marker}\\n  </body>`);\n" +
+      '}\n' +
+      "await writeFile(indexPath, index, 'utf-8');\n" +
+      "console.log('Built ValueScope Japan into web/dist');\n"
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    import { cp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+    import { resolve } from 'node:path';
+    
+    const root = resolve(import.meta.dirname, '..');
+    const dist = resolve(root, 'dist');
+    await rm(dist, { recursive: true, force: true });
+    await mkdir(dist, { recursive: true });
+    
+    const staticFiles = [
+      'index.html','styles.css','app.js','dashboard.js','scoring.js','demo-data.js',
+      'data-client.js','data-client-core.js',
+      'summary-fix.js','demo-trade.js','demo-trade-core.js','demo-trade.css','demo-portfolio.json',
+      'performance-dashboard.js','performance-dashboard-core.js','performance-dashboard.css',
+      'risk-diagnostics.js','risk-diagnostics-core.js','risk-diagnostics.css',
+      'decision-report.js','decision-report-core.js','decision-report.css','jquants-plans.json',
+      'responsive-mode.js','responsive-enhancements.css',
+      'screening-lab.js','screening-lab-core.js','screening-lab.css',
+      'fundamental-tuning.js','fundamental-tuning-core.js','fundamental-tuning.css',
+      'strategy-lab-view.js','strategy-lab-view-core.js','strategy-lab-view.css',
+      'app-shell-core.js','app-shell.js','app-shell.css','app-shell-polish.css',
+    ];
+    for (const file of staticFiles) await cp(resolve(root, file), resolve(dist, file));
+    for (const file of ['jquants-ranking.json','jquants-ranking.csv','live-ranking.json','live-ranking.csv']) {
+      try { await stat(resolve(root, file)); await cp(resolve(root, file), resolve(dist, file)); } catch { /* optional generated file */ }
+    }
+    try { await stat(resolve(root, 'data')); await cp(resolve(root, 'data'), resolve(dist, 'data'), { recursive: true }); } catch { /* first build */ }
+    
+    const indexPath = resolve(dist, 'index.html');
+    let index = await readFile(indexPath, 'utf-8');
+    for (const marker of [
+      '<link rel="stylesheet" href="./demo-trade.css" />',
+      '<link rel="stylesheet" href="./performance-dashboard.css" />',
+      '<link rel="stylesheet" href="./risk-diagnostics.css" />',
+      '<link rel="stylesheet" href="./decision-report.css" />',
+      '<link rel="stylesheet" href="./screening-lab.css" />',
+      '<link rel="stylesheet" href="./fundamental-tuning.css" />',
+      '<link rel="stylesheet" href="./strategy-lab-view.css" />',
+      '<link rel="stylesheet" href="./app-shell.css" />',
+      '<link rel="stylesheet" href="./app-shell-polish.css" />',
+    ]) {
+      if (!index.includes(marker)) index = index.replace('</head>', `  ${marker}\n  </head>`);
+    }
+    for (const marker of [
+      '<script type="module" src="./data-client.js"></script>',
+      '<script type="module" src="./summary-fix.js"></script>',
+      '<script type="module" src="./demo-trade.js"></script>',
+      '<script type="module" src="./performance-dashboard.js"></script>',
+      '<script type="module" src="./risk-diagnostics.js"></script>',
+      '<script type="module" src="./decision-report.js"></script>',
+      '<script type="module" src="./strategy-lab-view.js"></script>',
+      '<script type="module" src="./screening-lab.js"></script>',
+      '<script type="module" src="./fundamental-tuning.js"></script>',
+      '<script type="module" src="./app-shell.js"></script>',
+    ]) {
+      if (!index.includes(marker)) index = index.replace('</body>', `  ${marker}\n  </body>`);
+    }
+    await writeFile(indexPath, index, 'utf-8');
+    console.log('Built ValueScope Japan into web/dist');
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/app-shell-build.test.mjs:10:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: adaptive shell keeps separate large and iPhone navigation
+ok 6 - adaptive shell keeps separate large and iPhone navigation
+  ---
+  duration_ms: 4.169352
+  type: 'test'
+  ...
+# Subtest: phone tables are converted to labelled cards with details
+ok 7 - phone tables are converted to labelled cards with details
+  ---
+  duration_ms: 5.477902
+  type: 'test'
+  ...
+# Subtest: CSS contains dedicated desktop tablet and phone modes
+ok 8 - CSS contains dedicated desktop tablet and phone modes
+  ---
+  duration_ms: 9.549439
+  type: 'test'
+  ...
+# Subtest: shell source exposes all five primary views
+ok 9 - shell source exposes all five primary views
+  ---
+  duration_ms: 2.210622
+  type: 'test'
+  ...
+# Subtest: viewport modes separate phone tablet and desktop
+ok 10 - viewport modes separate phone tablet and desktop
+  ---
+  duration_ms: 1.123333
+  type: 'test'
+  ...
+# Subtest: view routing preserves screening configuration hash
+ok 11 - view routing preserves screening configuration hash
+  ---
+  duration_ms: 0.479444
+  type: 'test'
+  ...
+# Subtest: direct anchors map to their primary view
+ok 12 - direct anchors map to their primary view
+  ---
+  duration_ms: 0.393847
+  type: 'test'
+  ...
+# Subtest: phone always uses comfortable density
+ok 13 - phone always uses comfortable density
+  ---
+  duration_ms: 0.206568
+  type: 'test'
+  ...
+# Subtest: section map groups existing dynamic modules once
+ok 14 - section map groups existing dynamic modules once
+  ---
+  duration_ms: 1.313666
+  type: 'test'
+  ...
+# Subtest: normalizes J-Quants metadata and reasons
+ok 15 - normalizes J-Quants metadata and reasons
+  ---
+  duration_ms: 1.511911
   type: 'test'
   ...
 # Subtest: filters and sorts deterministically
-ok 2 - filters and sorts deterministically
+ok 16 - filters and sorts deterministically
   ---
-  duration_ms: 0.488683
+  duration_ms: 0.374358
   type: 'test'
   ...
 # Subtest: summaries and CSV contain sanitized display columns
-ok 3 - summaries and CSV contain sanitized display columns
+ok 17 - summaries and CSV contain sanitized display columns
   ---
-  duration_ms: 0.889423
+  duration_ms: 0.646833
+  type: 'test'
+  ...
+# Subtest: normalizes transient cache-busting parameters while preserving compact mode
+ok 18 - normalizes transient cache-busting parameters while preserving compact mode
+  ---
+  duration_ms: 1.431091
+  type: 'test'
+  ...
+# Subtest: builds an immediate saved quote fallback from daily report and demo entries
+ok 19 - builds an immediate saved quote fallback from daily report and demo entries
+  ---
+  duration_ms: 1.463739
+  type: 'test'
+  ...
+# Subtest: quote and portfolio requests share one canonical compact key
+ok 20 - quote and portfolio requests share one canonical compact key
+  ---
+  duration_ms: 1.24895
+  type: 'test'
+  ...
+# Subtest: static JSON cache busting is removed while stable parameters remain
+ok 21 - static JSON cache busting is removed while stable parameters remain
+  ---
+  duration_ms: 0.351924
+  type: 'test'
+  ...
+# Subtest: portfolio status is derived from a compact quote payload
+ok 22 - portfolio status is derived from a compact quote payload
+  ---
+  duration_ms: 0.538151
+  type: 'test'
+  ...
+# Subtest: stale age and static summary remain explicit
+ok 23 - stale age and static summary remain explicit
+  ---
+  duration_ms: 1.315569
   type: 'test'
   ...
 # Subtest: paper decision labels are explicit
-ok 4 - paper decision labels are explicit
+ok 24 - paper decision labels are explicit
   ---
-  duration_ms: 0.84722
+  duration_ms: 1.172036
   type: 'test'
   ...
 # Subtest: CSV separates fundamental and technical columns
-ok 5 - CSV separates fundamental and technical columns
+ok 25 - CSV separates fundamental and technical columns
   ---
-  duration_ms: 0.575884
+  duration_ms: 0.775955
   type: 'test'
   ...
 # Subtest: plan impact explains upgrade without promising profit
-ok 6 - plan impact explains upgrade without promising profit
+ok 26 - plan impact explains upgrade without promising profit
   ---
-  duration_ms: 0.214081
+  duration_ms: 0.274559
   type: 'test'
   ...
 # Subtest: calculates per-position unrealized result
-ok 7 - calculates per-position unrealized result
+ok 27 - calculates per-position unrealized result
   ---
-  duration_ms: 1.341912
+  duration_ms: 0.915994
   type: 'test'
   ...
 # Subtest: aggregates portfolio and falls back to entry on unusable quote
-ok 8 - aggregates portfolio and falls back to entry on unusable quote
+ok 28 - aggregates portfolio and falls back to entry on unusable quote
   ---
-  duration_ms: 0.455993
+  duration_ms: 0.304884
   type: 'test'
   ...
 # Subtest: formats Japanese currency and signed percent
-ok 9 - formats Japanese currency and signed percent
+ok 29 - formats Japanese currency and signed percent
   ---
-  duration_ms: 31.128935
+  duration_ms: 33.561546
+  type: 'test'
+  ...
+# Subtest: canonical key removes cache busters and unifies quote consumers
+ok 30 - canonical key removes cache busters and unifies quote consumers
+  ---
+  duration_ms: 1.20833
+  type: 'test'
+  ...
+# Subtest: full quote payload can be normalized for compact consumers
+ok 31 - full quote payload can be normalized for compact consumers
+  ---
+  duration_ms: 0.595096
   type: 'test'
   ...
 # Subtest: preset applies detailed thresholds and weights
-ok 10 - preset applies detailed thresholds and weights
+ok 32 - preset applies detailed thresholds and weights
   ---
-  duration_ms: 1.287852
+  duration_ms: 0.896825
   type: 'test'
   ...
 # Subtest: Free conservative preset keeps complete strong data and excludes weak data
-ok 11 - Free conservative preset keeps complete strong data and excludes weak data
+ok 33 - Free conservative preset keeps complete strong data and excludes weak data
   ---
-  duration_ms: 3.743013
+  duration_ms: 2.778086
   type: 'test'
   ...
 # Subtest: missing policy neutral preserves score and exclude rejects enabled missing field
-ok 12 - missing policy neutral preserves score and exclude rejects enabled missing field
+ok 34 - missing policy neutral preserves score and exclude rejects enabled missing field
   ---
-  duration_ms: 0.797215
+  duration_ms: 0.683848
   type: 'test'
   ...
 # Subtest: CSV includes raw metrics and no credentials
-ok 13 - CSV includes raw metrics and no credentials
+ok 35 - CSV includes raw metrics and no credentials
   ---
-  duration_ms: 0.809493
+  duration_ms: 0.674314
   type: 'test'
   ...
 # Subtest: high and low direction percentiles reward the correct issue
-ok 14 - high and low direction percentiles reward the correct issue
+ok 36 - high and low direction percentiles reward the correct issue
   ---
-  duration_ms: 1.997365
+  duration_ms: 1.929643
   type: 'test'
   ...
 # Subtest: raw threshold uses display units and missing exclude is respected
-ok 15 - raw threshold uses display units and missing exclude is respected
+ok 37 - raw threshold uses display units and missing exclude is respected
   ---
-  duration_ms: 1.075392
+  duration_ms: 1.05457
   type: 'test'
   ...
 # Subtest: cash flow preset enables FCF metrics and formula explains weights
-ok 16 - cash flow preset enables FCF metrics and formula explains weights
+ok 38 - cash flow preset enables FCF metrics and formula explains weights
   ---
-  duration_ms: 0.500551
+  duration_ms: 0.492683
   type: 'test'
   ...
 # Subtest: contributions sum to custom score and CSV is secret-free
-ok 17 - contributions sum to custom score and CSV is secret-free
+ok 39 - contributions sum to custom score and CSV is secret-free
   ---
-  duration_ms: 0.69313
+  duration_ms: 0.617709
+  type: 'test'
+  ...
+# Subtest: raw fundamental metrics are converted to percentages
+ok 40 - raw fundamental metrics are converted to percentages
+  ---
+  duration_ms: 1.450971
+  type: 'test'
+  ...
+# Subtest: quality preset filters weak company
+ok 41 - quality preset filters weak company
+  ---
+  duration_ms: 1.682094
+  type: 'test'
+  ...
+# Subtest: missing exclude rejects missing ROE when ROE threshold is active
+ok 42 - missing exclude rejects missing ROE when ROE threshold is active
+  ---
+  duration_ms: 2.237521
+  type: 'test'
+  ...
+# Subtest: composite respects user weights
+ok 43 - composite respects user weights
+  ---
+  duration_ms: 0.352394
+  type: 'test'
+  ...
+# Subtest: shared data client is loaded before live-data startup modules
+ok 44 - shared data client is loaded before live-data startup modules
+  ---
+  duration_ms: 11.606601
+  type: 'test'
+  ...
+# Subtest: data client includes in-flight deduplication timeout fallback and background refresh
+ok 45 - data client includes in-flight deduplication timeout fallback and background refresh
+  ---
+  duration_ms: 2.351211
+  type: 'test'
+  ...
+# Subtest: quote function has bounded concurrency stable cache and partial response
+ok 46 - quote function has bounded concurrency stable cache and partial response
+  ---
+  duration_ms: 1.968601
   type: 'test'
   ...
 # Subtest: performance analytics module loads and preserves missing values
-ok 18 - performance analytics module loads and preserves missing values
+ok 47 - performance analytics module loads and preserves missing values
   ---
-  duration_ms: 1.129063
+  duration_ms: 1.51132
   type: 'test'
   ...
 # Subtest: one observation is not converted into fake returns
-ok 19 - one observation is not converted into fake returns
+ok 48 - one observation is not converted into fake returns
   ---
-  duration_ms: 2.374971
+  duration_ms: 2.336009
   type: 'test'
   ...
 # Subtest: range filtering preserves observed points only
-ok 20 - range filtering preserves observed points only
+ok 49 - range filtering preserves observed points only
   ---
-  duration_ms: 10.794177
+  duration_ms: 11.692819
   type: 'test'
   ...
 # Subtest: adjustable settings recalculate risk reward and ratios
-ok 21 - adjustable settings recalculate risk reward and ratios
+ok 50 - adjustable settings recalculate risk reward and ratios
   ---
-  duration_ms: 2.622533
+  duration_ms: 2.460143
   type: 'test'
   ...
 # Subtest: chart modes and CSV expose all series without secrets
-ok 22 - chart modes and CSV expose all series without secrets
+ok 51 - chart modes and CSV expose all series without secrets
   ---
-  duration_ms: 0.520351
+  duration_ms: 0.485984
+  type: 'test'
+  ...
+# Subtest: period filter keeps recent points
+ok 52 - period filter keeps recent points
+  ---
+  duration_ms: 1.931056
+  type: 'test'
+  ...
+# Subtest: live equity is appended using entry basis
+ok 53 - live equity is appended using entry basis
+  ---
+  duration_ms: 0.634755
+  type: 'test'
+  ...
+# Subtest: metric state preserves insufficient history
+ok 54 - metric state preserves insufficient history
+  ---
+  duration_ms: 0.220919
+  type: 'test'
+  ...
+# Subtest: contribution view prefers live quote P&L
+ok 55 - contribution view prefers live quote P&L
+  ---
+  duration_ms: 0.329991
+  type: 'test'
+  ...
+# Subtest: chart bounds include zero when requested
+ok 56 - chart bounds include zero when requested
+  ---
+  duration_ms: 0.379344
+  type: 'test'
+  ...
+# Subtest: shared data client is inserted before quote-consuming scripts
+ok 57 - shared data client is inserted before quote-consuming scripts
+  ---
+  duration_ms: 7.356553
+  type: 'test'
+  ...
+# Subtest: data client provides one shared quote request timeout and saved fallback
+ok 58 - data client provides one shared quote request timeout and saved fallback
+  ---
+  duration_ms: 2.343319
+  type: 'test'
+  ...
+# Subtest: static fallback is available before live quote completion
+ok 59 - static fallback is available before live quote completion
+  ---
+  duration_ms: 1.37045
+  type: 'test'
+  ...
+# Subtest: quote API has bounded concurrency timeouts partial fallback and cache
+ok 60 - quote API has bounded concurrency timeouts partial fallback and cache
+  ---
+  duration_ms: 6.64201
+  type: 'test'
+  ...
+# Subtest: data client module is injected before consumers
+ok 61 - data client module is injected before consumers
+  ---
+  duration_ms: 1.760441
   type: 'test'
   ...
 # Subtest: responsive layer includes iPhone breakpoint and safe areas
-ok 23 - responsive layer includes iPhone breakpoint and safe areas
+ok 62 - responsive layer includes iPhone breakpoint and safe areas
   ---
-  duration_ms: 6.426747
+  duration_ms: 5.466058
   type: 'test'
   ...
 # Subtest: responsive script installs viewport indicator and five mobile destinations
-ok 24 - responsive script installs viewport indicator and five mobile destinations
+ok 63 - responsive script installs viewport indicator and five mobile destinations
   ---
-  duration_ms: 4.672186
+  duration_ms: 1.557489
+  type: 'test'
+  ...
+# Subtest: risk diagnostics module loads with stable default limits
+ok 64 - risk diagnostics module loads with stable default limits
+  ---
+  duration_ms: 0.911608
   type: 'test'
   ...
 # Subtest: robust score ranks quality value above trap
-ok 25 - robust score ranks quality value above trap
+ok 65 - robust score ranks quality value above trap
   ---
-  duration_ms: 4.043744
+  duration_ms: 3.73804
   type: 'test'
   ...
 # Subtest: missing metrics are not converted to zero
-ok 26 - missing metrics are not converted to zero
+ok 66 - missing metrics are not converted to zero
   ---
-  duration_ms: 0.540891
+  duration_ms: 0.53033
   type: 'test'
   ...
 # Subtest: weights must sum to 100
-ok 27 - weights must sum to 100
+ok 67 - weights must sum to 100
   ---
-  duration_ms: 0.482143
+  duration_ms: 0.442218
   type: 'test'
   ...
 # Subtest: csv parser and exporter preserve quoted values
-ok 28 - csv parser and exporter preserve quoted values
+ok 68 - csv parser and exporter preserve quoted values
   ---
-  duration_ms: 0.575543
+  duration_ms: 0.506905
   type: 'test'
   ...
 # Subtest: summary reports eligible and median
-ok 29 - summary reports eligible and median
+ok 69 - summary reports eligible and median
   ---
-  duration_ms: 1.685608
+  duration_ms: 1.701543
   type: 'test'
   ...
 # Subtest: merges ranking and daily technical data
-ok 30 - merges ranking and daily technical data
+ok 70 - merges ranking and daily technical data
   ---
-  duration_ms: 1.557776
+  duration_ms: 1.528015
   type: 'test'
   ...
 # Subtest: Free safe preset excludes weak record
-ok 31 - Free safe preset excludes weak record
+ok 71 - Free safe preset excludes weak record
   ---
-  duration_ms: 2.846559
+  duration_ms: 2.785107
   type: 'test'
   ...
 # Subtest: missing policy neutral produces score while exclude rejects
-ok 32 - missing policy neutral produces score while exclude rejects
+ok 72 - missing policy neutral produces score while exclude rejects
   ---
-  duration_ms: 0.441332
+  duration_ms: 0.424762
   type: 'test'
   ...
 # Subtest: CSV contains separate pillars and no secrets
-ok 33 - CSV contains separate pillars and no secrets
+ok 73 - CSV contains separate pillars and no secrets
   ---
-  duration_ms: 0.704306
+  duration_ms: 0.804358
   type: 'test'
   ...
 # Subtest: insufficient history cannot be promoted
-ok 34 - insufficient history cannot be promoted
+ok 74 - insufficient history cannot be promoted
   ---
-  duration_ms: 1.328583
+  duration_ms: 1.320947
   type: 'test'
   ...
 # Subtest: research CSV exposes baseline comparison and no secrets
-ok 35 - research CSV exposes baseline comparison and no secrets
+ok 75 - research CSV exposes baseline comparison and no secrets
   ---
-  duration_ms: 0.593791
+  duration_ms: 0.589037
   type: 'test'
   ...
-1..35
-# tests 35
+1..75
+# tests 75
 # suites 0
-# pass 35
-# fail 0
+# pass 74
+# fail 1
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 317.317696
-exit_code=0
+# duration_ms 604.442359
+exit_code=1
