@@ -1,0 +1,79 @@
+name: Weekly sanitized stock details
+
+on:
+  schedule:
+    - cron: '0 2 * * 6'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-stock-details
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install
+        run: pip install -e '.[dev,jquants]'
+      - name: Focused tests
+        run: pytest tests/test_stock_detail_pipeline.py
+      - name: Refresh financial summaries
+        env:
+          JQUANTS_API_KEY: ${{ secrets.JQUANTS_API_KEY }}
+        run: python -m investment_audit.stock_detail_pipeline --root . --plan free --limit 20 | tee stock-detail-result.json
+      - name: Validate sanitized files
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('web/data/stock-details')
+          index = json.loads((root / 'index.json').read_text(encoding='utf-8'))
+          assert index.get('paper_only', True) is True
+          text = ''.join(path.read_text(encoding='utf-8') for path in root.glob('*.json')).lower()
+          assert 'api_key' not in text and 'authorization' not in text
+          for path in root.glob('*.json'):
+              json.loads(path.read_text(encoding='utf-8'))
+          PY
+      - name: Commit sanitized stock details
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add web/data/stock-details
+          if git diff --cached --quiet; then
+            echo 'No stock-detail changes.'
+            exit 0
+          fi
+          git commit -m 'data: refresh sanitized stock financial summaries'
+          git pull --rebase origin main
+          git push origin main
+      - name: Summary
+        if: always()
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          path = Path('web/data/stock-details/index.json')
+          if not path.exists():
+              print('## Stock details\nNo index generated.')
+              raise SystemExit
+          data = json.loads(path.read_text(encoding='utf-8'))
+          print('## Sanitized stock detail refresh')
+          print(f"- Securities: {len(data.get('securities', []))}")
+          print(f"- Updated: {data.get('updated', 0)}")
+          print(f"- Preserved: {data.get('preserved', 0)}")
+          print(f"- Errors: {len(data.get('errors', []))}")
+          print('- TDnet add-on: not configured unless official sanitized output exists')
+          print('- Secrets committed: no')
+          PY
