@@ -1,0 +1,1024 @@
+
+> valuescope-japan-web@1.6.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: two-mode boundary assigns 767 to iPhone and 768 to large mode
+ok 1 - two-mode boundary assigns 767 to iPhone and 768 to large mode
+  ---
+  duration_ms: 6.571272
+  type: 'test'
+  ...
+# Subtest: large navigation has six destinations and iPhone navigation has five
+ok 2 - large navigation has six destinations and iPhone navigation has five
+  ---
+  duration_ms: 1.581836
+  type: 'test'
+  ...
+# Subtest: stable section IDs, safe areas and accessible tap targets are present
+ok 3 - stable section IDs, safe areas and accessible tap targets are present
+  ---
+  duration_ms: 2.065642
+  type: 'test'
+  ...
+# Subtest: advanced content uses disclosures and paper-only status remains visible
+ok 4 - advanced content uses disclosures and paper-only status remains visible
+  ---
+  duration_ms: 1.036583
+  type: 'test'
+  ...
+# Subtest: production build loads the authoritative app shell last
+ok 5 - production build loads the authoritative app shell last
+  ---
+  duration_ms: 7.423708
+  type: 'test'
+  ...
+# Subtest: app shell avoids nested main and keeps five primary destinations
+ok 6 - app shell avoids nested main and keeps five primary destinations
+  ---
+  duration_ms: 3.097166
+  type: 'test'
+  ...
+# Subtest: polish layer has separate iPhone iPad and desktop layouts
+ok 7 - polish layer has separate iPhone iPad and desktop layouts
+  ---
+  duration_ms: 1.373004
+  type: 'test'
+  ...
+# Subtest: phone tables are converted to cards with labels
+ok 8 - phone tables are converted to cards with labels
+  ---
+  duration_ms: 3.899573
+  type: 'test'
+  ...
+# Subtest: CSS contains dedicated desktop tablet and phone modes
+ok 9 - CSS contains dedicated desktop tablet and phone modes
+  ---
+  duration_ms: 7.102586
+  type: 'test'
+  ...
+# Subtest: shell source exposes all five primary views
+not ok 10 - shell source exposes all five primary views
+  ---
+  duration_ms: 7.026292
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/app-shell-static.test.mjs:17:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /条件スクリーナー/. Input:
+    
+    'import {\n' +
+      '  densityForMode,\n' +
+      '  normalizeView,\n' +
+      '  parseShellHash,\n' +
+      '  sectionViewMap,\n' +
+      '  shellHash,\n' +
+      '  viewportMode,\n' +
+      "} from './app-shell-core.js';\n" +
+      '\n' +
+      "const STORAGE_DENSITY = 'valuescope-density-v1';\n" +
+      'const VIEW_LABELS = Object.freeze({\n' +
+      "  overview: '概要',\n" +
+      "  decision: '投資判断',\n" +
+      "  screening: '条件設定',\n" +
+      "  analytics: '損益・リスク',\n" +
+      "  data: 'データ・プラン',\n" +
+      '});\n' +
+      'const VIEW_DESCRIPTIONS = Object.freeze({\n' +
+      "  overview: '現在の成績、判断、リスク、データ鮮度を最初に確認します。',\n" +
+      "  decision: '売買判断の根拠をFundamentalとTechnicalに分けて確認します。',\n" +
+      "  screening: '条件とウェイトを調整し、通過銘柄と除外理由を確認します。',\n" +
+      "  analytics: '保有銘柄、資産推移、損益、ドローダウンと原因診断を確認します。',\n" +
+      "  data: 'J-Quantsの鮮度、プラン差、適時開示能力、研究情報を確認します。',\n" +
+      '});\n' +
+      "const NAV_ICONS = Object.freeze({ overview: '⌂', decision: '◎', screening: '⌕', analytics: '↗', data: '▦' });\n" +
+      'const $ = selector => document.querySelector(selector);\n' +
+      'const $$ = selector => [...document.querySelectorAll(selector)];\n' +
+      '\n' +
+      "let activeView = 'overview';\n" +
+      'let currentMode = viewportMode(window.innerWidth);\n' +
+      "let requestedDensity = localStorage.getItem(STORAGE_DENSITY) ?? 'comfortable';\n" +
+      'let observer = null;\n' +
+      'let contextTimer = null;\n' +
+      'let trustedSummaryLoaded = false;\n' +
+      '\n' +
+      'const money = value => Number.isFinite(Number(value))\n' +
+      "  ? new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(Number(value))\n" +
+      "  : '–';\n" +
+      'const percent = value => Number.isFinite(Number(value))\n' +
+      "  ? `${Number(value) >= 0 ? '+' : ''}${Number(value).toFixed(2)}%`\n" +
+      "  : '–';\n" +
+      'const dateTime = value => {\n' +
+      "  if (!value) return '–';\n" +
+      '  const date = new Date(value);\n' +
+      "  return Number.isNaN(date.getTime()) ? String(value) : new Intl.DateTimeFormat('ja-JP', {\n" +
+      "    timeZone: 'Asia/Tokyo',\n" +
+      "    year: 'numeric',\n" +
+      "    month: '2-digit',\n" +
+      "    day: '2-digit',\n" +
+      "    hour: '2-digit',\n" +
+      "    minute: '2-digit',\n" +
+      '  }).format(date);\n' +
+      '};\n' +
+      '\n' +
+      'function createShell() {\n' +
+      "  const main = $('main');\n" +
+      "  if (!main || $('#uxAppShell')) return;\n" +
+      "  const shell = document.createElement('div');\n" +
+      "  shell.id = 'uxAppShell';\n" +
+      "  shell.className = 'ux-app-shell';\n" +
+      '  shell.innerHTML = `\n' +
+      '    <aside class="ux-rail">\n' +
+      '      <div class="ux-rail-brand"><span>VS</span><div><strong>ValueScope</strong><small>Japan</small></div></div>\n' +
+      '      <nav id="uxPrimaryNav" class="ux-primary-nav" aria-label="主要画面">\n' +
+      '        ${Object.entries(VIEW_LABELS).map(([key, label]) => `<button type="button" data-view="${key}" aria-current="false"><span aria-hidden="true">${NAV_ICONS[key]}</span><b>${label}</b></button>`).join(\'\')}\n' +
+      '      </nav>\n' +
+      '      <div class="ux-rail-footer"><span id="uxModeLabel">PC表示</span><small>Paper analysis only</small></div>\n' +
+      '    </aside>\n' +
+      '    <section class="ux-workspace">\n' +
+      '      <header class="ux-view-header">\n' +
+      '        <div><p class="eyebrow">VALUESCOPE WORKSPACE</p><h1 id="uxViewTitle">概要</h1><p id="uxViewDescription">${VIEW_DESCRIPTIONS.overview}</p></div>\n' +
+      '        <div class="ux-header-actions"><button id="uxDensityToggle" type="button" class="ux-density-button">表示密度: 標準</button><span class="ux-safety">実注文なし</span></div>\n' +
+      '      </header>\n' +
+      '      <section id="uxOverviewHighlights" class="ux-overview-highlights" aria-label="主要サマリー">\n' +
+      '        <article><span>合計損益（日次確定）</span><strong id="uxTotalPnl">読込中</strong><small id="uxTotalReturn">–</small></article>\n' +
+      '        <article><span>含み損益（現在値）</span><strong id="uxUnrealizedPnl">読込中</strong><small>現在保有分</small></article>\n' +
+      '        <article><span>現在ドローダウン</span><strong id="uxCurrentDd">読込中</strong><small id="uxRiskState">リスク確認中</small></article>\n' +
+      '        <article><span>Fundamentalデータ</span><strong id="uxDataState">読込中</strong><small id="uxFreshness">鮮度確認中</small></article>\n' +
+      '      </section>\n' +
+      '      <div id="uxViewHost" class="ux-view-host">\n' +
+      '        ${Object.entries(VIEW_LABELS).map(([key, label]) => `<section id="uxView-${key}" class="ux-view" data-view="${key}" aria-label="${label}" ${key === \'overview\' ? \'\' : \'hidden\'}><div class="ux-view-loading"><i></i><i></i><i></i><span>${label}を準備しています</span></div></section>`).join(\'\')}\n' +
+      '      </div>\n' +
+      '    </section>\n' +
+      '    <aside class="ux-context" aria-label="コンテキストサマリー">\n' +
+      '      <section><span>現在の画面</span><strong id="uxContextView">概要</strong></section>\n' +
+      '      <section><span>リスク状態</span><strong id="uxContextRisk">確認中</strong></section>\n' +
+      '      <section><span>データ鮮度</span><strong id="uxContextData">確認中</strong></section>\n' +
+      '      <section><span>最終更新</span><strong id="uxContextUpdated">確認中</strong></section>\n' +
+      '      <section class="ux-context-help"><strong>見方</strong><p id="uxContextHelp">最初に合計損益と現在DDを確認し、異常時は「損益・リスク」へ進みます。</p></section>\n' +
+      '    </aside>`;\n' +
+      '  main.prepend(shell);\n' +
+      "  document.documentElement.classList.add('ux-shell-ready');\n" +
+      "  $('#mobileNavigation')?.remove();\n" +
+      '  installNavigation();\n' +
+      '  installHistoryPatch();\n' +
+      '  installObserver();\n' +
+      '  moveKnownSections();\n' +
+      '  updateMode();\n' +
+      '  const initial = parseShellHash(location.hash).view;\n' +
+      "  activateView(initial, { history: 'replace', scroll: false });\n" +
+      '  loadTrustedSummaries();\n' +
+      '  contextTimer = window.setInterval(() => {\n' +
+      '    updateSummariesFromDom();\n' +
+      '    if (!trustedSummaryLoaded) loadTrustedSummaries();\n' +
+      '  }, 15000);\n' +
+      '  window.setTimeout(() => clearInterval(contextTimer), 180000);\n' +
+      '}\n' +
+      '\n' +
+      'function installNavigation() {\n' +
+      "  $('#uxPrimaryNav')?.addEventListener('click', event => {\n" +
+      "    const button = event.target.closest('button[data-view]');\n" +
+      '    if (!button) return;\n' +
+      "    activateView(button.dataset.view, { history: 'push', scroll: true });\n" +
+      '  });\n' +
+      "  $('#uxDensityToggle')?.addEventListener('click', () => {\n" +
+      "    requestedDensity = requestedDensity === 'compact' ? 'comfortable' : 'compact';\n" +
+      '    localStorage.setItem(STORAGE_DENSITY, requestedDensity);\n' +
+      '    applyDensity();\n' +
+      '  });\n' +
+      "  window.addEventListener('popstate', () => activateView(parseShellHash(location.hash).view, { history: 'none', scroll: false }));\n" +
+      "  window.addEventListener('hashchange', () => {\n" +
+      '    const parsed = parseShellHash(location.hash);\n' +
+      "    if (parsed.view !== activeView) activateView(parsed.view, { history: 'none', scroll: false });\n" +
+      '  });\n' +
+      "  window.addEventListener('resize', updateMode, { passive: true });\n" +
+      "  window.addEventListener('orientationchange', () => requestAnimationFrame(updateMode));\n" +
+      "  document.addEventListener('keydown', event => {\n" +
+      `    if (event.key === 'Escape') document.querySelectorAll('[data-ux-open="true"]').forEach(node => { node.dataset.uxOpen = 'false'; });\n` +
+      '  });\n' +
+      '}\n' +
+      '\n' +
+      'function installHistoryPatch() {\n' +
+      '  const original = history.replaceState.bind(history);\n' +
+      '  history.replaceState = (state, title, url) => {\n' +
+      "    if (typeof url === 'string' && url.includes('#screen=') && !url.includes('view=')) {\n" +
+      "      const replacement = url.replace('#screen=', `#view=${activeView}&screen=`);\n" +
+      '      return original(state, title, replacement);\n' +
+      '    }\n' +
+      '    return original(state, title, url);\n' +
+      '  };\n' +
+      '}\n' +
+      '\n' +
+      'function installObserver() {\n' +
+      "  const main = $('main');\n" +
+      '  if (!main) return;\n' +
+      '  observer = new MutationObserver(() => {\n' +
+      '    moveKnownSections();\n' +
+      '    updateSummariesFromDom();\n' +
+      '  });\n' +
+      '  observer.observe(main, { childList: true, subtree: true });\n' +
+      '  window.setTimeout(() => {\n' +
+      '    moveKnownSections();\n' +
+      '    observer?.disconnect();\n' +
+      '  }, 20000);\n' +
+      '}\n' +
+      '\n' +
+      'function targetViewFor(selector, mappedView) {\n' +
+      "  if (selector === '#investmentDecisionReport' && activeView === 'data') return 'data';\n" +
+      '  return mappedView;\n' +
+      '}\n' +
+      '\n' +
+      'function moveKnownSections() {\n' +
+      '  const map = sectionViewMap();\n' +
+      '  for (const [selector, mappedView] of Object.entries(map)) {\n' +
+      '    document.querySelectorAll(selector).forEach(node => {\n' +
+      '      const view = targetViewFor(selector, mappedView);\n' +
+      "      if (node.closest('#uxAppShell') && node.closest('.ux-view')?.dataset.view === view) return;\n" +
+      "      if (node.id === 'uxAppShell' || node.classList.contains('ux-view')) return;\n" +
+      '      $(`#uxView-${view}`)?.append(node);\n' +
+      '      node.dataset.uxGrouped = view;\n' +
+      '    });\n' +
+      '  }\n' +
+      "  document.querySelectorAll('.ux-view').forEach(view => {\n" +
+      "    const loading = view.querySelector(':scope > .ux-view-loading');\n" +
+      "    const hasContent = [...view.children].some(child => !child.classList.contains('ux-view-loading'));\n" +
+      '    if (loading) loading.hidden = hasContent;\n' +
+      '  });\n' +
+      '  prepareProgressiveSections();\n' +
+      '  labelResponsiveTables();\n' +
+      '  preparePhoneAccordions();\n' +
+      '}\n' +
+      '\n' +
+      'function createProgressiveDetails(id, label, helper) {\n' +
+      "  const details = document.createElement('details');\n" +
+      '  details.id = id;\n' +
+      "  details.className = 'ux-progressive-block';\n" +
+      '  details.innerHTML = `<summary><span>${label}</span><small>${helper}</small></summary><div class="ux-progressive-content"></div>`;\n' +
+      "  details.addEventListener('toggle', () => { details.dataset.uxUserToggled = 'true'; });\n" +
+      '  return details;\n' +
+      '}\n' +
+      '\n' +
+      'function prepareProgressiveSections() {\n' +
+      "  const ranking = $('.ranking');\n" +
+      "  const filters = $('.filters');\n" +
+      "  if (ranking && filters && !$('#uxLegacyRanking')) {\n" +
+      "    const details = createProgressiveDetails('uxLegacyRanking', 'ランキング表・簡易フィルター', '必要な時だけ展開');\n" +
+      '    filters.before(details);\n' +
+      "    details.querySelector('.ux-progressive-content').append(filters, ranking);\n" +
+      '  }\n' +
+      "  const visual = $('.visual-grid');\n" +
+      "  if (visual && !$('#uxOverviewCharts')) {\n" +
+      "    const details = createProgressiveDetails('uxOverviewCharts', 'スコア分布・上位比較', '補助チャートを表示');\n" +
+      '    visual.before(details);\n' +
+      "    details.querySelector('.ux-progressive-content').append(visual);\n" +
+      "    details.open = currentMode !== 'phone';\n" +
+      '  }\n' +
+      "  const demo = $('#demoTrade');\n" +
+      "  const demoTable = demo?.querySelector('.demo-table-wrap');\n" +
+      "  if (demo && demoTable && !$('#uxDemoPositions')) {\n" +
+      "    const details = createProgressiveDetails('uxDemoPositions', '保有銘柄の明細', '10銘柄の損益と検証状態');\n" +
+      '    demoTable.before(details);\n' +
+      "    details.querySelector('.ux-progressive-content').append(demoTable);\n" +
+      '  }\n' +
+      "  if (demo && !demo.querySelector('.ux-section-jump')) {\n" +
+      "    const button = document.createElement('button');\n" +
+      "    button.type = 'button';\n" +
+      "    button.className = 'ux-section-jump';\n" +
+      "    button.textContent = '詳細な損益・リスク分析へ';\n" +
+      "    button.addEventListener('click', () => activateView('analytics', { history: 'push', scroll: true }));\n" +
+      '    demo.prepend(button);\n' +
+      '  }\n' +
+      "  const report = $('#investmentDecisionReport');\n" +
+      "  if (report) report.dataset.uxShared = 'decision-data';\n" +
+      '}\n' +
+      '\n' +
+      'function labelTable(bodySelector, labels) {\n' +
+      '  const body = $(bodySelector);\n' +
+      "  if (!body || body.dataset.uxLabels === 'rea"... 8129 more characters
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    import {
+      densityForMode,
+      normalizeView,
+      parseShellHash,
+      sectionViewMap,
+      shellHash,
+      viewportMode,
+    } from './app-shell-core.js';
+    
+    const STORAGE_DENSITY = 'valuescope-density-v1';
+    const VIEW_LABELS = Object.freeze({
+      overview: '概要',
+      decision: '投資判断',
+      screening: '条件設定',
+      analytics: '損益・リスク',
+      data: 'データ・プラン',
+    });
+    const VIEW_DESCRIPTIONS = Object.freeze({
+      overview: '現在の成績、判断、リスク、データ鮮度を最初に確認します。',
+      decision: '売買判断の根拠をFundamentalとTechnicalに分けて確認します。',
+      screening: '条件とウェイトを調整し、通過銘柄と除外理由を確認します。',
+      analytics: '保有銘柄、資産推移、損益、ドローダウンと原因診断を確認します。',
+      data: 'J-Quantsの鮮度、プラン差、適時開示能力、研究情報を確認します。',
+    });
+    const NAV_ICONS = Object.freeze({ overview: '⌂', decision: '◎', screening: '⌕', analytics: '↗', data: '▦' });
+    const $ = selector => document.querySelector(selector);
+    const $$ = selector => [...document.querySelectorAll(selector)];
+    
+    let activeView = 'overview';
+    let currentMode = viewportMode(window.innerWidth);
+    let requestedDensity = localStorage.getItem(STORAGE_DENSITY) ?? 'comfortable';
+    let observer = null;
+    let contextTimer = null;
+    let trustedSummaryLoaded = false;
+    
+    const money = value => Number.isFinite(Number(value))
+      ? new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY', maximumFractionDigits: 0 }).format(Number(value))
+      : '–';
+    const percent = value => Number.isFinite(Number(value))
+      ? `${Number(value) >= 0 ? '+' : ''}${Number(value).toFixed(2)}%`
+      : '–';
+    const dateTime = value => {
+      if (!value) return '–';
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? String(value) : new Intl.DateTimeFormat('ja-JP', {
+        timeZone: 'Asia/Tokyo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(date);
+    };
+    
+    function createShell() {
+      const main = $('main');
+      if (!main || $('#uxAppShell')) return;
+      const shell = document.createElement('div');
+      shell.id = 'uxAppShell';
+      shell.className = 'ux-app-shell';
+      shell.innerHTML = `
+        <aside class="ux-rail">
+          <div class="ux-rail-brand"><span>VS</span><div><strong>ValueScope</strong><small>Japan</small></div></div>
+          <nav id="uxPrimaryNav" class="ux-primary-nav" aria-label="主要画面">
+            ${Object.entries(VIEW_LABELS).map(([key, label]) => `<button type="button" data-view="${key}" aria-current="false"><span aria-hidden="true">${NAV_ICONS[key]}</span><b>${label}</b></button>`).join('')}
+          </nav>
+          <div class="ux-rail-footer"><span id="uxModeLabel">PC表示</span><small>Paper analysis only</small></div>
+        </aside>
+        <section class="ux-workspace">
+          <header class="ux-view-header">
+            <div><p class="eyebrow">VALUESCOPE WORKSPACE</p><h1 id="uxViewTitle">概要</h1><p id="uxViewDescription">${VIEW_DESCRIPTIONS.overview}</p></div>
+            <div class="ux-header-actions"><button id="uxDensityToggle" type="button" class="ux-density-button">表示密度: 標準</button><span class="ux-safety">実注文なし</span></div>
+          </header>
+          <section id="uxOverviewHighlights" class="ux-overview-highlights" aria-label="主要サマリー">
+            <article><span>合計損益（日次確定）</span><strong id="uxTotalPnl">読込中</strong><small id="uxTotalReturn">–</small></article>
+            <article><span>含み損益（現在値）</span><strong id="uxUnrealizedPnl">読込中</strong><small>現在保有分</small></article>
+            <article><span>現在ドローダウン</span><strong id="uxCurrentDd">読込中</strong><small id="uxRiskState">リスク確認中</small></article>
+            <article><span>Fundamentalデータ</span><strong id="uxDataState">読込中</strong><small id="uxFreshness">鮮度確認中</small></article>
+          </section>
+          <div id="uxViewHost" class="ux-view-host">
+            ${Object.entries(VIEW_LABELS).map(([key, label]) => `<section id="uxView-${key}" class="ux-view" data-view="${key}" aria-label="${label}" ${key === 'overview' ? '' : 'hidden'}><div class="ux-view-loading"><i></i><i></i><i></i><span>${label}を準備しています</span></div></section>`).join('')}
+          </div>
+        </section>
+        <aside class="ux-context" aria-label="コンテキストサマリー">
+          <section><span>現在の画面</span><strong id="uxContextView">概要</strong></section>
+          <section><span>リスク状態</span><strong id="uxContextRisk">確認中</strong></section>
+          <section><span>データ鮮度</span><strong id="uxContextData">確認中</strong></section>
+          <section><span>最終更新</span><strong id="uxContextUpdated">確認中</strong></section>
+          <section class="ux-context-help"><strong>見方</strong><p id="uxContextHelp">最初に合計損益と現在DDを確認し、異常時は「損益・リスク」へ進みます。</p></section>
+        </aside>`;
+      main.prepend(shell);
+      document.documentElement.classList.add('ux-shell-ready');
+      $('#mobileNavigation')?.remove();
+      installNavigation();
+      installHistoryPatch();
+      installObserver();
+      moveKnownSections();
+      updateMode();
+      const initial = parseShellHash(location.hash).view;
+      activateView(initial, { history: 'replace', scroll: false });
+      loadTrustedSummaries();
+      contextTimer = window.setInterval(() => {
+        updateSummariesFromDom();
+        if (!trustedSummaryLoaded) loadTrustedSummaries();
+      }, 15000);
+      window.setTimeout(() => clearInterval(contextTimer), 180000);
+    }
+    
+    function installNavigation() {
+      $('#uxPrimaryNav')?.addEventListener('click', event => {
+        const button = event.target.closest('button[data-view]');
+        if (!button) return;
+        activateView(button.dataset.view, { history: 'push', scroll: true });
+      });
+      $('#uxDensityToggle')?.addEventListener('click', () => {
+        requestedDensity = requestedDensity === 'compact' ? 'comfortable' : 'compact';
+        localStorage.setItem(STORAGE_DENSITY, requestedDensity);
+        applyDensity();
+      });
+      window.addEventListener('popstate', () => activateView(parseShellHash(location.hash).view, { history: 'none', scroll: false }));
+      window.addEventListener('hashchange', () => {
+        const parsed = parseShellHash(location.hash);
+        if (parsed.view !== activeView) activateView(parsed.view, { history: 'none', scroll: false });
+      });
+      window.addEventListener('resize', updateMode, { passive: true });
+      window.addEventListener('orientationchange', () => requestAnimationFrame(updateMode));
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') document.querySelectorAll('[data-ux-open="true"]').forEach(node => { node.dataset.uxOpen = 'false'; });
+      });
+    }
+    
+    function installHistoryPatch() {
+      const original = history.replaceState.bind(history);
+      history.replaceState = (state, title, url) => {
+        if (typeof url === 'string' && url.includes('#screen=') && !url.includes('view=')) {
+          const replacement = url.replace('#screen=', `#view=${activeView}&screen=`);
+          return original(state, title, replacement);
+        }
+        return original(state, title, url);
+      };
+    }
+    
+    function installObserver() {
+      const main = $('main');
+      if (!main) return;
+      observer = new MutationObserver(() => {
+        moveKnownSections();
+        updateSummariesFromDom();
+      });
+      observer.observe(main, { childList: true, subtree: true });
+      window.setTimeout(() => {
+        moveKnownSections();
+        observer?.disconnect();
+      }, 20000);
+    }
+    
+    function targetViewFor(selector, mappedView) {
+      if (selector === '#investmentDecisionReport' && activeView === 'data') return 'data';
+      return mappedView;
+    }
+    
+    function moveKnownSections() {
+      const map = sectionViewMap();
+      for (const [selector, mappedView] of Object.entries(map)) {
+        document.querySelectorAll(selector).forEach(node => {
+          const view = targetViewFor(selector, mappedView);
+          if (node.closest('#uxAppShell') && node.closest('.ux-view')?.dataset.view === view) return;
+          if (node.id === 'uxAppShell' || node.classList.contains('ux-view')) return;
+          $(`#uxView-${view}`)?.append(node);
+          node.dataset.uxGrouped = view;
+        });
+      }
+      document.querySelectorAll('.ux-view').forEach(view => {
+        const loading = view.querySelector(':scope > .ux-view-loading');
+        const hasContent = [...view.children].some(child => !child.classList.contains('ux-view-loading'));
+        if (loading) loading.hidden = hasContent;
+      });
+      prepareProgressiveSections();
+      labelResponsiveTables();
+      preparePhoneAccordions();
+    }
+    
+    function createProgressiveDetails(id, label, helper) {
+      const details = document.createElement('details');
+      details.id = id;
+      details.className = 'ux-progressive-block';
+      details.innerHTML = `<summary><span>${label}</span><small>${helper}</small></summary><div class="ux-progressive-content"></div>`;
+      details.addEventListener('toggle', () => { details.dataset.uxUserToggled = 'true'; });
+      return details;
+    }
+    
+    function prepareProgressiveSections() {
+      const ranking = $('.ranking');
+      const filters = $('.filters');
+      if (ranking && filters && !$('#uxLegacyRanking')) {
+        const details = createProgressiveDetails('uxLegacyRanking', 'ランキング表・簡易フィルター', '必要な時だけ展開');
+        filters.before(details);
+        details.querySelector('.ux-progressive-content').append(filters, ranking);
+      }
+      const visual = $('.visual-grid');
+      if (visual && !$('#uxOverviewCharts')) {
+        const details = createProgressiveDetails('uxOverviewCharts', 'スコア分布・上位比較', '補助チャートを表示');
+        visual.before(details);
+        details.querySelector('.ux-progressive-content').append(visual);
+        details.open = currentMode !== 'phone';
+      }
+      const demo = $('#demoTrade');
+      const demoTable = demo?.querySelector('.demo-table-wrap');
+      if (demo && demoTable && !$('#uxDemoPositions')) {
+        const details = createProgressiveDetails('uxDemoPositions', '保有銘柄の明細', '10銘柄の損益と検証状態');
+        demoTable.before(details);
+        details.querySelector('.ux-progressive-content').append(demoTable);
+      }
+      if (demo && !demo.querySelector('.ux-section-jump')) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'ux-section-jump';
+        button.textContent = '詳細な損益・リスク分析へ';
+        button.addEventListener('click', () => activateView('analytics', { history: 'push', scroll: true }));
+        demo.prepend(button);
+      }
+      const report = $('#investmentDecisionReport');
+      if (report) report.dataset.uxShared = 'decision-data';
+    }
+    
+    function labelTable(bodySelector, labels) {
+      const body = $(bodySelector);
+      if (!body || body.dataset.uxLabels === 'ready') return;
+      const apply = () => body.querySelectorAll('tr').forEach(row => {
+        [...row.children].forEach((cell, index) => { cell.dataset.label = labels[index] ?? ''; });
+      });
+      apply();
+      new MutationObserver(apply).observe(body, { childList: true, subtree: true });
+      body.dataset.uxLabels = 'ready';
+    }
+    
+    function labelResponsiveTables() {
+      labelTable('#rankingBody', ['順位', '銘柄', '市場・業種', '株価', '総合', '割安', '品質', 'Technical', '流動性', 'Trap', '充足率', '判定']);
+      labelTable('#demoTradeBody', ['銘柄', '株数', '取得価格', '現在値', '投資額', '評価額', '損益', '収益率', '検証', '更新時刻']);
+    }
+    
+    function preparePhoneAccordions() {
+      if (currentMode !== 'phone') return;
+      const screening = $$('#screeningLab .sl-controls > details');
+      screening.forEach((details, index) => {
+        if (details.dataset.uxPhonePrepared) return;
+        details.dataset.uxPhonePrepared = 'true';
+        details.open = index === 0;
+      });
+      $$('#fundamentalDetailLab details, .pa-settings, .pa-series-table').forEach(details => {
+        if (details.dataset.uxPhonePrepared) return;
+        details.dataset.uxPhonePrepared = 'true';
+        details.open = false;
+      });
+      const overviewCharts = $('#uxOverviewCharts');
+      if (overviewCharts && overviewCharts.dataset.uxUserToggled !== 'true') overviewCharts.open = false;
+      const legacy = $('#uxLegacyRanking');
+      if (legacy && legacy.dataset.uxUserToggled !== 'true') legacy.open = false;
+      const positions = $('#uxDemoPositions');
+      if (positions && positions.dataset.uxUserToggled !== 'true') positions.open = false;
+    }
+    
+    function activateView(requested, options = {}) {
+      const view = normalizeView(requested);
+      activeView = view;
+      document.body.dataset.uxView = view;
+      const report = $('#investmentDecisionReport');
+      if (report) {
+        if (view === 'data') {
+          $('#uxView-data')?.append(report);
+          report.querySelector('[data-tab="plan"]')?.click();
+        } else if (view === 'decision') {
+          $('#uxView-decision')?.append(report);
+          report.querySelector('[data-tab="judge"]')?.click();
+        }
+      }
+      document.querySelectorAll('.ux-view').forEach(node => { node.hidden = node.dataset.view !== view; });
+      document.querySelectorAll('#uxPrimaryNav button').forEach(button => {
+        const selected = button.dataset.view === view;
+        button.setAttribute('aria-current', selected ? 'page' : 'false');
+      });
+      $('#uxViewTitle').textContent = VIEW_LABELS[view];
+      $('#uxViewDescription').textContent = VIEW_DESCRIPTIONS[view];
+      $('#uxContextView').textContent = VIEW_LABELS[view];
+      $('#uxContextHelp').textContent = VIEW_DESCRIPTIONS[view];
+      if (options.history === 'push') history.pushState({ uxView: view }, '', shellHash(view, location.hash));
+      if (options.history === 'replace') history.replaceState({ uxView: view }, '', shellHash(view, location.hash));
+      if (options.scroll) $('#uxAppShell')?.scrollIntoView({ behavior: currentMode === 'phone' ? 'smooth' : 'auto', block: 'start' });
+      updateSummariesFromDom();
+    }
+    
+    function updateMode() {
+      currentMode = viewportMode(window.innerWidth);
+      document.documentElement.dataset.uxMode = currentMode;
+      const label = currentMode === 'phone' ? 'iPhone表示' : currentMode === 'tablet' ? 'iPad表示' : 'PC表示';
+      $('#uxModeLabel').textContent = label;
+      const legacy = $('#viewportMode');
+      if (legacy) legacy.textContent = label;
+      applyDensity();
+      preparePhoneAccordions();
+      if (currentMode !== 'phone') {
+        const overviewCharts = $('#uxOverviewCharts');
+        if (overviewCharts && overviewCharts.dataset.uxUserToggled !== 'true') overviewCharts.open = true;
+      }
+    }
+    
+    function applyDensity() {
+      const density = densityForMode(currentMode, requestedDensity);
+      document.documentElement.dataset.uxDensity = density;
+      const button = $('#uxDensityToggle');
+      if (button) {
+        button.hidden = currentMode === 'phone';
+        button.textContent = `表示密度: ${density === 'compact' ? 'コンパクト' : '標準'}`;
+      }
+    }
+    
+    function readText(selector, fallback = '–') {
+      const value = $(selector)?.textContent?.trim();
+      return value || fallback;
+    }
+    
+    function setSignedClass(node, text) {
+      if (!node) return;
+      node.className = String(text).includes('-') ? 'negative' : ['読込中', '–'].includes(String(text)) ? '' : 'positive';
+    }
+    
+    function updateSummariesFromDom() {
+      if (trustedSummaryLoaded) return;
+      const totalPnl = readText('#paTotalPnl', readText('#demoPnl', '読込中'));
+      const totalReturn = readText('#paTotalReturn', readText('#demoReturn'));
+      const unrealized = readText('#rdSnapshot article:nth-child(2) strong', readText('#demoPnl'));
+      const drawdown = readText('#rdSnapshot article:nth-child(3) strong', readText('.pa-metric-grid .pa-metric:nth-child(3) strong'));
+      const risk = readText('#rdStatus', '確認中');
+      const dataState = readText('#liveState', '確認中');
+      const freshness = readText('#cutoffLabel', readText('#priceDateLabel'));
+      const updated = readText('#demoUpdatedAt', readText('#asOfLabel'));
+      $('#uxTotalPnl').textContent = totalPnl;
+      $('#uxTotalReturn').textContent = totalReturn;
+      $('#uxUnrealizedPnl').textContent = unrealized;
+      $('#uxCurrentDd').textContent = drawdown;
+      $('#uxRiskState').textContent = risk;
+      $('#uxDataState').textContent = dataState;
+      $('#uxFreshness').textContent = freshness;
+      $('#uxContextRisk').textContent = risk;
+      $('#uxContextData').textContent = dataState;
+      $('#uxContextUpdated').textContent = updated;
+      setSignedClass($('#uxTotalPnl'), totalPnl);
+      setSignedClass($('#uxUnrealizedPnl'), unrealized);
+    }
+    
+    function parsePortfolioStatus(text) {
+      const lines = String(text ?? '').trim().split('\n').map(line => line.split('\t'));
+      const total = lines.find(parts => parts[0] === 'total') ?? [];
+      return {
+        generatedAt: lines.find(parts => parts[0] === 'generated_at')?.[1] ?? null,
+        currentValue: Number(total[2]),
+        unrealizedPnl: Number(total[3]),
+        returnPct: Number(total[4]),
+      };
+    }
+    
+    async function loadTrustedSummaries() {
+      try {
+        const [reportResponse, portfolioResponse, metricsResponse] = await Promise.all([
+          fetch(`./data/paper-trading/latest-report.json?ts=${Date.now()}`, { cache: 'no-store' }),
+          fetch('/api/portfolio-status?offset=0&limit=10', { cache: 'no-store' }),
+          fetch(`./data/paper-trading/performance-metrics.json?ts=${Date.now()}`, { cache: 'no-store' }),
+        ]);
+        const report = reportResponse.ok ? await reportResponse.json() : null;
+        const portfolio = portfolioResponse.ok ? parsePortfolioStatus(await portfolioResponse.text()) : null;
+        const metrics = metricsResponse.ok ? await metricsResponse.json() : null;
+        if (!report && !portfolio) return;
+        const summary = report?.summary ?? {};
+        const totalPnl = Number(summary.total_pnl);
+        const totalReturn = Number(summary.cumulative_return_pct);
+        const unrealized = Number.isFinite(portfolio?.unrealizedPnl) ? portfolio.unrealizedPnl : Number(summary.unrealized_pnl);
+        const currentDd = metrics?.risk?.current_drawdown_pct?.value ?? summary.max_drawdown_pct;
+        const cutoff = report?.fundamental_source?.effective_data_cutoff ?? '–';
+        const plan = report?.fundamental_source?.plan?.name ?? report?.fundamental_source?.plan ?? 'Free';
+        const riskText = Number(currentDd) <= -8 ? '高リスク' : Number(currentDd) <= -4 ? '注意' : '設定内';
+        $('#uxTotalPnl').textContent = `${totalPnl >= 0 ? '+' : ''}${money(totalPnl)}`;
+        $('#uxTotalReturn').textContent = percent(totalReturn);
+        $('#uxUnrealizedPnl').textContent = `${unrealized >= 0 ? '+' : ''}${money(unrealized)}`;
+        $('#uxCurrentDd').textContent = percent(currentDd);
+        $('#uxRiskState').textContent = riskText;
+        $('#uxDataState').textContent = `${plan}`;
+        $('#uxFreshness').textContent = `cutoff ${cutoff}`;
+        $('#uxContextRisk').textContent = riskText;
+        $('#uxContextData').textContent = `${plan} / ${cutoff}`;
+        $('#uxContextUpdated').textContent = dateTime(portfolio?.generatedAt ?? report?.generated_at);
+        setSignedClass($('#uxTotalPnl'), totalPnl);
+        setSignedClass($('#uxUnrealizedPnl'), unrealized);
+        trustedSummaryLoaded = true;
+      } catch {
+        trustedSummaryLoaded = false;
+      }
+    }
+    
+    function start() {
+      createShell();
+    }
+    
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+    else start();
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/app-shell-static.test.mjs:19:75)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: viewport modes separate phone tablet and desktop
+ok 11 - viewport modes separate phone tablet and desktop
+  ---
+  duration_ms: 1.355641
+  type: 'test'
+  ...
+# Subtest: view routing preserves screening configuration hash
+ok 12 - view routing preserves screening configuration hash
+  ---
+  duration_ms: 0.523571
+  type: 'test'
+  ...
+# Subtest: direct anchors map to their primary view
+ok 13 - direct anchors map to their primary view
+  ---
+  duration_ms: 0.388649
+  type: 'test'
+  ...
+# Subtest: phone always uses comfortable density
+ok 14 - phone always uses comfortable density
+  ---
+  duration_ms: 0.249848
+  type: 'test'
+  ...
+# Subtest: section map groups existing dynamic modules once
+ok 15 - section map groups existing dynamic modules once
+  ---
+  duration_ms: 1.213435
+  type: 'test'
+  ...
+# Subtest: normalizes J-Quants metadata and reasons
+ok 16 - normalizes J-Quants metadata and reasons
+  ---
+  duration_ms: 1.439348
+  type: 'test'
+  ...
+# Subtest: filters and sorts deterministically
+ok 17 - filters and sorts deterministically
+  ---
+  duration_ms: 0.468338
+  type: 'test'
+  ...
+# Subtest: summaries and CSV contain sanitized display columns
+ok 18 - summaries and CSV contain sanitized display columns
+  ---
+  duration_ms: 0.904305
+  type: 'test'
+  ...
+# Subtest: paper decision labels are explicit
+ok 19 - paper decision labels are explicit
+  ---
+  duration_ms: 0.921528
+  type: 'test'
+  ...
+# Subtest: CSV separates fundamental and technical columns
+ok 20 - CSV separates fundamental and technical columns
+  ---
+  duration_ms: 0.569518
+  type: 'test'
+  ...
+# Subtest: plan impact explains upgrade without promising profit
+ok 21 - plan impact explains upgrade without promising profit
+  ---
+  duration_ms: 0.252934
+  type: 'test'
+  ...
+# Subtest: calculates per-position unrealized result
+ok 22 - calculates per-position unrealized result
+  ---
+  duration_ms: 1.426234
+  type: 'test'
+  ...
+# Subtest: aggregates portfolio and falls back to entry on unusable quote
+ok 23 - aggregates portfolio and falls back to entry on unusable quote
+  ---
+  duration_ms: 0.511069
+  type: 'test'
+  ...
+# Subtest: formats Japanese currency and signed percent
+ok 24 - formats Japanese currency and signed percent
+  ---
+  duration_ms: 378.647948
+  type: 'test'
+  ...
+# Subtest: preset applies detailed thresholds and weights
+ok 25 - preset applies detailed thresholds and weights
+  ---
+  duration_ms: 0.955671
+  type: 'test'
+  ...
+# Subtest: Free conservative preset keeps complete strong data and excludes weak data
+ok 26 - Free conservative preset keeps complete strong data and excludes weak data
+  ---
+  duration_ms: 2.675847
+  type: 'test'
+  ...
+# Subtest: missing policy neutral preserves score and exclude rejects enabled missing field
+ok 27 - missing policy neutral preserves score and exclude rejects enabled missing field
+  ---
+  duration_ms: 0.632997
+  type: 'test'
+  ...
+# Subtest: CSV includes raw metrics and no credentials
+ok 28 - CSV includes raw metrics and no credentials
+  ---
+  duration_ms: 0.664375
+  type: 'test'
+  ...
+# Subtest: high and low direction percentiles reward the correct issue
+ok 29 - high and low direction percentiles reward the correct issue
+  ---
+  duration_ms: 1.982757
+  type: 'test'
+  ...
+# Subtest: raw threshold uses display units and missing exclude is respected
+ok 30 - raw threshold uses display units and missing exclude is respected
+  ---
+  duration_ms: 1.035261
+  type: 'test'
+  ...
+# Subtest: cash flow preset enables FCF metrics and formula explains weights
+ok 31 - cash flow preset enables FCF metrics and formula explains weights
+  ---
+  duration_ms: 0.507221
+  type: 'test'
+  ...
+# Subtest: contributions sum to custom score and CSV is secret-free
+ok 32 - contributions sum to custom score and CSV is secret-free
+  ---
+  duration_ms: 0.648416
+  type: 'test'
+  ...
+# Subtest: raw fundamental metrics are converted to percentages
+ok 33 - raw fundamental metrics are converted to percentages
+  ---
+  duration_ms: 1.085615
+  type: 'test'
+  ...
+# Subtest: quality preset filters weak company
+ok 34 - quality preset filters weak company
+  ---
+  duration_ms: 1.204948
+  type: 'test'
+  ...
+# Subtest: missing exclude rejects missing ROE when ROE threshold is active
+ok 35 - missing exclude rejects missing ROE when ROE threshold is active
+  ---
+  duration_ms: 1.196544
+  type: 'test'
+  ...
+# Subtest: composite respects user weights
+ok 36 - composite respects user weights
+  ---
+  duration_ms: 0.235602
+  type: 'test'
+  ...
+# Subtest: performance analytics module loads and preserves missing values
+ok 37 - performance analytics module loads and preserves missing values
+  ---
+  duration_ms: 1.150367
+  type: 'test'
+  ...
+# Subtest: one observation is not converted into fake returns
+ok 38 - one observation is not converted into fake returns
+  ---
+  duration_ms: 1.722699
+  type: 'test'
+  ...
+# Subtest: range filtering preserves observed points only
+ok 39 - range filtering preserves observed points only
+  ---
+  duration_ms: 8.947785
+  type: 'test'
+  ...
+# Subtest: adjustable settings recalculate risk reward and ratios
+ok 40 - adjustable settings recalculate risk reward and ratios
+  ---
+  duration_ms: 1.486978
+  type: 'test'
+  ...
+# Subtest: chart modes and CSV expose all series without secrets
+ok 41 - chart modes and CSV expose all series without secrets
+  ---
+  duration_ms: 0.349315
+  type: 'test'
+  ...
+# Subtest: period filter keeps recent points
+ok 42 - period filter keeps recent points
+  ---
+  duration_ms: 1.457573
+  type: 'test'
+  ...
+# Subtest: live equity is appended using entry basis
+ok 43 - live equity is appended using entry basis
+  ---
+  duration_ms: 0.465773
+  type: 'test'
+  ...
+# Subtest: metric state preserves insufficient history
+ok 44 - metric state preserves insufficient history
+  ---
+  duration_ms: 0.17064
+  type: 'test'
+  ...
+# Subtest: contribution view prefers live quote P&L
+ok 45 - contribution view prefers live quote P&L
+  ---
+  duration_ms: 0.307938
+  type: 'test'
+  ...
+# Subtest: chart bounds include zero when requested
+ok 46 - chart bounds include zero when requested
+  ---
+  duration_ms: 0.267271
+  type: 'test'
+  ...
+# Subtest: responsive layer includes iPhone breakpoint and safe areas
+ok 47 - responsive layer includes iPhone breakpoint and safe areas
+  ---
+  duration_ms: 4.89647
+  type: 'test'
+  ...
+# Subtest: responsive script installs viewport indicator and five mobile destinations
+ok 48 - responsive script installs viewport indicator and five mobile destinations
+  ---
+  duration_ms: 1.359649
+  type: 'test'
+  ...
+# Subtest: risk diagnostics module loads with stable default limits
+ok 49 - risk diagnostics module loads with stable default limits
+  ---
+  duration_ms: 0.790251
+  type: 'test'
+  ...
+# Subtest: robust score ranks quality value above trap
+ok 50 - robust score ranks quality value above trap
+  ---
+  duration_ms: 3.919248
+  type: 'test'
+  ...
+# Subtest: missing metrics are not converted to zero
+ok 51 - missing metrics are not converted to zero
+  ---
+  duration_ms: 0.590026
+  type: 'test'
+  ...
+# Subtest: weights must sum to 100
+ok 52 - weights must sum to 100
+  ---
+  duration_ms: 0.410299
+  type: 'test'
+  ...
+# Subtest: csv parser and exporter preserve quoted values
+ok 53 - csv parser and exporter preserve quoted values
+  ---
+  duration_ms: 0.59226
+  type: 'test'
+  ...
+# Subtest: summary reports eligible and median
+ok 54 - summary reports eligible and median
+  ---
+  duration_ms: 1.727499
+  type: 'test'
+  ...
+# Subtest: merges ranking and daily technical data
+ok 55 - merges ranking and daily technical data
+  ---
+  duration_ms: 1.226389
+  type: 'test'
+  ...
+# Subtest: Free safe preset excludes weak record
+ok 56 - Free safe preset excludes weak record
+  ---
+  duration_ms: 2.203241
+  type: 'test'
+  ...
+# Subtest: missing policy neutral produces score while exclude rejects
+ok 57 - missing policy neutral produces score while exclude rejects
+  ---
+  duration_ms: 0.350858
+  type: 'test'
+  ...
+# Subtest: CSV contains separate pillars and no secrets
+ok 58 - CSV contains separate pillars and no secrets
+  ---
+  duration_ms: 0.56022
+  type: 'test'
+  ...
+# Subtest: insufficient history cannot be promoted
+ok 59 - insufficient history cannot be promoted
+  ---
+  duration_ms: 0.915487
+  type: 'test'
+  ...
+# Subtest: research CSV exposes baseline comparison and no secrets
+ok 60 - research CSV exposes baseline comparison and no secrets
+  ---
+  duration_ms: 0.507441
+  type: 'test'
+  ...
+1..60
+# tests 60
+# suites 0
+# pass 59
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 598.737399
+
+exit_code=1
