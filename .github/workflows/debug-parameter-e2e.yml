@@ -20,32 +20,37 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - name: Install and run E2E
-        working-directory: web
         shell: bash
         run: |
+          cd web
           npm ci
-          npm install --no-save --package-lock=false @playwright/test@1.55.0
+          npm run build
+          npm install --no-save --package-lock=false @playwright/test
           npx playwright install --with-deps chromium
           set +e
           npm run e2e > ../parameter-e2e-output.txt 2>&1
           code=$?
           set -e
-          echo "exit_code=$code" >> ../parameter-e2e-output.txt
-      - name: Commit sanitized output
+          echo "e2e_exit_code=$code" >> ../parameter-e2e-output.txt
+      - name: Commit unique diagnostic output
         shell: bash
         run: |
           mkdir -p debug
-          mv parameter-e2e-output.txt debug/parameter-e2e-output.txt
-          python - <<'PY'
-          from pathlib import Path
-          path=Path('debug/parameter-e2e-output.txt')
-          text=path.read_text(encoding='utf-8',errors='replace')
-          text=text.replace(str(Path.cwd()),'[WORKSPACE]')
-          path.write_text(text[-120000:],encoding='utf-8')
-          PY
+          target="debug/parameter-e2e-output-${GITHUB_RUN_ID}.txt"
+          mv parameter-e2e-output.txt "$target"
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add debug/parameter-e2e-output.txt
-          git commit -m 'debug: capture parameter E2E output [skip ci]'
+          git add "$target"
+          git commit -m "debug: parameter E2E output ${GITHUB_RUN_ID} [skip ci]"
           git pull --rebase origin main
           git push origin main
+      - name: Upload E2E artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: parameter-e2e-${{ github.run_id }}
+          path: |
+            web/playwright-report
+            web/test-results
+          if-no-files-found: warn
+          retention-days: 2
