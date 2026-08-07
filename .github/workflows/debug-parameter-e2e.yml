@@ -1,0 +1,48 @@
+name: Temporary parameter E2E diagnostic
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install and run E2E
+        working-directory: web
+        shell: bash
+        run: |
+          npm ci
+          npm install --no-save --package-lock=false @playwright/test@1.55.0
+          npx playwright install --with-deps chromium
+          set +e
+          npm run e2e > ../parameter-e2e-output.txt 2>&1
+          code=$?
+          set -e
+          echo "exit_code=$code" >> ../parameter-e2e-output.txt
+      - name: Commit sanitized output
+        shell: bash
+        run: |
+          mkdir -p debug
+          mv parameter-e2e-output.txt debug/parameter-e2e-output.txt
+          python - <<'PY'
+          from pathlib import Path
+          path=Path('debug/parameter-e2e-output.txt')
+          text=path.read_text(encoding='utf-8',errors='replace')
+          text=text.replace(str(Path.cwd()),'[WORKSPACE]')
+          path.write_text(text[-120000:],encoding='utf-8')
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add debug/parameter-e2e-output.txt
+          git commit -m 'debug: capture parameter E2E output [skip ci]'
+          git push
