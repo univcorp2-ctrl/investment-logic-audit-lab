@@ -5,22 +5,25 @@ import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 
-test('shared data client is loaded before live-data startup modules', async () => {
+test('fetch coordinator is loaded before quote-consuming modules', async () => {
   const build = await readFile(resolve(root, 'scripts/build.mjs'), 'utf8');
-  const client = build.indexOf('<script type="module" src="./data-client.js"></script>');
+  const coordinator = build.indexOf('<script type="module" src="./fetch-coordinator.js"></script>');
   const demo = build.indexOf('<script type="module" src="./demo-trade.js"></script>');
-  assert.ok(client >= 0);
-  assert.ok(demo > client);
+  assert.ok(coordinator >= 0);
+  assert.ok(demo > coordinator);
+  assert.match(build, /fast-data-bootstrap\.js/);
+  assert.match(build, /adaptive-shell\.js/);
+  assert.doesNotMatch(build, /<script[^>]*src="\.\/data-client\.js"/);
+  assert.doesNotMatch(build, /<script[^>]*src="\.\/app-shell\.js"/);
 });
 
-test('data client includes in-flight deduplication timeout fallback and background refresh', async () => {
-  const source = await readFile(resolve(root, 'data-client.js'), 'utf8');
-  assert.match(source, /inFlight/);
-  assert.match(source, /NETWORK_TIMEOUT_MS/);
-  assert.match(source, /saved-fallback/);
-  assert.match(source, /requestIdleCallback/);
+test('coordinator contains immediate saved fallback and one background live request', async () => {
+  const source = await readFile(resolve(root, 'fetch-coordinator.js'), 'utf8');
+  assert.match(source, /savedQuotePromise/);
+  assert.match(source, /buildSavedQuotePayload/);
+  assert.match(source, /quoteInflight/);
+  assert.match(source, /_saved_snapshot/);
   assert.match(source, /valuescope:quotes/);
-  assert.match(source, /portfolioStatusResponse/);
 });
 
 test('quote function has bounded concurrency stable cache and partial response', async () => {
