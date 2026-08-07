@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-07T11:23:16.054919+09:00",
+  "generated_at": "2026-08-07T17:20:25.669228+09:00",
   "paper_only": true,
   "manual_review_required": true,
   "proposals": [
@@ -40,19 +40,19 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 37520.0,
+        "price": 37460.0,
         "price_date": "2026-08-07",
-        "sma20": 42280.5,
-        "sma60": 43726.0537,
-        "price_vs_sma20_pct": -11.2593,
-        "price_vs_sma60_pct": -14.193,
-        "rsi14": 44.2706,
-        "momentum20_pct": -12.7848,
-        "momentum60_pct": -7.1292,
-        "volatility20_pct": 118.6703,
-        "drawdown20_pct": -24.4918,
-        "average_volume20": 3841050.0,
-        "trading_value20": 163154476950.0,
+        "sma20": 42275.0,
+        "sma60": 43724.2204,
+        "price_vs_sma20_pct": -11.3897,
+        "price_vs_sma60_pct": -14.3267,
+        "rsi14": 44.1418,
+        "momentum20_pct": -12.9242,
+        "momentum60_pct": -7.2777,
+        "volatility20_pct": 119.0208,
+        "drawdown20_pct": -24.6126,
+        "average_volume20": 3951825.0,
+        "trading_value20": 167286207600.0,
         "score": 0.0,
         "regime": "DOWNTREND",
         "positive_reasons": [],
@@ -68,10 +68,10 @@
       },
       "quote": {
         "valid": true,
-        "current_price": 37520.0,
-        "quote_time": "2026-08-07T11:22:00+09:00",
+        "current_price": 37460.0,
+        "quote_time": "2026-08-07T15:30:00+09:00",
         "verification": "double-checked",
-        "max_difference_pct": 0.1333,
+        "max_difference_pct": 0.0,
         "risks": []
       },
       "decision": {

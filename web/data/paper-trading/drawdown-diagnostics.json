@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-07T02:23:16.895067+00:00",
+  "generated_at": "2026-08-07T08:20:26.555332+00:00",
   "paper_only": true,
   "thresholds": {
     "portfolio_drawdown_alert_pct": -8.0,
@@ -17,12 +17,12 @@
     "preferred_rule_change_observations": 60
   },
   "snapshot": {
-    "equity": 31062900.0,
+    "equity": 31152000.0,
     "seed_cost_basis": 30722100.0,
-    "unrealized_pnl": -282600.0,
-    "unrealized_loss_pct_of_seed": -0.9198589940140811,
-    "max_drawdown_pct": -1.6607835377918434,
-    "current_drawdown_pct": -1.6607835377918434,
+    "unrealized_pnl": 166500.0,
+    "unrealized_loss_pct_of_seed": 0.5419551397853662,
+    "max_drawdown_pct": -1.3787099327265517,
+    "current_drawdown_pct": -1.3787099327265517,
     "observations": 3
   },
   "causes": [
@@ -31,7 +31,7 @@
       "severity": "high",
       "title": "個別銘柄の損失が集中",
       "evidence": [
-        "レーザーテック -8.62%"
+        "レーザーテック -8.77%"
       ],
       "explanation": "少数の銘柄が全体損益を大きく押し下げている可能性があります。"
     },
@@ -50,11 +50,10 @@
       "title": "テクニカル悪化が複数銘柄で発生",
       "evidence": [
         "キオクシアホールディングス Technical 0.0",
-        "ＪＸ金属 Technical 29.0",
-        "三井金属 Technical 0.0",
-        "フジクラ Technical 0.0",
+        "三井金属 Technical 29.0",
         "レーザーテック Technical 0.0",
-        "東京エレクトロン Technical 0.0"
+        "東京エレクトロン Technical 0.0",
+        "ソフトバンクグループ Technical 0.0"
       ],
       "explanation": "トレンド崩れ・負のモメンタム・高ボラ化が含み損を拡大させる典型要因です。"
     },
@@ -74,7 +73,7 @@
       "severity": "low",
       "title": "同一業種の損失集中を確認",
       "evidence": [
-        "3650 合計 -354,000円"
+        "3650 合計 -360,000円"
       ],
       "explanation": "複数銘柄を保有していても同じ業種なら実質的な分散が弱くなります。"
     }

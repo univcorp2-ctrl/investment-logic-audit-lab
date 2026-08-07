@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "portfolio_id": "valuescope-demo-20260803-afternoon",
-  "cash": 15451700.0,
-  "realized_pnl": 623400.0,
+  "cash": 19197700.0,
+  "realized_pnl": 263400.0,
   "positions": [
     {
       "symbol": "6857.T",
@@ -11,14 +11,6 @@
       "quantity": 100,
       "avg_cost": 31260.0,
       "opened_at": "2026-08-03T14:35:00+09:00"
-    },
-    {
-      "symbol": "6920.T",
-      "code": "6920",
-      "company_name": "レーザーテック",
-      "quantity": 100,
-      "avg_cost": 41060.0,
-      "opened_at": "2026-08-03T14:36:00+09:00"
     },
     {
       "symbol": "9983.T",
