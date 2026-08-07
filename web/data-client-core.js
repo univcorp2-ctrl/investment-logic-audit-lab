@@ -1,4 +1,4 @@
-const TRANSIENT_PARAMS = new Set(['ts', 'refresh', 'cacheBust', '_']);
+const TRANSIENT_PARAMS = new Set(['ts', 'refresh', 'cacheBust', '_', 'adaptive', 'final', 'verify', 'summary', 'count']);
 
 export function normalizeDataUrl(input, base = 'https://valuescope.local/') {
   const url = new URL(typeof input === 'string' ? input : input.url, base);
@@ -9,6 +9,14 @@ export function normalizeDataUrl(input, base = 'https://valuescope.local/') {
     aKey.localeCompare(bKey) || aValue.localeCompare(bValue));
   url.search = '';
   for (const [key, value] of entries) url.searchParams.append(key, value);
+  return url.toString();
+}
+
+export function normalizeRequestKey(input, base = 'https://valuescope.local/') {
+  const url = new URL(normalizeDataUrl(input, base));
+  if (url.pathname === '/api/quotes' || url.pathname === '/api/portfolio-status') {
+    return `${url.origin}/api/quotes?compact=1`;
+  }
   return url.toString();
 }
 
@@ -25,20 +33,44 @@ export function isForcedQuoteRefresh(input, base = 'https://valuescope.local/') 
   return url.searchParams.has('refresh') || url.searchParams.get('force') === '1';
 }
 
-export function deriveCompactQuotePayload(fullPayload) {
-  const quotes = Array.isArray(fullPayload?.quotes) ? fullPayload.quotes : [];
+const numberOrNull = value => {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+export function staleAgeSeconds(generatedAt, nowMs = Date.now()) {
+  const timestamp = Date.parse(generatedAt);
+  return Number.isFinite(timestamp) ? Math.max(0, Math.round((nowMs - timestamp) / 1000)) : null;
+}
+
+export function summaryFromStatic(report = {}, metrics = {}) {
   return {
-    generated_at: fullPayload?.generated_at ?? null,
-    timezone: fullPayload?.timezone ?? 'Asia/Tokyo',
-    refresh_seconds: fullPayload?.refresh_seconds ?? 60,
-    source_policy: fullPayload?.source_policy ?? {},
-    source_status: fullPayload?.source_status ?? {},
-    partial: Boolean(fullPayload?.partial),
-    portfolio: fullPayload?.portfolio ?? {},
-    positions: quotes.map(quote => ({
+    totalPnl: numberOrNull(report?.summary?.total_pnl),
+    totalReturnPct: numberOrNull(report?.summary?.cumulative_return_pct),
+    unrealizedPnl: numberOrNull(report?.summary?.unrealized_pnl),
+    currentDrawdownPct: numberOrNull(metrics?.risk?.current_drawdown_pct?.value ?? report?.summary?.max_drawdown_pct),
+    plan: report?.fundamental_source?.plan?.name ?? report?.fundamental_source?.plan ?? null,
+    effectiveDataCutoff: report?.fundamental_source?.effective_data_cutoff ?? null,
+  };
+}
+
+export function deriveCompactQuotePayload(fullPayload = {}) {
+  const source = Array.isArray(fullPayload.positions)
+    ? fullPayload.positions
+    : Array.isArray(fullPayload.quotes) ? fullPayload.quotes : [];
+  return {
+    generated_at: fullPayload.generated_at ?? null,
+    timezone: fullPayload.timezone ?? 'Asia/Tokyo',
+    refresh_seconds: fullPayload.refresh_seconds ?? 60,
+    source_policy: fullPayload.source_policy ?? {},
+    source_status: fullPayload.source_status ?? {},
+    partial: Boolean(fullPayload.partial),
+    portfolio: fullPayload.portfolio ?? {},
+    positions: source.map(quote => ({
       symbol: quote.symbol,
       code: quote.code,
-      name: quote.name,
+      name: quote.name ?? quote.company_name,
       entry_price: quote.entry_price,
       current_price: quote.current_price,
       quote_time: quote.quote_time,
@@ -49,16 +81,11 @@ export function deriveCompactQuotePayload(fullPayload) {
       max_difference_pct: quote.max_difference_pct,
       primary_source: quote.primary_source,
       secondary_source: quote.secondary_source,
+      secondary_price: quote.secondary_price,
       errors: quote.errors ?? [],
     })),
   };
 }
-
-const numberOrNull = value => {
-  if (value === null || value === undefined || value === '') return null;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-};
 
 export function buildSavedQuotePayload(report = {}, demo = {}, compact = false) {
   const decisions = new Map();
@@ -137,12 +164,14 @@ export function buildSavedQuotePayload(report = {}, demo = {}, compact = false) 
 }
 
 export function portfolioStatusText(payload, offset = 0, limit = 10) {
-  const positions = (payload?.positions ?? []).slice(offset, offset + limit);
+  const start = Math.max(0, Number(offset) || 0);
+  const size = Math.min(10, Math.max(1, Number(limit) || 10));
+  const positions = (payload?.positions ?? []).slice(start, start + size);
   const portfolio = payload?.portfolio ?? {};
   const lines = [
     `generated_at\t${payload?.generated_at ?? ''}`,
     `total\t${portfolio.total_entry_value ?? ''}\t${portfolio.total_current_value ?? ''}\t${portfolio.total_unrealized_pnl ?? ''}\t${portfolio.total_return_pct ?? ''}\t${portfolio.winners ?? ''}\t${portfolio.losers ?? ''}\t${portfolio.unchanged ?? ''}\t${portfolio.usable_quotes ?? ''}\t${portfolio.double_checked ?? ''}`,
-    `range\t${offset}\t${offset + positions.length}`,
+    `range\t${start}\t${start + positions.length}`,
     'code\tname\tentry\tcurrent\tpnl\treturn_pct\tverification\tusable\tquote_time\tmax_diff_pct',
     ...positions.map(position => [
       position.code,
