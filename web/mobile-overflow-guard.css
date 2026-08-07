@@ -1,0 +1,112 @@
+@media (max-width: 767px) {
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0;
+    overflow-x: clip;
+  }
+
+  body > header,
+  body > main,
+  body > footer,
+  main,
+  .adaptive-shell,
+  .adaptive-stable-section,
+  .adaptive-screen,
+  .parameter-control,
+  .screening-lab,
+  .fundamental-tuning,
+  .pa-shell,
+  .rd-shell,
+  .dr-shell,
+  .demo-trade {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .parameter-control,
+  .parameter-control .pc-panel,
+  .parameter-control .pc-field-grid,
+  .parameter-control .pc-check-grid,
+  .parameter-control .pc-management-grid,
+  .parameter-control .pc-impact,
+  .parameter-control .pc-change-list,
+  .parameter-control .pc-actions {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .parameter-control .pc-tabs,
+  .parameter-control .pc-presets {
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0 !important;
+    padding-inline: 0.25rem;
+    box-sizing: border-box;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .parameter-control .pc-tabs::-webkit-scrollbar,
+  .parameter-control .pc-presets::-webkit-scrollbar {
+    display: none;
+  }
+
+  .parameter-control input,
+  .parameter-control select,
+  .parameter-control textarea,
+  .parameter-control button,
+  .parameter-control label,
+  .parameter-control fieldset,
+  .parameter-control pre,
+  .parameter-control code {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .parameter-control pre,
+  .parameter-control code,
+  .parameter-control .pc-change-list,
+  .parameter-control .pc-message {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .adaptive-mobile-header,
+  .adaptive-mobile-nav {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .adaptive-mobile-nav {
+    left: 0;
+    right: 0;
+  }
+
+  .table-wrap,
+  .demo-table-wrap,
+  .ledger-wrap,
+  .dr-ledger,
+  .pa-chart-panel,
+  .chart-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  img,
+  svg,
+  canvas {
+    max-width: 100%;
+  }
+}
