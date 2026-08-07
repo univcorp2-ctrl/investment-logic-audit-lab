@@ -14,7 +14,7 @@ export function normalizeView(value) {
 
 export function viewForSelector(selector) {
   const value = String(selector ?? '');
-  if (/screeningLab|ranking|filters|own-data/.test(value)) return 'screening';
+  if (/parameterControlCenter|screeningLab|ranking|filters|own-data/.test(value)) return 'screening';
   if (/performanceAnalytics|riskDiagnostics|demoTrade/.test(value)) return 'analytics';
   if (/investmentDecisionReport/.test(value)) return 'decision';
   if (/methodology|jquants|plan/.test(value)) return 'data';
@@ -48,6 +48,7 @@ export function sectionViewMap() {
     '.summary-grid':'overview',
     '.visual-grid':'overview',
     '#investmentDecisionReport':'decision',
+    '#parameterControlCenter':'screening',
     '#screeningLab':'screening',
     '.filters':'screening',
     '.ranking':'screening',
