@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "version": 1,
+  "status": "collecting_data",
+  "approved": false,
+  "updated_at": null,
+  "strategy_config": {
+    "quantity": 100,
+    "buy_fundamental": 58.0,
+    "buy_quality": 55.0,
+    "buy_technical": 60.0,
+    "buy_completeness": 35.0,
+    "buy_max_trap": 50.0,
+    "sell_fundamental": 40.0,
+    "sell_technical": 35.0,
+    "sell_trap": 70.0,
+    "stop_loss_pct": -8.0,
+    "max_drawdown_pct": -12.0,
+    "max_quote_difference_pct": 3.0,
+    "max_quote_age_days": 4
+  },
+  "feature_weights": {
+    "fundamental": 0.5,
+    "technical": 0.5
+  },
+  "versions": [],
+  "pending_evaluation": null,
+  "paper_only": true
+}
