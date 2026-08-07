@@ -18,11 +18,11 @@ const staticFiles = [
   'strategy-lab-view.js','strategy-lab-view-core.js','strategy-lab-view.css',
   'app-shell-core.js','app-shell.js','app-shell.css','app-shell-polish.css',
   'adaptive-shell.js','adaptive-shell.css',
-  'parameter-control-core.js','parameter-control.js','parameter-control.css','font-boot.js','readability.css','mobile-overflow-guard.css','parameter-readable.css',
-  'parameter-category-core.js','parameter-category.js','parameter-category.css',
-  'phone-flow-core.js','phone-flow.js','phone-flow.css',
+  'parameter-control-core.js','parameter-control.js','parameter-control.css','font-boot.js','readability.css','mobile-overflow-guard.css',
+  'mobile-task-flow-core.js','mobile-task-flow.js','mobile-task-flow.css',
   'security-detail-core.js','security-detail.js','security-detail.css',
-  'auto-learning-core.js','auto-learning-view.js','auto-learning-view.css',
+  'adaptive-learning-core.js','adaptive-learning.js','adaptive-learning.css',
+  'parameter-classification.js','parameter-classification.css',
 ];
 for (const file of staticFiles) await cp(resolve(root, file), resolve(dist, file));
 for (const file of ['jquants-ranking.json','jquants-ranking.csv','live-ranking.json','live-ranking.csv']) {
@@ -41,13 +41,12 @@ for (const marker of [
   '<link rel="stylesheet" href="./strategy-lab-view.css" />',
   '<link rel="stylesheet" href="./adaptive-shell.css" />',
   '<link rel="stylesheet" href="./parameter-control.css" />',
+  '<link rel="stylesheet" href="./security-detail.css" />',
+  '<link rel="stylesheet" href="./adaptive-learning.css" />',
+  '<link rel="stylesheet" href="./parameter-classification.css" />',
   '<link rel="stylesheet" href="./readability.css" />',
   '<link rel="stylesheet" href="./mobile-overflow-guard.css" />',
-  '<link rel="stylesheet" href="./parameter-readable.css" />',
-  '<link rel="stylesheet" href="./parameter-category.css" />',
-  '<link rel="stylesheet" href="./phone-flow.css" />',
-  '<link rel="stylesheet" href="./security-detail.css" />',
-  '<link rel="stylesheet" href="./auto-learning-view.css" />',
+  '<link rel="stylesheet" href="./mobile-task-flow.css" />',
 ]) {
   if (!index.includes(marker)) index = index.replace('</head>', `  ${marker}\n  </head>`);
 }
@@ -65,10 +64,10 @@ for (const marker of [
   '<script type="module" src="./adaptive-shell.js"></script>',
   '<script type="module" src="./fast-data-bootstrap.js"></script>',
   '<script type="module" src="./parameter-control.js"></script>',
-  '<script type="module" src="./parameter-category.js"></script>',
-  '<script type="module" src="./phone-flow.js"></script>',
+  '<script type="module" src="./parameter-classification.js"></script>',
+  '<script type="module" src="./adaptive-learning.js"></script>',
   '<script type="module" src="./security-detail.js"></script>',
-  '<script type="module" src="./auto-learning-view.js"></script>',
+  '<script type="module" src="./mobile-task-flow.js"></script>',
 ]) {
   if (!index.includes(marker)) index = index.replace('</body>', `  ${marker}\n  </body>`);
 }
