@@ -6,289 +6,289 @@ TAP version 13
 # Subtest: two-mode boundary assigns 767 to iPhone and 768 to large mode
 ok 1 - two-mode boundary assigns 767 to iPhone and 768 to large mode
   ---
-  duration_ms: 5.54077
+  duration_ms: 12.385542
   type: 'test'
   ...
 # Subtest: large navigation has six destinations and iPhone navigation has five
 ok 2 - large navigation has six destinations and iPhone navigation has five
   ---
-  duration_ms: 1.259105
+  duration_ms: 1.689987
   type: 'test'
   ...
 # Subtest: stable section IDs, safe areas and accessible tap targets are present
 ok 3 - stable section IDs, safe areas and accessible tap targets are present
   ---
-  duration_ms: 2.186173
+  duration_ms: 3.706941
   type: 'test'
   ...
 # Subtest: advanced content uses disclosures and paper-only status remains visible
 ok 4 - advanced content uses disclosures and paper-only status remains visible
   ---
-  duration_ms: 1.034513
+  duration_ms: 1.275113
   type: 'test'
   ...
 # Subtest: production build loads the adaptive shell last
 ok 5 - production build loads the adaptive shell last
   ---
-  duration_ms: 7.635873
+  duration_ms: 7.393166
   type: 'test'
   ...
 # Subtest: adaptive shell keeps separate large and iPhone navigation
 ok 6 - adaptive shell keeps separate large and iPhone navigation
   ---
-  duration_ms: 1.662923
+  duration_ms: 1.986961
   type: 'test'
   ...
 # Subtest: phone tables are converted to labelled cards with details
 ok 7 - phone tables are converted to labelled cards with details
   ---
-  duration_ms: 2.714953
+  duration_ms: 2.848296
   type: 'test'
   ...
 # Subtest: CSS contains dedicated desktop tablet and phone modes
 ok 8 - CSS contains dedicated desktop tablet and phone modes
   ---
-  duration_ms: 4.976967
+  duration_ms: 6.811975
   type: 'test'
   ...
 # Subtest: shell source exposes all five primary views
 ok 9 - shell source exposes all five primary views
   ---
-  duration_ms: 1.496799
+  duration_ms: 2.602745
   type: 'test'
   ...
 # Subtest: viewport modes separate phone tablet and desktop
 ok 10 - viewport modes separate phone tablet and desktop
   ---
-  duration_ms: 0.643262
+  duration_ms: 1.076707
   type: 'test'
   ...
 # Subtest: view routing preserves screening configuration hash
 ok 11 - view routing preserves screening configuration hash
   ---
-  duration_ms: 0.283854
+  duration_ms: 0.451773
   type: 'test'
   ...
 # Subtest: direct anchors map to their primary view
 ok 12 - direct anchors map to their primary view
   ---
-  duration_ms: 0.217539
+  duration_ms: 0.333875
   type: 'test'
   ...
 # Subtest: phone always uses comfortable density
 ok 13 - phone always uses comfortable density
   ---
-  duration_ms: 0.103634
+  duration_ms: 0.187579
   type: 'test'
   ...
 # Subtest: section map groups existing dynamic modules once
 ok 14 - section map groups existing dynamic modules once
   ---
-  duration_ms: 0.897843
+  duration_ms: 1.381655
   type: 'test'
   ...
 # Subtest: normalizes J-Quants metadata and reasons
 ok 15 - normalizes J-Quants metadata and reasons
   ---
-  duration_ms: 1.479685
+  duration_ms: 1.37881
   type: 'test'
   ...
 # Subtest: filters and sorts deterministically
 ok 16 - filters and sorts deterministically
   ---
-  duration_ms: 0.435126
+  duration_ms: 0.340998
   type: 'test'
   ...
 # Subtest: summaries and CSV contain sanitized display columns
 ok 17 - summaries and CSV contain sanitized display columns
   ---
-  duration_ms: 0.716015
+  duration_ms: 0.591791
   type: 'test'
   ...
 # Subtest: normalizes transient cache-busting parameters while preserving compact mode
 ok 18 - normalizes transient cache-busting parameters while preserving compact mode
   ---
-  duration_ms: 1.268358
+  duration_ms: 1.488396
   type: 'test'
   ...
 # Subtest: builds an immediate saved quote fallback from daily report and demo entries
 ok 19 - builds an immediate saved quote fallback from daily report and demo entries
   ---
-  duration_ms: 0.975319
+  duration_ms: 1.154421
   type: 'test'
   ...
 # Subtest: quote and portfolio requests share one canonical compact key
 ok 20 - quote and portfolio requests share one canonical compact key
   ---
-  duration_ms: 0.71196
+  duration_ms: 0.872142
   type: 'test'
   ...
 # Subtest: static JSON cache busting is removed while stable parameters remain
 ok 21 - static JSON cache busting is removed while stable parameters remain
   ---
-  duration_ms: 0.186899
+  duration_ms: 0.216854
   type: 'test'
   ...
 # Subtest: portfolio status is derived from a compact quote payload
 ok 22 - portfolio status is derived from a compact quote payload
   ---
-  duration_ms: 0.304161
+  duration_ms: 0.383486
   type: 'test'
   ...
 # Subtest: stale age and static summary remain explicit
 ok 23 - stale age and static summary remain explicit
   ---
-  duration_ms: 0.856976
+  duration_ms: 1.05082
   type: 'test'
   ...
 # Subtest: paper decision labels are explicit
 ok 24 - paper decision labels are explicit
   ---
-  duration_ms: 0.913949
+  duration_ms: 1.085739
   type: 'test'
   ...
 # Subtest: CSV separates fundamental and technical columns
 ok 25 - CSV separates fundamental and technical columns
   ---
-  duration_ms: 0.650134
+  duration_ms: 0.755517
   type: 'test'
   ...
 # Subtest: plan impact explains upgrade without promising profit
 ok 26 - plan impact explains upgrade without promising profit
   ---
-  duration_ms: 0.230234
+  duration_ms: 0.33635
   type: 'test'
   ...
 # Subtest: calculates per-position unrealized result
 ok 27 - calculates per-position unrealized result
   ---
-  duration_ms: 1.151012
+  duration_ms: 1.30274
   type: 'test'
   ...
 # Subtest: aggregates portfolio and falls back to entry on unusable quote
 ok 28 - aggregates portfolio and falls back to entry on unusable quote
   ---
-  duration_ms: 0.434266
+  duration_ms: 0.448716
   type: 'test'
   ...
 # Subtest: formats Japanese currency and signed percent
 ok 29 - formats Japanese currency and signed percent
   ---
-  duration_ms: 14.897522
+  duration_ms: 33.04931
   type: 'test'
   ...
 # Subtest: canonical key removes cache busters and unifies quote consumers
 ok 30 - canonical key removes cache busters and unifies quote consumers
   ---
-  duration_ms: 0.706085
+  duration_ms: 1.245593
   type: 'test'
   ...
 # Subtest: full quote payload can be normalized for compact consumers
 ok 31 - full quote payload can be normalized for compact consumers
   ---
-  duration_ms: 0.347474
+  duration_ms: 0.633606
   type: 'test'
   ...
 # Subtest: preset applies detailed thresholds and weights
 ok 32 - preset applies detailed thresholds and weights
   ---
-  duration_ms: 0.989615
+  duration_ms: 1.146499
   type: 'test'
   ...
 # Subtest: Free conservative preset keeps complete strong data and excludes weak data
 ok 33 - Free conservative preset keeps complete strong data and excludes weak data
   ---
-  duration_ms: 3.249173
+  duration_ms: 3.53353
   type: 'test'
   ...
 # Subtest: missing policy neutral preserves score and exclude rejects enabled missing field
 ok 34 - missing policy neutral preserves score and exclude rejects enabled missing field
   ---
-  duration_ms: 0.671033
+  duration_ms: 0.516339
   type: 'test'
   ...
 # Subtest: CSV includes raw metrics and no credentials
 ok 35 - CSV includes raw metrics and no credentials
   ---
-  duration_ms: 0.779795
+  duration_ms: 0.635306
   type: 'test'
   ...
 # Subtest: high and low direction percentiles reward the correct issue
 ok 36 - high and low direction percentiles reward the correct issue
   ---
-  duration_ms: 2.067632
+  duration_ms: 2.535039
   type: 'test'
   ...
 # Subtest: raw threshold uses display units and missing exclude is respected
 ok 37 - raw threshold uses display units and missing exclude is respected
   ---
-  duration_ms: 0.935257
+  duration_ms: 1.441035
   type: 'test'
   ...
 # Subtest: cash flow preset enables FCF metrics and formula explains weights
 ok 38 - cash flow preset enables FCF metrics and formula explains weights
   ---
-  duration_ms: 0.3853
+  duration_ms: 0.723974
   type: 'test'
   ...
 # Subtest: contributions sum to custom score and CSV is secret-free
 ok 39 - contributions sum to custom score and CSV is secret-free
   ---
-  duration_ms: 0.657998
+  duration_ms: 0.822215
   type: 'test'
   ...
 # Subtest: raw fundamental metrics are converted to percentages
 ok 40 - raw fundamental metrics are converted to percentages
   ---
-  duration_ms: 0.945179
+  duration_ms: 1.348307
   type: 'test'
   ...
 # Subtest: quality preset filters weak company
 ok 41 - quality preset filters weak company
   ---
-  duration_ms: 0.988711
+  duration_ms: 1.592527
   type: 'test'
   ...
 # Subtest: missing exclude rejects missing ROE when ROE threshold is active
 ok 42 - missing exclude rejects missing ROE when ROE threshold is active
   ---
-  duration_ms: 1.168375
+  duration_ms: 1.674808
   type: 'test'
   ...
 # Subtest: composite respects user weights
 ok 43 - composite respects user weights
   ---
-  duration_ms: 0.206004
+  duration_ms: 0.296236
   type: 'test'
   ...
 # Subtest: fetch coordinator is loaded before quote-consuming modules
 ok 44 - fetch coordinator is loaded before quote-consuming modules
   ---
-  duration_ms: 5.432446
+  duration_ms: 6.105552
   type: 'test'
   ...
 # Subtest: coordinator contains immediate saved fallback and one background live request
 ok 45 - coordinator contains immediate saved fallback and one background live request
   ---
-  duration_ms: 3.973065
+  duration_ms: 1.034125
   type: 'test'
   ...
 # Subtest: quote function has bounded concurrency stable cache and partial response
 ok 46 - quote function has bounded concurrency stable cache and partial response
   ---
-  duration_ms: 1.053541
+  duration_ms: 2.355132
   type: 'test'
   ...
 # Subtest: parameter center and readability assets are in production build
 ok 47 - parameter center and readability assets are in production build
   ---
-  duration_ms: 5.461385
+  duration_ms: 6.55156
   type: 'test'
   ...
 # Subtest: readability CSS has no sub-standard font scale and enforces mobile controls
 not ok 48 - readability CSS has no sub-standard font scale and enforces mobile controls
   ---
-  duration_ms: 3.7404
+  duration_ms: 115.486185
   type: 'test'
   location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/parameter-center-build.test.mjs:19:1'
   failureType: 'testCodeFailure'
@@ -312,319 +312,319 @@ not ok 48 - readability CSS has no sub-standard font scale and enforces mobile c
 # Subtest: Playwright suite covers PC, two iPads and two iPhones
 ok 49 - Playwright suite covers PC, two iPads and two iPhones
   ---
-  duration_ms: 4.548438
+  duration_ms: 5.041377
   type: 'test'
   ...
 # Subtest: normalization clamps ranges and keeps supported display sizes
 ok 50 - normalization clamps ranges and keeps supported display sizes
   ---
-  duration_ms: 1.430551
+  duration_ms: 1.69474
   type: 'test'
   ...
 # Subtest: weights are normalized to exactly 100 percent
 ok 51 - weights are normalized to exactly 100 percent
   ---
-  duration_ms: 1.600515
+  duration_ms: 1.255111
   type: 'test'
   ...
 # Subtest: RSI inversion is a blocking validation error
 ok 52 - RSI inversion is a blocking validation error
   ---
-  duration_ms: 0.442838
+  duration_ms: 0.515266
   type: 'test'
   ...
 # Subtest: all named presets are available and change defaults
 ok 53 - all named presets are available and change defaults
   ---
-  duration_ms: 4.401075
+  duration_ms: 5.628058
   type: 'test'
   ...
 # Subtest: legacy screening fundamental and risk settings migrate
 ok 54 - legacy screening fundamental and risk settings migrate
   ---
-  duration_ms: 0.336098
+  duration_ms: 0.51966
   type: 'test'
   ...
 # Subtest: legacy stores preserve existing feature contracts
 ok 55 - legacy stores preserve existing feature contracts
   ---
-  duration_ms: 0.450253
+  duration_ms: 0.352323
   type: 'test'
   ...
 # Subtest: font mapping has no option below 16 pixels
 ok 56 - font mapping has no option below 16 pixels
   ---
-  duration_ms: 0.218571
+  duration_ms: 0.318917
   type: 'test'
   ...
 # Subtest: parameter control labels and no-order warning exist
 ok 57 - parameter control labels and no-order warning exist
   ---
-  duration_ms: 6.180422
+  duration_ms: 6.388369
   type: 'test'
   ...
 # Subtest: readability layer enforces font and touch minimums
 ok 58 - readability layer enforces font and touch minimums
   ---
-  duration_ms: 4.333674
+  duration_ms: 1.399331
   type: 'test'
   ...
 # Subtest: font boot reads preferences before feature modules
 ok 59 - font boot reads preferences before feature modules
   ---
-  duration_ms: 1.891966
+  duration_ms: 1.13229
   type: 'test'
   ...
 # Subtest: default bundle starts with readable large font
 ok 60 - default bundle starts with readable large font
   ---
-  duration_ms: 1.580957
+  duration_ms: 1.233271
   type: 'test'
   ...
 # Subtest: conservative preset tightens risk and quality controls
 ok 61 - conservative preset tightens risk and quality controls
   ---
-  duration_ms: 0.811732
+  duration_ms: 0.596816
   type: 'test'
   ...
 # Subtest: normalization clamps invalid settings
 ok 62 - normalization clamps invalid settings
   ---
-  duration_ms: 0.766504
+  duration_ms: 0.850045
   type: 'test'
   ...
 # Subtest: path helpers update nested parameter values
 ok 63 - path helpers update nested parameter values
   ---
-  duration_ms: 0.368543
+  duration_ms: 0.329259
   type: 'test'
   ...
 # Subtest: export and import preserve user settings
 ok 64 - export and import preserve user settings
   ---
-  duration_ms: 0.723784
+  duration_ms: 0.514823
   type: 'test'
   ...
 # Subtest: quality preset raises quality and ROE thresholds
 ok 65 - quality preset raises quality and ROE thresholds
   ---
-  duration_ms: 1.886885
+  duration_ms: 1.820064
   type: 'test'
   ...
 # Subtest: loss-control preset tightens risk limits without enabling orders
 ok 66 - loss-control preset tightens risk limits without enabling orders
   ---
-  duration_ms: 0.468202
+  duration_ms: 0.459534
   type: 'test'
   ...
 # Subtest: invalid import is rejected with accessible validation detail
 ok 67 - invalid import is rejected with accessible validation detail
   ---
-  duration_ms: 0.417537
+  duration_ms: 0.341725
   type: 'test'
   ...
 # Subtest: wrong schema is rejected
 ok 68 - wrong schema is rejected
   ---
-  duration_ms: 0.538847
+  duration_ms: 0.469986
   type: 'test'
   ...
 # Subtest: existing individual storage keys remain authoritative
 ok 69 - existing individual storage keys remain authoritative
   ---
-  duration_ms: 0.617196
+  duration_ms: 0.498766
   type: 'test'
   ...
 # Subtest: storage payload writes legacy and central keys
 ok 70 - storage payload writes legacy and central keys
   ---
-  duration_ms: 0.406496
+  duration_ms: 0.263946
   type: 'test'
   ...
 # Subtest: change summary includes fundamental weight edits
 ok 71 - change summary includes fundamental weight edits
   ---
-  duration_ms: 1.97453
+  duration_ms: 1.468753
   type: 'test'
   ...
 # Subtest: impact preview returns honest counts from sanitized data
 ok 72 - impact preview returns honest counts from sanitized data
   ---
-  duration_ms: 2.007354
+  duration_ms: 1.696549
   type: 'test'
   ...
 # Subtest: performance analytics module loads and preserves missing values
 ok 73 - performance analytics module loads and preserves missing values
   ---
-  duration_ms: 0.839649
+  duration_ms: 1.524196
   type: 'test'
   ...
 # Subtest: one observation is not converted into fake returns
 ok 74 - one observation is not converted into fake returns
   ---
-  duration_ms: 1.924803
+  duration_ms: 1.942441
   type: 'test'
   ...
 # Subtest: range filtering preserves observed points only
 ok 75 - range filtering preserves observed points only
   ---
-  duration_ms: 10.110588
+  duration_ms: 8.540398
   type: 'test'
   ...
 # Subtest: adjustable settings recalculate risk reward and ratios
 ok 76 - adjustable settings recalculate risk reward and ratios
   ---
-  duration_ms: 1.908618
+  duration_ms: 1.727049
   type: 'test'
   ...
 # Subtest: chart modes and CSV expose all series without secrets
 ok 77 - chart modes and CSV expose all series without secrets
   ---
-  duration_ms: 0.365314
+  duration_ms: 0.325698
   type: 'test'
   ...
 # Subtest: period filter keeps recent points
 ok 78 - period filter keeps recent points
   ---
-  duration_ms: 1.543136
+  duration_ms: 1.80682
   type: 'test'
   ...
 # Subtest: live equity is appended using entry basis
 ok 79 - live equity is appended using entry basis
   ---
-  duration_ms: 0.508766
+  duration_ms: 0.584036
   type: 'test'
   ...
 # Subtest: metric state preserves insufficient history
 ok 80 - metric state preserves insufficient history
   ---
-  duration_ms: 0.192226
+  duration_ms: 0.252404
   type: 'test'
   ...
 # Subtest: contribution view prefers live quote P&L
 ok 81 - contribution view prefers live quote P&L
   ---
-  duration_ms: 0.290793
+  duration_ms: 0.324433
   type: 'test'
   ...
 # Subtest: chart bounds include zero when requested
 ok 82 - chart bounds include zero when requested
   ---
-  duration_ms: 0.346751
+  duration_ms: 0.382931
   type: 'test'
   ...
 # Subtest: fetch coordinator is inserted before quote-consuming scripts
 ok 83 - fetch coordinator is inserted before quote-consuming scripts
   ---
-  duration_ms: 5.028501
+  duration_ms: 7.131062
   type: 'test'
   ...
 # Subtest: coordinator provides one shared compact quote request and timeout
 ok 84 - coordinator provides one shared compact quote request and timeout
   ---
-  duration_ms: 1.173153
+  duration_ms: 1.312103
   type: 'test'
   ...
 # Subtest: fast bootstrap displays static daily data before live quotes
 ok 85 - fast bootstrap displays static daily data before live quotes
   ---
-  duration_ms: 1.002559
+  duration_ms: 1.177492
   type: 'test'
   ...
 # Subtest: quote API uses bounded concurrency, source timeouts and partial output
 ok 86 - quote API uses bounded concurrency, source timeouts and partial output
   ---
-  duration_ms: 4.830059
+  duration_ms: 4.956702
   type: 'test'
   ...
 # Subtest: coordinator is injected before consumers and adaptive shell last
 ok 87 - coordinator is injected before consumers and adaptive shell last
   ---
-  duration_ms: 1.470353
+  duration_ms: 1.623875
   type: 'test'
   ...
 # Subtest: responsive layer includes iPhone breakpoint and safe areas
 ok 88 - responsive layer includes iPhone breakpoint and safe areas
   ---
-  duration_ms: 5.171723
+  duration_ms: 6.203786
   type: 'test'
   ...
 # Subtest: responsive script installs viewport indicator and five mobile destinations
 ok 89 - responsive script installs viewport indicator and five mobile destinations
   ---
-  duration_ms: 1.10631
+  duration_ms: 1.691836
   type: 'test'
   ...
 # Subtest: risk diagnostics module loads with stable default limits
 ok 90 - risk diagnostics module loads with stable default limits
   ---
-  duration_ms: 0.793693
+  duration_ms: 0.673958
   type: 'test'
   ...
 # Subtest: robust score ranks quality value above trap
 ok 91 - robust score ranks quality value above trap
   ---
-  duration_ms: 2.855062
+  duration_ms: 4.722821
   type: 'test'
   ...
 # Subtest: missing metrics are not converted to zero
 ok 92 - missing metrics are not converted to zero
   ---
-  duration_ms: 0.417592
+  duration_ms: 0.734146
   type: 'test'
   ...
 # Subtest: weights must sum to 100
 ok 93 - weights must sum to 100
   ---
-  duration_ms: 0.349961
+  duration_ms: 0.536853
   type: 'test'
   ...
 # Subtest: csv parser and exporter preserve quoted values
 ok 94 - csv parser and exporter preserve quoted values
   ---
-  duration_ms: 0.403815
+  duration_ms: 0.710737
   type: 'test'
   ...
 # Subtest: summary reports eligible and median
 ok 95 - summary reports eligible and median
   ---
-  duration_ms: 1.480063
+  duration_ms: 2.207537
   type: 'test'
   ...
 # Subtest: merges ranking and daily technical data
 ok 96 - merges ranking and daily technical data
   ---
-  duration_ms: 1.222356
+  duration_ms: 1.04302
   type: 'test'
   ...
 # Subtest: Free safe preset excludes weak record
 ok 97 - Free safe preset excludes weak record
   ---
-  duration_ms: 2.648385
+  duration_ms: 2.058885
   type: 'test'
   ...
 # Subtest: missing policy neutral produces score while exclude rejects
 ok 98 - missing policy neutral produces score while exclude rejects
   ---
-  duration_ms: 0.362811
+  duration_ms: 0.317895
   type: 'test'
   ...
 # Subtest: CSV contains separate pillars and no secrets
 ok 99 - CSV contains separate pillars and no secrets
   ---
-  duration_ms: 0.630281
+  duration_ms: 0.537955
   type: 'test'
   ...
 # Subtest: insufficient history cannot be promoted
 ok 100 - insufficient history cannot be promoted
   ---
-  duration_ms: 0.636467
+  duration_ms: 0.776291
   type: 'test'
   ...
 # Subtest: research CSV exposes baseline comparison and no secrets
 ok 101 - research CSV exposes baseline comparison and no secrets
   ---
-  duration_ms: 0.355631
+  duration_ms: 0.382963
   type: 'test'
   ...
 1..101
@@ -635,5 +635,5 @@ ok 101 - research CSV exposes baseline comparison and no secrets
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 547.022101
+# duration_ms 722.789463
 exit_code=1
