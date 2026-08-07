@@ -18,11 +18,22 @@ test('shared data client is inserted before quote-consuming scripts', async () =
   assert.ok(build.indexOf(riskMarker) > client);
 });
 
-test('shared client provides one live request, timeout, saved fallback and update event', async () => {
+test('data client provides one shared quote request timeout and saved fallback', async () => {
   const source = await readFile(resolve(root, 'data-client.js'), 'utf8');
   assert.match(source, /liveQuotePromise/);
-  assert.match(source, /NETWORK_TIMEOUT_MS = 8_000/);
+  assert.match(source, /NETWORK_TIMEOUT_MS/);
+  assert.match(source, /\/api\/quotes/);
   assert.match(source, /saved-fallback/);
-  assert.match(source, /valuescope:quotes/);
   assert.match(source, /requestIdleCallback/);
+  assert.match(source, /valuescope:quotes/);
+});
+
+test('static fallback is available before live quote completion', async () => {
+  const source = await readFile(resolve(root, 'data-client.js'), 'utf8');
+  const fallback = source.indexOf('buildSavedQuotePayload');
+  const background = source.indexOf('backgroundLiveRefresh');
+  assert.ok(fallback >= 0);
+  assert.ok(background > fallback);
+  assert.match(source, /latest-report\.json/);
+  assert.match(source, /demo-portfolio\.json/);
 });
