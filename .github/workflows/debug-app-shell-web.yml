@@ -1,39 +1,13 @@
-name: Temporary unified loader diagnostic
+name: Deprecated unified loader diagnostic
 
 on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  diagnose:
+  notice:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-          cache-dependency-path: web/package-lock.json
-      - name: Capture tests
-        shell: bash
-        run: |
-          cd web
-          npm ci
-          set +e
-          npm test > ../unified-loader-test-output.txt 2>&1
-          code=$?
-          set -e
-          echo "exit_code=$code" >> ../unified-loader-test-output.txt
-      - name: Commit sanitized output
-        shell: bash
-        run: |
-          mkdir -p debug
-          mv unified-loader-test-output.txt debug/unified-loader-test-output.txt
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add debug/unified-loader-test-output.txt
-          git commit -m 'debug: capture unified loader test output [skip ci]'
-          git push
+      - run: echo 'Temporary diagnostic is retired. Use web-ci.yml.'
