@@ -27,7 +27,7 @@ jobs:
           code=$?
           set -e
           echo "exit_code=$code" >> ../parameter-test-output.txt
-      - name: Commit diagnostic
+      - name: Commit output
         shell: bash
         run: |
           mkdir -p debug
@@ -35,5 +35,5 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add debug/parameter-test-output.txt
-          git commit -m 'debug: capture parameter unit test output [skip ci]'
+          git commit -m 'debug: capture parameter test output [skip ci]'
           git push
