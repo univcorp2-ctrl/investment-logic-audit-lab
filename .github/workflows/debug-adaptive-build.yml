@@ -16,23 +16,27 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Capture production build output
+      - name: Capture unit tests and production build
         shell: bash
         run: |
           cd web
           npm ci
           set +e
+          npm test > ../adaptive-test-diagnostic.txt 2>&1
+          test_code=$?
           npm run build > ../adaptive-build-diagnostic.txt 2>&1
-          code=$?
+          build_code=$?
           set -e
-          printf '\nexit_code=%s\n' "$code" >> ../adaptive-build-diagnostic.txt
-      - name: Publish sanitized diagnostic
+          printf '\ntest_exit_code=%s\n' "$test_code" >> ../adaptive-test-diagnostic.txt
+          printf '\nbuild_exit_code=%s\n' "$build_code" >> ../adaptive-build-diagnostic.txt
+      - name: Publish sanitized diagnostics
         shell: bash
         run: |
           mkdir -p debug
+          mv adaptive-test-diagnostic.txt debug/adaptive-test-diagnostic.txt
           mv adaptive-build-diagnostic.txt debug/adaptive-build-diagnostic.txt
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add debug/adaptive-build-diagnostic.txt
-          git commit -m 'debug: capture adaptive build output [skip ci]'
+          git add debug/adaptive-test-diagnostic.txt debug/adaptive-build-diagnostic.txt
+          git commit -m 'debug: capture adaptive test output [skip ci]'
           git push
