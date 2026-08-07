@@ -89,8 +89,18 @@ def analyze_performance(
     benchmark_prices = pd.Series(dtype=float)
     if benchmark_history is not None and not benchmark_history.empty and "close" in benchmark_history:
         benchmark_prices = pd.to_numeric(benchmark_history["close"], errors="coerce").dropna()
+    history_for_engine = [
+        {
+            **row,
+            "daily_return_pct": row.get("daily_return_pct"),
+            "realized_pnl": row.get("realized_pnl"),
+            "unrealized_pnl": row.get("unrealized_pnl"),
+            "total_pnl": row.get("total_pnl"),
+        }
+        for row in history
+    ]
     analytics = calculate_performance_analytics(
-        history,
+        history_for_engine,
         latest_report,
         portfolio_state,
         trades,
