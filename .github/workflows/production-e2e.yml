@@ -1,0 +1,42 @@
+name: Production E2E
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  production-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install app dependencies
+        working-directory: web
+        run: npm ci
+      - name: Install Playwright runner
+        working-directory: web
+        run: |
+          npm install --no-save --package-lock=false @playwright/test@1.61.1
+          npx playwright install --with-deps chromium
+      - name: Run production E2E on PC, iPad, and iPhone viewports
+        working-directory: web
+        env:
+          BASE_URL: https://valuescope-japan.pages.dev
+        run: npm run e2e:production
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-e2e-${{ github.run_id }}
+          path: |
+            web/playwright-report
+            web/test-results
+          if-no-files-found: warn
+          retention-days: 14
