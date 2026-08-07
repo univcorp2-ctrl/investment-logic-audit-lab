@@ -1,6 +1,5 @@
 import { cp, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-
 const root = resolve(import.meta.dirname, '..');
 const dist = resolve(root, 'dist');
 await rm(dist, { recursive:true, force:true });
@@ -18,7 +17,7 @@ const staticFiles = [
   'strategy-lab-view.js','strategy-lab-view-core.js','strategy-lab-view.css',
   'app-shell-core.js','app-shell.js','app-shell.css','app-shell-polish.css',
   'adaptive-shell.js','adaptive-shell.css',
-  'parameter-control-core.js','parameter-control.js','parameter-control.css','font-boot.js','readability.css','mobile-overflow-guard.css',
+  'parameter-control-core.js','parameter-control.js','parameter-control.css','font-boot.js','readability.css','mobile-overflow-guard.css','parameter-readable.css',
 ];
 for (const file of staticFiles) await cp(resolve(root, file), resolve(dist, file));
 for (const file of ['jquants-ranking.json','jquants-ranking.csv','live-ranking.json','live-ranking.csv']) {
@@ -39,6 +38,7 @@ for (const marker of [
   '<link rel="stylesheet" href="./parameter-control.css" />',
   '<link rel="stylesheet" href="./readability.css" />',
   '<link rel="stylesheet" href="./mobile-overflow-guard.css" />',
+  '<link rel="stylesheet" href="./parameter-readable.css" />',
 ]) {
   if (!index.includes(marker)) index = index.replace('</head>', `  ${marker}\n  </head>`);
 }
