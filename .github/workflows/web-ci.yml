@@ -4,12 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - 'web/**'
-      - '.github/workflows/web-ci.yml'
+      - "web/**"
+      - ".github/workflows/web-ci.yml"
   pull_request:
     paths:
-      - 'web/**'
-      - '.github/workflows/web-ci.yml'
+      - "web/**"
+      - ".github/workflows/web-ci.yml"
 
 permissions:
   contents: read
@@ -22,10 +22,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Install
+      - name: Install application
         working-directory: web
         run: npm ci
       - name: Syntax check
@@ -37,19 +37,20 @@ jobs:
       - name: Production build
         working-directory: web
         run: npm run build
-      - name: Install Playwright Chromium
+      - name: Install Playwright test runner
         working-directory: web
-        run: |
-          npm install --no-save --package-lock=false @playwright/test@1.61.1
-          npx playwright install --with-deps chromium
-      - name: E2E — PC, iPad, iPhone
+        run: npm install --no-save --package-lock=false @playwright/test
+      - name: Install Chromium
+        working-directory: web
+        run: npx playwright install --with-deps chromium
+      - name: Browser E2E — PC, iPad and iPhone
         working-directory: web
         run: npm run e2e
-      - name: Upload E2E artifacts
+      - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: web-e2e-${{ github.run_id }}
+          name: playwright-report-${{ github.run_id }}
           path: |
             web/playwright-report
             web/test-results
