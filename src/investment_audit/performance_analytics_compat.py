@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+import numpy as np
 import pandas as pd
 
 from .performance_analytics import AnalyticsConfig, calculate_performance_analytics
@@ -27,6 +28,23 @@ def _number(value: Any) -> float | None:
     except (TypeError, ValueError):
         return None
     return parsed if pd.notna(parsed) else None
+
+
+def _json_safe(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {str(key): _json_safe(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_safe(item) for item in value]
+    if isinstance(value, (pd.Timestamp,)):
+        return value.isoformat()
+    if isinstance(value, np.integer):
+        return int(value)
+    if isinstance(value, np.floating):
+        parsed = float(value)
+        return parsed if np.isfinite(parsed) else None
+    if value is pd.NA:
+        return None
+    return value
 
 
 def _seed_cost(summary: dict[str, Any], seed_positions: list[dict[str, Any]]) -> float | None:
@@ -129,7 +147,7 @@ def analyze_performance(
         **analytics.get("benchmark", {}),
     }
     benchmark["status"] = benchmark_status
-    return {
+    payload = {
         "schema_version": 2,
         "generated_at": generated_at,
         "reliability": {
@@ -152,3 +170,4 @@ def analyze_performance(
         "definitions": analytics.get("definitions", {}),
         "paper_only": True,
     }
+    return _json_safe(payload)
