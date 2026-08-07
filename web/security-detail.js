@@ -1,159 +1,27 @@
-import { DETAIL_TABS, chartGeometry, extractSecurityCode, normalizeSecurityCode, pickDisclosure, reasonGroups, recommendationLabel, sliceChartBars } from './security-detail-core.js';
-
-const $ = selector => document.querySelector(selector);
-const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[character]);
-const number = (value, digits = 1) => Number.isFinite(Number(value)) ? Number(value).toLocaleString('ja-JP', { maximumFractionDigits:digits }) : '–';
-const percent = (value, digits = 1) => Number.isFinite(Number(value)) ? `${Number(value) >= 0 ? '+' : ''}${Number(value).toFixed(digits)}%` : '–';
-const money = value => Number.isFinite(Number(value)) ? new Intl.NumberFormat('ja-JP', { style:'currency', currency:'JPY', maximumFractionDigits:0 }).format(Number(value)) : '–';
-const dateText = value => { const date = new Date(value); return !value || Number.isNaN(date.getTime()) ? String(value ?? '–') : new Intl.DateTimeFormat('ja-JP', { year:'numeric', month:'2-digit', day:'2-digit' }).format(date); };
-let indexData = { securities:[] };
-let currentDetail = null;
-let activeTab = 'overview';
-let chartRange = '6m';
-let observer = null;
-
-async function getJson(path) {
-  if (window.ValueScopeData?.getJson) return window.ValueScopeData.getJson(path);
-  const response = await fetch(path, { cache:'default' });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return response.json();
-}
-
-function list(items, empty = '該当情報はありません。') {
-  const values = (items ?? []).filter(Boolean);
-  return values.length ? `<ul>${values.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : `<p class="sd-empty">${empty}</p>`;
-}
-
-function installDialog() {
-  if ($('#securityDetailDialog')) return;
-  const dialog = document.createElement('dialog');
-  dialog.id = 'securityDetailDialog';
-  dialog.className = 'security-detail-dialog';
-  dialog.setAttribute('aria-labelledby', 'sdTitle');
-  dialog.innerHTML = `<div class="sd-shell"><header class="sd-header"><div><p class="eyebrow">SECURITY ANALYSIS</p><h2 id="sdTitle">銘柄詳細</h2><p id="sdSubtitle">決算・開示・推奨理由・チャート</p></div><form method="dialog"><button class="sd-close" type="submit" aria-label="銘柄詳細を閉じる">×</button></form></header><nav class="sd-tabs" role="tablist" aria-label="銘柄詳細タブ">${DETAIL_TABS.map((tab, index) => `<button type="button" role="tab" data-sd-tab="${tab.key}" aria-selected="${index === 0}">${tab.label}</button>`).join('')}</nav><main id="sdBody" class="sd-body"><div class="sd-loading">銘柄データを読み込んでいます。</div></main></div>`;
-  document.body.append(dialog);
-  dialog.querySelector('.sd-tabs').addEventListener('click', event => {
-    const button = event.target.closest('[data-sd-tab]');
-    if (!button) return;
-    activeTab = button.dataset.sdTab;
-    render();
-  });
-  dialog.addEventListener('close', () => { document.body.classList.remove('security-detail-open'); });
-}
-
-function openDialog() {
-  const dialog = $('#securityDetailDialog');
-  document.body.classList.add('security-detail-open');
-  if (typeof dialog.showModal === 'function' && !dialog.open) dialog.showModal(); else dialog.setAttribute('open', '');
-}
-
-function findCode(node) {
-  const direct = normalizeSecurityCode(node?.dataset?.securityCode ?? node?.closest?.('[data-security-code]')?.dataset?.securityCode ?? '');
-  if (direct) return direct;
-  return extractSecurityCode(node?.textContent ?? '', indexData.securities ?? []);
-}
-
-async function showSecurity(code) {
-  const normalized = normalizeSecurityCode(code);
-  if (!normalized) return;
-  installDialog();
-  openDialog();
-  activeTab = 'overview';
-  currentDetail = null;
-  $('#sdTitle').textContent = `${normalized} 読み込み中`;
-  $('#sdBody').innerHTML = '<div class="sd-loading">決算・開示・チャートを読み込んでいます。</div>';
-  try {
-    currentDetail = await getJson(`./data/security-details/${normalized}.json`);
-    $('#sdTitle').textContent = `${currentDetail.company_name}（${normalized}）`;
-    $('#sdSubtitle').textContent = `${currentDetail.market ?? '市場不明'} · 更新 ${dateText(currentDetail.generated_at)}`;
-    render();
-  } catch (error) {
-    $('#sdBody').innerHTML = `<div class="sd-error"><strong>銘柄詳細を取得できません。</strong><p>${escapeHtml(error.message)}</p><small>日次の詳細データ更新後に再度確認してください。</small></div>`;
-  }
-}
-
-function renderOverview() {
-  const groups = reasonGroups(currentDetail);
-  const recommendation = currentDetail.recommendation ?? {};
-  const scores = currentDetail.scores ?? {};
-  return `<section class="sd-recommendation"><div class="sd-recommendation-head"><span class="sd-action action-${String(recommendation.action ?? '').toLowerCase()}">${escapeHtml(recommendationLabel(recommendation.action))}</span><div><strong>確信度 ${number(recommendation.confidence)}%</strong><small>${escapeHtml(recommendation.execution_note ?? '監視・研究用')}</small></div></div><div class="sd-score-grid"><article><span>総合</span><strong>${number(scores.overall_score)}</strong></article><article><span>割安</span><strong>${number(scores.value_score)}</strong></article><article><span>品質</span><strong>${number(scores.quality_score)}</strong></article><article><span>Technical</span><strong>${number(scores.technical_score)}</strong></article><article><span>Trap</span><strong>${number(scores.value_trap_risk)}</strong></article></div><div class="sd-reason-columns"><article class="fundamental"><header><span>F</span><div><h3>Fundamentalの理由</h3><p>何を保有するか</p></div><strong>${number(groups.fundamental.score)}</strong></header><h4>支持材料</h4>${list(groups.fundamental.positive)}<h4>リスク・欠損</h4>${list([...groups.fundamental.risks, ...groups.fundamental.missing.map(item => `欠損: ${item}`)], '明示的なFundamentalリスクなし')}</article><article class="technical"><header><span>T</span><div><h3>Technicalの理由</h3><p>いつ入る・出るか</p></div><strong>${number(groups.technical.score)}</strong></header><p class="sd-regime">トレンド: ${escapeHtml(groups.technical.regime ?? '不明')}</p><h4>支持材料</h4>${list(groups.technical.positive)}<h4>警戒材料</h4>${list(groups.technical.risks, '明示的なTechnicalリスクなし')}</article></div><p class="sd-disclaimer">${escapeHtml(recommendation.disclaimer ?? '機械的なデモ分析であり、利益を保証しません。')}</p></section>`;
-}
-
-function financialMetric(label, value, type = 'number') {
-  const display = type === 'money' ? money(value) : type === 'percent' ? percent(value) : number(value, 2);
-  return `<article><span>${escapeHtml(label)}</span><strong>${display}</strong></article>`;
-}
-
-function renderFinancials() {
-  const financials = currentDetail.financials ?? {};
-  const latest = financials.latest_snapshot ?? {};
-  const trend = financials.trend ?? {};
-  const history = financials.summary_history ?? [];
-  return `<section class="sd-financials"><div class="sd-financial-head"><div><span>決算状況</span><strong>${escapeHtml(trend.label ?? '比較データ不足')}</strong></div><p>実効データcutoff: ${escapeHtml(financials.effective_data_cutoff ?? '–')} · ${escapeHtml(financials.source ?? '')}</p></div><div class="sd-financial-grid">${financialMetric('売上高', latest.net_sales, 'money')}${financialMetric('営業利益', latest.operating_profit, 'money')}${financialMetric('純利益', latest.profit, 'money')}${financialMetric('EPS', latest.eps)}${financialMetric('総資産', latest.total_assets, 'money')}${financialMetric('自己資本', latest.equity, 'money')}${financialMetric('営業CF', latest.operating_cash_flow, 'money')}${financialMetric('投資CF', latest.investing_cash_flow, 'money')}</div><div class="sd-change-grid">${financialMetric('売上変化', trend.sales_change_pct, 'percent')}${financialMetric('営業利益変化', trend.operating_profit_change_pct, 'percent')}</div><h3>決算短信・要約履歴</h3><div class="sd-table-wrap"><table><thead><tr><th>開示日</th><th>売上</th><th>営業利益</th><th>純利益</th><th>EPS</th></tr></thead><tbody>${history.slice(-8).reverse().map(row => `<tr><td>${dateText(row.disclosed_date ?? row.DiscDate ?? row.DisclosedDate)}</td><td>${money(row.net_sales ?? row.Sales ?? row.NetSales)}</td><td>${money(row.operating_profit ?? row.OP ?? row.OperatingProfit)}</td><td>${money(row.profit ?? row.Profit)}</td><td>${number(row.eps ?? row.EPS ?? row.EarningsPerShare, 2)}</td></tr>`).join('') || '<tr><td colspan="5">履歴なし</td></tr>'}</tbody></table></div><h3>次回決算予定</h3>${list((financials.earnings_dates ?? []).map(row => `${dateText(row.Date ?? row.date ?? row.EarningsDate)} ${row.Note ?? row.Status ?? ''}`), '取得可能な決算予定日はありません。')}<details class="sd-statement-details"><summary>決算書詳細データを見る</summary><pre>${escapeHtml(JSON.stringify((financials.statement_details ?? []).slice(-1)[0] ?? {}, null, 2))}</pre></details></section>`;
-}
-
-function renderNews() {
-  const disclosures = (currentDetail.disclosures ?? []).map(pickDisclosure);
-  const news = currentDetail.news ?? [];
-  const disclosureHtml = disclosures.length ? disclosures.map(item => `<article><div><span>${escapeHtml(item.category)}</span><time>${dateText(item.published_at)}</time></div><h3>${escapeHtml(item.title)}</h3>${item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">公式資料を開く</a>` : '<small>文書リンクなし</small>'}</article>`).join('') : '<p class="sd-empty">TDnetアドオンまたはサニタイズ済み適時開示データがありません。</p>';
-  const newsHtml = news.length ? news.map(item => `<article><div><span>${escapeHtml(item.source ?? 'News')}</span><time>${dateText(item.published_at)}</time></div><h3>${escapeHtml(item.title)}</h3><a href="${escapeHtml(item.url)}" target="_blank" rel="noreferrer">記事提供元で確認</a></article>`).join('') : '<p class="sd-empty">ニュース見出しを取得できませんでした。</p>';
-  return `<section class="sd-news"><div class="sd-source-note"><strong>一次情報を優先</strong><p>適時開示は公式資料、ニュースは見出しと提供元リンクのみを表示します。記事本文や推測の要約は生成しません。</p></div><h3>適時開示・決算短信</h3><div class="sd-news-list">${disclosureHtml}</div><h3>関連ニュース</h3><div class="sd-news-list">${newsHtml}</div></section>`;
-}
-
-function candleSvg(bars) {
-  const geometry = chartGeometry(bars);
-  if (!geometry.bars.length) return '<div class="sd-empty">日足OHLCデータがありません。</div>';
-  const { x, y, bodyWidth, width, height, left, right, top, bottom, min, max } = geometry;
-  const candles = geometry.bars.map((bar, index) => { const open = Number(bar.open), close = Number(bar.close), high = Number(bar.high), low = Number(bar.low); const rising = close >= open; const bodyY = Math.min(y(open), y(close)); const bodyHeight = Math.max(1.5, Math.abs(y(open) - y(close))); const color = rising ? '#45dea0' : '#ff7482'; return `<g><line x1="${x(index)}" x2="${x(index)}" y1="${y(high)}" y2="${y(low)}" stroke="${color}" stroke-width="1"/><rect x="${x(index)-bodyWidth/2}" y="${bodyY}" width="${bodyWidth}" height="${bodyHeight}" fill="${color}" rx="1"><title>${bar.date} O ${number(open)} H ${number(high)} L ${number(low)} C ${number(close)}</title></rect></g>`; }).join('');
-  const line = (key, color) => { const points = geometry.bars.map((bar, index) => Number.isFinite(Number(bar[key])) ? `${x(index)},${y(bar[key])}` : null).filter(Boolean).join(' '); return points ? `<polyline points="${points}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>` : ''; };
-  const first = geometry.bars[0]?.date ?? '';
-  const last = geometry.bars.at(-1)?.date ?? '';
-  return `<svg class="sd-candle-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(currentDetail.company_name)}の日足ローソク足、SMA20、SMA60"><line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" class="sd-axis"/><line x1="${left}" y1="${top}" x2="${left}" y2="${bottom}" class="sd-axis"/>${candles}${line('sma20','#6bb8ff')}${line('sma60','#ffd08b')}<text x="${left-6}" y="${top+5}" text-anchor="end" class="sd-chart-label">${number(max)}</text><text x="${left-6}" y="${bottom}" text-anchor="end" class="sd-chart-label">${number(min)}</text><text x="${left}" y="${height-12}" class="sd-chart-label">${escapeHtml(first)}</text><text x="${right}" y="${height-12}" text-anchor="end" class="sd-chart-label">${escapeHtml(last)}</text></svg>`;
-}
-
-function renderChart() {
-  const chart = currentDetail.chart ?? {};
-  const bars = sliceChartBars(chart.bars ?? [], chartRange);
-  const latest = bars.at(-1) ?? {};
-  return `<section class="sd-chart"><div class="sd-chart-toolbar"><div><strong>日足ローソク足</strong><small>${escapeHtml(chart.source ?? '')}</small></div><div>${['3m','6m','1y'].map(range => `<button type="button" data-sd-range="${range}" class="${chartRange === range ? 'active' : ''}">${range.toUpperCase()}</button>`).join('')}</div></div><div class="sd-chart-legend"><span class="price-up">陽線</span><span class="price-down">陰線</span><span class="sma20">SMA20 ${number(latest.sma20)}</span><span class="sma60">SMA60 ${number(latest.sma60)}</span></div>${candleSvg(bars)}<div class="sd-chart-metrics"><article><span>終値</span><strong>${money(latest.close)}</strong></article><article><span>SMA20</span><strong>${money(latest.sma20)}</strong></article><article><span>SMA60</span><strong>${money(latest.sma60)}</strong></article><article><span>出来高</span><strong>${number(latest.volume, 0)}</strong></article></div><p class="sd-chart-note">移動平均は日足終値から算出。売買判断はFundamentalと併せて確認してください。</p></section>`;
-}
-
-function render() {
-  if (!currentDetail) return;
-  document.querySelectorAll('[data-sd-tab]').forEach(button => { const active = button.dataset.sdTab === activeTab; button.setAttribute('aria-selected', String(active)); button.tabIndex = active ? 0 : -1; });
-  $('#sdBody').innerHTML = ({ overview:renderOverview, financials:renderFinancials, news:renderNews, chart:renderChart })[activeTab]?.() ?? renderOverview();
-  $('#sdBody').querySelectorAll('[data-sd-range]').forEach(button => button.addEventListener('click', () => { chartRange = button.dataset.sdRange; render(); }));
-}
-
-function decorateTargets() {
-  const candidates = document.querySelectorAll('#rankingBody tr,#demoTradeBody tr,.sl-card,.decision-card,.dr-card');
-  candidates.forEach(node => {
-    if (node.dataset.securityDetailReady === 'true') return;
-    const code = findCode(node);
-    if (!code) return;
-    node.dataset.securityCode = code;
-    node.dataset.securityDetailReady = 'true';
-    node.title = `${node.title ? `${node.title} / ` : ''}ダブルクリックで銘柄詳細`;
-    const host = node.matches('tr') ? node.querySelector('td') : node.querySelector('header') ?? node;
-    if (host && !host.querySelector('.security-detail-open')) {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'security-detail-open';
-      button.textContent = '銘柄詳細';
-      button.setAttribute('aria-label', `${code}の銘柄詳細を開く`);
-      button.addEventListener('click', event => { event.stopPropagation(); showSecurity(code); });
-      host.append(button);
-    }
-  });
-}
-
-async function start() {
-  installDialog();
-  try { indexData = await getJson('./data/security-details/index.json'); } catch { indexData = { securities:[] }; }
-  document.addEventListener('dblclick', event => { const target = event.target.closest('[data-security-code],#rankingBody tr,#demoTradeBody tr,.sl-card,.decision-card,.dr-card'); const code = findCode(target); if (code) showSecurity(code); });
-  observer = new MutationObserver(decorateTargets);
-  observer.observe(document.querySelector('main') ?? document.body, { childList:true, subtree:true });
-  decorateTargets();
-}
-
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once:true }); else start();
+import{filterCandles,finiteNumber,normalizeSecurityCode,reasonGroups,securityHash}from'./security-detail-core.js';
+const $=selector=>document.querySelector(selector);const $$=selector=>[...document.querySelectorAll(selector)];const esc=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));const money=value=>finiteNumber(value)===null?'–':new Intl.NumberFormat('ja-JP',{style:'currency',currency:'JPY',maximumFractionDigits:0}).format(Number(value));const num=(value,d=1)=>finiteNumber(value)===null?'–':Number(value).toFixed(d);const pct=(value,d=1)=>finiteNumber(value)===null?'–':`${Number(value)>=0?'+':''}${Number(value).toFixed(d)}%`;const date=value=>value?new Intl.DateTimeFormat('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(value)):'–';
+let current=null,activeTab='overview',period='1y',show20=true,show60=true,returnFocus=null,previousHash='';
+function inferCode(node){const explicit=normalizeSecurityCode(node?.dataset?.securityCode);if(explicit)return explicit;const text=node?.textContent??'';for(const match of text.matchAll(/(?:^|\D)([0-9]{4}|[0-9]{3}[A-Z])(?:\D|$)/g)){const code=normalizeSecurityCode(match[1]);if(code)return code}return''}
+function addButton(node){if(!node||node.querySelector('.security-detail-button'))return;const code=inferCode(node);if(!code)return;node.dataset.securityCode=code;const button=document.createElement('button');button.type='button';button.className='security-detail-button';button.dataset.securityOpen=code;button.textContent='詳細を見る';button.addEventListener('dblclick',event=>event.stopPropagation());const host=node.matches('tr')?(node.querySelector('td:nth-child(2)')??node.querySelector('td')??node):node;host.append(button)}
+function annotate(){document.querySelectorAll('#rankingBody tr,#demoTradeBody tr,.sl-card,.dr-card,.decision-card,.pillar-card,.technical-card').forEach(addButton)}
+function installLauncher(){if($('#securityDetailLauncher'))return;const section=document.createElement('section');section.id='securityDetailLauncher';section.className='security-detail-launcher adaptive-ordered';section.style.setProperty('--adaptive-order','21');section.innerHTML='<div><p class="eyebrow">SECURITY DETAILS</p><h2>銘柄詳細</h2><p>銘柄を選ぶと、決算・開示・ローソク足・推奨理由を確認できます。</p></div><div id="securityDetailChoices" class="security-detail-choices"><span>銘柄一覧を読込中</span></div>';(document.querySelector('#decisionSection')??document.querySelector('main'))?.after?.(section);loadChoices()}
+async function loadChoices(){try{const ranking=window.ValueScopeData?.getRanking?await window.ValueScopeData.getRanking():await fetch('./jquants-ranking.json').then(response=>response.json());const choices=$('#securityDetailChoices');if(!choices)return;choices.innerHTML=(ranking.rows??[]).map(row=>{const code=normalizeSecurityCode(row.code);return`<button type="button" data-security-open="${code}"><strong>${esc(row.company_name)}</strong><span>${code}</span></button>`}).join('')||'<p>銘柄データがありません。</p>'}catch{const choices=$('#securityDetailChoices');if(choices)choices.innerHTML='<p>銘柄一覧を取得できません。</p>'}}
+function installDialog(){if($('#securityDetailDialog'))return;const dialog=document.createElement('section');dialog.id='securityDetailDialog';dialog.className='security-detail-dialog';dialog.hidden=true;dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-labelledby','securityDetailTitle');dialog.innerHTML=`<div class="security-detail-sheet"><header><div><p class="eyebrow">SECURITY RESEARCH</p><h2 id="securityDetailTitle">銘柄詳細</h2><p id="securityDetailMeta">データを読み込んでいます。</p></div><button type="button" class="security-detail-close" aria-label="銘柄詳細を閉じる">×</button></header><nav class="security-detail-tabs" role="tablist" aria-label="銘柄詳細タブ">${[['overview','概要'],['financials','決算'],['news','ニュース・開示'],['chart','チャート'],['reasons','推奨理由']].map(([key,label],index)=>`<button type="button" role="tab" data-security-tab="${key}" aria-selected="${index===0}">${label}</button>`).join('')}</nav><div id="securityDetailState" class="security-detail-state">読み込み中…</div><div id="securityDetailContent" class="security-detail-content"></div></div>`;document.body.append(dialog);dialog.querySelector('.security-detail-close').addEventListener('click',closeDetail);dialog.querySelector('.security-detail-tabs').addEventListener('click',event=>{const button=event.target.closest('[data-security-tab]');if(button){activeTab=button.dataset.securityTab;render()}});dialog.addEventListener('keydown',trapFocus)}
+function trapFocus(event){if(event.key==='Escape'){closeDetail();return}if(event.key!=='Tab')return;const focusable=$$('#securityDetailDialog button:not([disabled]),#securityDetailDialog a[href],#securityDetailDialog input:not([disabled])').filter(node=>!node.hidden);if(!focusable.length)return;const first=focusable[0],last=focusable.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}}
+async function openDetail(code,{push=true}={}){const normalized=normalizeSecurityCode(code);if(!normalized)return;installDialog();returnFocus=document.activeElement;previousHash=location.hash;const dialog=$('#securityDetailDialog');dialog.hidden=false;document.body.classList.add('security-detail-open');$('#securityDetailTitle').textContent=`${normalized} 銘柄詳細`;$('#securityDetailMeta').textContent='決算・開示・チャートを読み込んでいます。';$('#securityDetailState').hidden=false;$('#securityDetailState').textContent='読み込み中…';$('#securityDetailContent').innerHTML='';activeTab='overview';if(push)history.pushState({security:normalized},'',securityHash(location.hash,normalized));try{const response=await fetch(`/api/security-detail?code=${encodeURIComponent(normalized)}`,{headers:{Accept:'application/json'}});if(!response.ok)throw new Error(`HTTP ${response.status}`);current=await response.json();$('#securityDetailTitle').textContent=`${current.name}（${current.code}）`;$('#securityDetailMeta').textContent=`Fundamental cutoff ${current.data_dates?.effective_fundamental_cutoff??'–'} / 株価 ${current.data_dates?.latest_price_date??'–'}`;$('#securityDetailState').hidden=true;render()}catch(error){$('#securityDetailState').textContent=`銘柄詳細を取得できません: ${error.message}`;$('#securityDetailState').hidden=false}dialog.querySelector('.security-detail-close').focus()}
+function closeDetail(){const dialog=$('#securityDetailDialog');if(!dialog||dialog.hidden)return;dialog.hidden=true;document.body.classList.remove('security-detail-open');current=null;if(location.hash.includes('security='))history.pushState({},'',securityHash(location.hash,''));if(returnFocus instanceof HTMLElement)returnFocus.focus()}
+function list(items,empty='該当する項目はありません。'){return items?.length?`<ul>${items.map(item=>`<li>${esc(typeof item==='string'?item:item.text??item.label??JSON.stringify(item))}</li>`).join('')}</ul>`:`<p class="security-detail-empty">${empty}</p>`}
+function metric(label,value,format=num){return`<article><span>${esc(label)}</span><strong>${format(value)}</strong></article>`}
+function renderOverview(){const f=current.fundamental??{},t=current.technical??{},next=current.earnings?.next;return`<div class="security-overview-grid"><article class="security-recommendation"><span>現在の判断</span><strong>${esc(current.recommendation?.summary??'監視')}</strong><small>確信度 ${num(current.confidence)} / データ充足率 ${num(f.data_completeness)}%</small></article>${metric('価格',t.price,money)}${metric('Fundamental',f.score)}${metric('Technical',t.score)}${metric('割安',f.value_score)}${metric('品質',f.quality_score)}${metric('Value Trap',f.value_trap_risk)}${metric('次回決算',next?.scheduled_date,value=>value?date(value):'未定')}</div><div class="security-data-dates"><h3>データ時点</h3><dl><div><dt>Fundamental実効日</dt><dd>${esc(current.data_dates?.effective_fundamental_cutoff??'–')}</dd></div><div><dt>最終開示</dt><dd>${esc(current.data_dates?.latest_disclosure_date??'–')}</dd></div><div><dt>株価最終日</dt><dd>${esc(current.data_dates?.latest_price_date??'–')}</dd></div></dl></div>${current.warnings?.length?`<div class="security-warning"><strong>データ上の注意</strong>${list(current.warnings)}</div>`:''}`}
+function valueCell(value,format=money){return finiteNumber(value)===null?'<span class="missing-label">欠損</span>':format(value)}
+function renderFinancials(){const periods=current.financials?.periods??[],earnings=current.earnings?.history??[];return`<div class="security-section-heading"><h3>決算サマリー</h3><span>J-Quants: ${esc(current.financials?.status??'unavailable')}</span></div>${periods.length?`<div class="financial-periods">${periods.slice(0,4).map(period=>`<article><header><strong>${esc(period.period_type??period.document_type??'決算')}</strong><time>${esc(period.disclosure_date??'–')}</time></header><dl><div><dt>売上高</dt><dd>${valueCell(period.sales)}</dd></div><div><dt>営業利益</dt><dd>${valueCell(period.operating_profit)}</dd></div><div><dt>純利益</dt><dd>${valueCell(period.net_profit)}</dd></div><div><dt>EPS</dt><dd>${valueCell(period.eps,value=>num(value,2))}</dd></div><div><dt>売上変化</dt><dd>${valueCell(period.changes?.sales_pct,pct)}</dd></div><div><dt>利益変化</dt><dd>${valueCell(period.changes?.net_profit_pct,pct)}</dd></div></dl></article>`).join('')}</div>`:'<div class="capability-empty"><h3>決算数値を取得できません</h3><p>現在のプラン・API設定ではJ-Quants決算サマリーが利用できないか、該当データがありません。</p></div>'}<div class="security-section-heading"><h3>BS・PL・CF</h3><span>${esc(current.financials?.details_status??'unavailable')}</span></div>${current.financials?.latest_details?`<details class="financial-details"><summary>最新の財務明細を表示</summary><dl>${Object.entries(current.financials.latest_details).slice(0,40).map(([key,value])=>`<div><dt>${esc(key)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl></details>`:'<p class="security-detail-empty">BS・PL・CF明細は利用できません。欠損を0として扱いません。</p>'}<div class="security-section-heading"><h3>決算発表予定</h3><span>${esc(current.earnings?.status??'unavailable')}</span></div>${earnings.length?`<div class="earnings-history">${earnings.slice(0,8).map(item=>`<article><strong>${esc(item.quarter??'–')}</strong><span>${item.scheduled_date?date(item.scheduled_date):'未定'}</span><small>公表 ${esc(item.publication_date??'–')}</small></article>`).join('')}</div>`:'<p class="security-detail-empty">発表予定データはありません。</p>'}`}
+function renderNews(){const disclosures=current.disclosures?.items??[];if(!disclosures.length)return`<div class="capability-empty"><span>TDnet / Company Disclosure</span><h3>ニュース・適時開示データは未接続です</h3><p>TDnetアドオンが未契約・未設定の場合、見出しを作りません。架空ニュースは表示しません。</p><a href="${esc(current.disclosures?.search_url??'#')}" target="_blank" rel="noreferrer">外部ニュース検索を開く</a></div>`;return`<div class="security-disclosures">${disclosures.map(item=>`<article><time>${esc(item.date??'–')} ${esc(item.time??'')}</time><div><h3>${esc(item.title??'タイトルなし')}</h3><p>資料種別: ${(item.document_types??[]).map(esc).join(', ')||'–'} / 開示番号 ${esc(item.disclosure_number??'–')}</p><small>出典: TDnet / J-Quants Company Disclosure</small></div></article>`).join('')}</div>`}
+function path(points){return points.map((point,index)=>`${index?'L':'M'}${point[0].toFixed(1)},${point[1].toFixed(1)}`).join(' ')}
+function drawChart(){const host=$('#securityCandlestick');if(!host||!current)return;const rows=filterCandles(current.chart?.rows??[],period);if(!rows.length){host.innerHTML='<div class="capability-empty"><p>ローソク足データがありません。</p></div>';return}const width=900,height=420,left=58,right=18,top=28,bottom=62,plotW=width-left-right,plotH=height-top-bottom;const values=rows.flatMap(row=>[row.high,row.low,show20?row.sma20:null,show60?row.sma60:null]).filter(value=>finiteNumber(value)!==null),min=Math.min(...values),max=Math.max(...values),span=Math.max(1,max-min),x=index=>left+(index+.5)/rows.length*plotW,y=value=>top+(max-value)/span*plotH,candleWidth=Math.max(2,Math.min(10,plotW/rows.length*.62));const sma20=rows.map((row,index)=>row.sma20===null?null:[x(index),y(row.sma20)]).filter(Boolean),sma60=rows.map((row,index)=>row.sma60===null?null:[x(index),y(row.sma60)]).filter(Boolean);host.innerHTML=`<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(current.name)} ${period} ローソク足"><line x1="${left}" y1="${top+plotH}" x2="${width-right}" y2="${top+plotH}" class="chart-axis"/>${rows.map((row,index)=>{const rising=row.close>=row.open,xx=x(index),openY=y(row.open),closeY=y(row.close),highY=y(row.high),lowY=y(row.low),bodyY=Math.min(openY,closeY),bodyH=Math.max(1,Math.abs(openY-closeY));return`<g class="candle ${rising?'rise':'fall'}" data-candle-index="${index}" tabindex="0"><title>${row.date} 始値${row.open} 高値${row.high} 安値${row.low} 終値${row.close}</title><line x1="${xx}" y1="${highY}" x2="${xx}" y2="${lowY}"/><rect x="${xx-candleWidth/2}" y="${bodyY}" width="${candleWidth}" height="${bodyH}"/></g>`}).join('')}${show20&&sma20.length?`<path d="${path(sma20)}" class="sma20"/>`:''}${show60&&sma60.length?`<path d="${path(sma60)}" class="sma60"/>`:''}<text x="${left}" y="${height-22}" class="chart-label">${esc(rows[0].date)}</text><text x="${width-right}" y="${height-22}" text-anchor="end" class="chart-label">${esc(rows.at(-1).date)}</text><text x="${left-8}" y="${top+8}" text-anchor="end" class="chart-label">${num(max,0)}</text><text x="${left-8}" y="${top+plotH}" text-anchor="end" class="chart-label">${num(min,0)}</text></svg>`;host.querySelectorAll('[data-candle-index]').forEach(group=>group.addEventListener('click',()=>{const row=rows[Number(group.dataset.candleIndex)];$('#securityCandleSummary').textContent=`${row.date}　始値 ${money(row.open)}　高値 ${money(row.high)}　安値 ${money(row.low)}　終値 ${money(row.close)}`}))}
+function renderChart(){return`<div class="security-chart-controls"><div>${['3m','6m','1y'].map(key=>`<button type="button" data-chart-period="${key}" aria-pressed="${period===key}">${key.toUpperCase()}</button>`).join('')}</div><label><input id="securitySma20" type="checkbox" ${show20?'checked':''}> SMA20</label><label><input id="securitySma60" type="checkbox" ${show60?'checked':''}> SMA60</label></div><div id="securityCandlestick" class="security-candlestick"></div><p id="securityCandleSummary" class="security-candle-summary" aria-live="polite">ローソク足を選ぶと始値・高値・安値・終値を表示します。</p><div class="technical-tool-grid">${metric('RSI14',current.technical?.rsi14)}${metric('20日Momentum',current.technical?.momentum20_pct,pct)}${metric('60日Momentum',current.technical?.momentum60_pct,pct)}${metric('年率Volatility',current.technical?.volatility20_pct,pct)}${metric('20日Drawdown',current.technical?.drawdown20_pct,pct)}</div>`}
+function reasonCard(title,positive,risks,dateValue,type){return`<article class="reason-card ${type}"><header><span>${type==='fundamental'?'FUNDAMENTAL':'TECHNICAL'}</span><h3>${title}</h3><small>根拠日 ${esc(dateValue??'–')}</small></header><section><h4>支持材料</h4>${list(positive)}</section><section><h4>リスク・反対材料</h4>${list(risks)}</section></article>`}
+function renderReasons(){const groups=reasonGroups(current),dates=current.recommendation?.evidence_dates??{};return`<div class="recommendation-summary"><span>${esc(current.recommendation?.summary??'監視')}</span><strong>なぜこの判断なのか</strong><p>FundamentalとTechnicalを混ぜず、それぞれの支持材料とリスクを表示します。</p></div><div class="reason-grid">${reasonCard('Fundamentalの推奨理由',groups.fundamental.positive,groups.fundamental.risks,dates.fundamental,'fundamental')}${reasonCard('Technicalの推奨理由',groups.technical.positive,groups.technical.risks,dates.technical,'technical')}</div>`}
+function render(){if(!current)return;document.querySelectorAll('[data-security-tab]').forEach(button=>button.setAttribute('aria-selected',String(button.dataset.securityTab===activeTab)));const content=$('#securityDetailContent');content.innerHTML=({overview:renderOverview,financials:renderFinancials,news:renderNews,chart:renderChart,reasons:renderReasons})[activeTab]?.()??renderOverview();content.dataset.activeTab=activeTab;if(activeTab==='chart'){content.querySelectorAll('[data-chart-period]').forEach(button=>button.addEventListener('click',()=>{period=button.dataset.chartPeriod;render()}));$('#securitySma20').addEventListener('change',event=>{show20=event.target.checked;drawChart()});$('#securitySma60').addEventListener('change',event=>{show60=event.target.checked;drawChart()});drawChart()}}
+function bind(){document.addEventListener('click',event=>{const button=event.target.closest('[data-security-open]');if(button){event.preventDefault();event.stopPropagation();openDetail(button.dataset.securityOpen)}});document.addEventListener('dblclick',event=>{const target=event.target.closest('[data-security-code],#rankingBody tr,#demoTradeBody tr,.sl-card,.dr-card,.decision-card');if(target&&!event.target.closest('button,input,a,summary')){const code=inferCode(target);if(code)openDetail(code)}});window.addEventListener('popstate',()=>{const params=new URLSearchParams(location.hash.replace(/^#/,''));const code=normalizeSecurityCode(params.get('security'));if(code&&($('#securityDetailDialog')?.hidden??true))openDetail(code,{push:false});else if(!code&&!($('#securityDetailDialog')?.hidden??true))closeDetail()})}
+function init(){installDialog();installLauncher();annotate();new MutationObserver(annotate).observe(document.querySelector('main')??document.body,{childList:true,subtree:true});bind();const code=normalizeSecurityCode(new URLSearchParams(location.hash.replace(/^#/,'')).get('security'));if(code)openDetail(code,{push:false})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
