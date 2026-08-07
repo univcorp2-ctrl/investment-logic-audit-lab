@@ -1,23 +1,35 @@
 import { defineConfig } from '@playwright/test';
 
+const production = process.env.E2E_SUITE === 'production' || Boolean(process.env.BASE_URL);
+const localBaseUrl = 'http://127.0.0.1:4173';
+
 export default defineConfig({
-  testDir:'./e2e',
-  timeout:60_000,
-  expect:{timeout:12_000},
-  fullyParallel:false,
-  workers:1,
-  reporter:[['list'],['html',{outputFolder:'playwright-report',open:'never'}]],
-  use:{
-    baseURL:'http://127.0.0.1:4173',
-    browserName:'chromium',
-    screenshot:'only-on-failure',
-    video:'retain-on-failure',
-    trace:'retain-on-failure',
+  testDir: './e2e',
+  testMatch: production
+    ? ['production-parameter-control.spec.mjs']
+    : ['parameter-control.spec.mjs', 'parameter-center.spec.mjs'],
+  timeout: 60_000,
+  expect: { timeout: 12_000 },
+  fullyParallel: false,
+  workers: 1,
+  retries: process.env.CI ? 1 : 0,
+  reporter: process.env.CI
+    ? [['line'], ['html', { outputFolder: 'playwright-report', open: 'never' }]]
+    : [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
+  use: {
+    baseURL: process.env.BASE_URL || localBaseUrl,
+    browserName: 'chromium',
+    locale: 'ja-JP',
+    timezoneId: 'Asia/Tokyo',
+    colorScheme: 'dark',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    trace: 'retain-on-failure',
   },
-  webServer:{
-    command:'npm run build && node scripts/serve.mjs',
-    url:'http://127.0.0.1:4173',
-    reuseExistingServer:true,
-    timeout:120_000,
+  webServer: production ? undefined : {
+    command: 'npm run build && node scripts/serve.mjs',
+    url: localBaseUrl,
+    reuseExistingServer: true,
+    timeout: 120_000,
   },
 });
