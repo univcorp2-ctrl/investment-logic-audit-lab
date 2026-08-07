@@ -1,466 +1,481 @@
 
-> valuescope-japan-web@1.7.0 test
+> valuescope-japan-web@2.2.0 test
 > node --test tests/*.test.mjs
 
 TAP version 13
 # Subtest: two-mode boundary assigns 767 to iPhone and 768 to large mode
 ok 1 - two-mode boundary assigns 767 to iPhone and 768 to large mode
   ---
-  duration_ms: 8.360103
+  duration_ms: 11.200124
   type: 'test'
   ...
 # Subtest: large navigation has six destinations and iPhone navigation has five
 ok 2 - large navigation has six destinations and iPhone navigation has five
   ---
-  duration_ms: 4.329513
+  duration_ms: 4.498126
   type: 'test'
   ...
 # Subtest: stable section IDs, safe areas and accessible tap targets are present
 ok 3 - stable section IDs, safe areas and accessible tap targets are present
   ---
-  duration_ms: 3.636524
+  duration_ms: 4.729599
   type: 'test'
   ...
 # Subtest: advanced content uses disclosures and paper-only status remains visible
 ok 4 - advanced content uses disclosures and paper-only status remains visible
   ---
-  duration_ms: 4.484357
+  duration_ms: 3.154125
   type: 'test'
   ...
-# Subtest: production build loads the authoritative app shell last
-ok 5 - production build loads the authoritative app shell last
+# Subtest: production build loads the adaptive shell last
+ok 5 - production build loads the adaptive shell last
   ---
-  duration_ms: 8.845052
+  duration_ms: 7.449831
   type: 'test'
   ...
-# Subtest: app shell avoids nested main and keeps five primary destinations
-ok 6 - app shell avoids nested main and keeps five primary destinations
+# Subtest: adaptive shell keeps separate large and iPhone navigation
+ok 6 - adaptive shell keeps separate large and iPhone navigation
   ---
-  duration_ms: 2.035732
+  duration_ms: 2.933041
   type: 'test'
   ...
-# Subtest: polish layer has separate iPhone iPad and desktop layouts
-ok 7 - polish layer has separate iPhone iPad and desktop layouts
+# Subtest: phone tables are converted to labelled cards with details
+ok 7 - phone tables are converted to labelled cards with details
   ---
-  duration_ms: 1.738922
-  type: 'test'
-  ...
-# Subtest: phone tables are converted to cards with labels
-ok 8 - phone tables are converted to cards with labels
-  ---
-  duration_ms: 4.029158
+  duration_ms: 4.361118
   type: 'test'
   ...
 # Subtest: CSS contains dedicated desktop tablet and phone modes
-ok 9 - CSS contains dedicated desktop tablet and phone modes
+ok 8 - CSS contains dedicated desktop tablet and phone modes
   ---
-  duration_ms: 8.944217
+  duration_ms: 7.674623
   type: 'test'
   ...
 # Subtest: shell source exposes all five primary views
-ok 10 - shell source exposes all five primary views
+ok 9 - shell source exposes all five primary views
   ---
-  duration_ms: 4.385968
+  duration_ms: 2.566533
   type: 'test'
   ...
 # Subtest: viewport modes separate phone tablet and desktop
-ok 11 - viewport modes separate phone tablet and desktop
+ok 10 - viewport modes separate phone tablet and desktop
   ---
-  duration_ms: 1.178284
+  duration_ms: 1.35437
   type: 'test'
   ...
 # Subtest: view routing preserves screening configuration hash
-ok 12 - view routing preserves screening configuration hash
+ok 11 - view routing preserves screening configuration hash
   ---
-  duration_ms: 0.506106
+  duration_ms: 0.564539
   type: 'test'
   ...
 # Subtest: direct anchors map to their primary view
-ok 13 - direct anchors map to their primary view
+ok 12 - direct anchors map to their primary view
   ---
-  duration_ms: 0.380576
+  duration_ms: 0.397576
   type: 'test'
   ...
 # Subtest: phone always uses comfortable density
-ok 14 - phone always uses comfortable density
+ok 13 - phone always uses comfortable density
   ---
-  duration_ms: 0.264511
+  duration_ms: 0.25621
   type: 'test'
   ...
 # Subtest: section map groups existing dynamic modules once
-ok 15 - section map groups existing dynamic modules once
+ok 14 - section map groups existing dynamic modules once
   ---
-  duration_ms: 1.900287
+  duration_ms: 1.449989
   type: 'test'
   ...
 # Subtest: normalizes J-Quants metadata and reasons
-ok 16 - normalizes J-Quants metadata and reasons
+ok 15 - normalizes J-Quants metadata and reasons
   ---
-  duration_ms: 1.781116
+  duration_ms: 2.192862
   type: 'test'
   ...
 # Subtest: filters and sorts deterministically
-ok 17 - filters and sorts deterministically
+ok 16 - filters and sorts deterministically
   ---
-  duration_ms: 0.481259
+  duration_ms: 0.592992
   type: 'test'
   ...
 # Subtest: summaries and CSV contain sanitized display columns
-ok 18 - summaries and CSV contain sanitized display columns
+ok 17 - summaries and CSV contain sanitized display columns
   ---
-  duration_ms: 0.714952
+  duration_ms: 0.943078
   type: 'test'
   ...
-# file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/data-client.test.mjs:3
-# import { normalizeRequestKey, portfolioStatusText, staleAgeSeconds, summaryFromStatic } from '../data-client-core.js';
-#          ^^^^^^^^^^^^^^^^^^^
-# SyntaxError: The requested module '../data-client-core.js' does not provide an export named 'normalizeRequestKey'
-#     at ModuleJob._instantiate (node:internal/modules/esm/module_job:226:21)
-#     at async ModuleJob.run (node:internal/modules/esm/module_job:335:5)
-#     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
-#     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
-# Node.js v22.23.2
-# Subtest: tests/data-client.test.mjs
-not ok 6 - tests/data-client.test.mjs
+# Subtest: normalizes transient cache-busting parameters while preserving compact mode
+ok 18 - normalizes transient cache-busting parameters while preserving compact mode
   ---
-  duration_ms: 55.300212
-  type: 'test'
-  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/data-client.test.mjs:1:1'
-  failureType: 'testCodeFailure'
-  exitCode: 1
-  signal: ~
-  error: 'test failed'
-  code: 'ERR_TEST_FAILURE'
-  ...
-# Subtest: paper decision labels are explicit
-ok 20 - paper decision labels are explicit
-  ---
-  duration_ms: 1.179686
+  duration_ms: 1.868774
   type: 'test'
   ...
-# Subtest: CSV separates fundamental and technical columns
-ok 21 - CSV separates fundamental and technical columns
+# Subtest: builds an immediate saved quote fallback from daily report and demo entries
+ok 19 - builds an immediate saved quote fallback from daily report and demo entries
   ---
-  duration_ms: 0.705038
+  duration_ms: 2.040277
   type: 'test'
   ...
-# Subtest: plan impact explains upgrade without promising profit
-ok 22 - plan impact explains upgrade without promising profit
+# Subtest: quote and portfolio requests share one canonical key
+ok 20 - quote and portfolio requests share one canonical key
   ---
-  duration_ms: 0.273684
+  duration_ms: 1.484373
   type: 'test'
   ...
-# Subtest: calculates per-position unrealized result
-ok 23 - calculates per-position unrealized result
+# Subtest: static JSON cache busting is removed from key
+not ok 21 - static JSON cache busting is removed from key
   ---
-  duration_ms: 0.885019
+  duration_ms: 2.756649
   type: 'test'
-  ...
-# Subtest: aggregates portfolio and falls back to entry on unusable quote
-ok 24 - aggregates portfolio and falls back to entry on unusable quote
-  ---
-  duration_ms: 0.307275
-  type: 'test'
-  ...
-# Subtest: formats Japanese currency and signed percent
-ok 25 - formats Japanese currency and signed percent
-  ---
-  duration_ms: 29.649267
-  type: 'test'
-  ...
-# Subtest: canonical URL removes cache busters and unifies quote mode
-ok 26 - canonical URL removes cache busters and unifies quote mode
-  ---
-  duration_ms: 1.80365
-  type: 'test'
-  ...
-# Subtest: compact quote payload is normalized for all consumers
-ok 27 - compact quote payload is normalized for all consumers
-  ---
-  duration_ms: 0.287274
-  type: 'test'
-  ...
-# Subtest: portfolio status can be synthesized from shared quote payload
-ok 28 - portfolio status can be synthesized from shared quote payload
-  ---
-  duration_ms: 0.479466
-  type: 'test'
-  ...
-# Subtest: static JSON detection is same-origin only
-ok 29 - static JSON detection is same-origin only
-  ---
-  duration_ms: 0.241466
-  type: 'test'
-  ...
-# Subtest: preset applies detailed thresholds and weights
-ok 30 - preset applies detailed thresholds and weights
-  ---
-  duration_ms: 1.13577
-  type: 'test'
-  ...
-# Subtest: Free conservative preset keeps complete strong data and excludes weak data
-ok 31 - Free conservative preset keeps complete strong data and excludes weak data
-  ---
-  duration_ms: 3.286664
-  type: 'test'
-  ...
-# Subtest: missing policy neutral preserves score and exclude rejects enabled missing field
-ok 32 - missing policy neutral preserves score and exclude rejects enabled missing field
-  ---
-  duration_ms: 0.776946
-  type: 'test'
-  ...
-# Subtest: CSV includes raw metrics and no credentials
-ok 33 - CSV includes raw metrics and no credentials
-  ---
-  duration_ms: 0.843837
-  type: 'test'
-  ...
-# Subtest: high and low direction percentiles reward the correct issue
-ok 34 - high and low direction percentiles reward the correct issue
-  ---
-  duration_ms: 2.136864
-  type: 'test'
-  ...
-# Subtest: raw threshold uses display units and missing exclude is respected
-ok 35 - raw threshold uses display units and missing exclude is respected
-  ---
-  duration_ms: 1.498448
-  type: 'test'
-  ...
-# Subtest: cash flow preset enables FCF metrics and formula explains weights
-ok 36 - cash flow preset enables FCF metrics and formula explains weights
-  ---
-  duration_ms: 0.641972
-  type: 'test'
-  ...
-# Subtest: contributions sum to custom score and CSV is secret-free
-ok 37 - contributions sum to custom score and CSV is secret-free
-  ---
-  duration_ms: 0.816657
-  type: 'test'
-  ...
-# Subtest: raw fundamental metrics are converted to percentages
-ok 38 - raw fundamental metrics are converted to percentages
-  ---
-  duration_ms: 1.342011
-  type: 'test'
-  ...
-# Subtest: quality preset filters weak company
-ok 39 - quality preset filters weak company
-  ---
-  duration_ms: 1.702366
-  type: 'test'
-  ...
-# Subtest: missing exclude rejects missing ROE when ROE threshold is active
-ok 40 - missing exclude rejects missing ROE when ROE threshold is active
-  ---
-  duration_ms: 1.44049
-  type: 'test'
-  ...
-# Subtest: composite respects user weights
-ok 41 - composite respects user weights
-  ---
-  duration_ms: 0.332222
-  type: 'test'
-  ...
-# Subtest: performance analytics module loads and preserves missing values
-ok 42 - performance analytics module loads and preserves missing values
-  ---
-  duration_ms: 1.461342
-  type: 'test'
-  ...
-# Subtest: one observation is not converted into fake returns
-ok 43 - one observation is not converted into fake returns
-  ---
-  duration_ms: 1.624359
-  type: 'test'
-  ...
-# Subtest: range filtering preserves observed points only
-ok 44 - range filtering preserves observed points only
-  ---
-  duration_ms: 9.160976
-  type: 'test'
-  ...
-# Subtest: adjustable settings recalculate risk reward and ratios
-ok 45 - adjustable settings recalculate risk reward and ratios
-  ---
-  duration_ms: 1.438618
-  type: 'test'
-  ...
-# Subtest: chart modes and CSV expose all series without secrets
-ok 46 - chart modes and CSV expose all series without secrets
-  ---
-  duration_ms: 0.425284
-  type: 'test'
-  ...
-# Subtest: period filter keeps recent points
-ok 47 - period filter keeps recent points
-  ---
-  duration_ms: 1.906024
-  type: 'test'
-  ...
-# Subtest: live equity is appended using entry basis
-ok 48 - live equity is appended using entry basis
-  ---
-  duration_ms: 0.599998
-  type: 'test'
-  ...
-# Subtest: metric state preserves insufficient history
-ok 49 - metric state preserves insufficient history
-  ---
-  duration_ms: 0.225982
-  type: 'test'
-  ...
-# Subtest: contribution view prefers live quote P&L
-ok 50 - contribution view prefers live quote P&L
-  ---
-  duration_ms: 0.328958
-  type: 'test'
-  ...
-# Subtest: chart bounds include zero when requested
-ok 51 - chart bounds include zero when requested
-  ---
-  duration_ms: 0.341026
-  type: 'test'
-  ...
-# Subtest: fetch coordinator is inserted before quote-consuming scripts
-not ok 52 - fetch coordinator is inserted before quote-consuming scripts
-  ---
-  duration_ms: 14.6473
-  type: 'test'
-  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/performance-loading.test.mjs:8:1'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/data-client.test.mjs:9:1'
   failureType: 'testCodeFailure'
   error: |-
-    The expression evaluated to a falsy value:
+    Expected values to be strictly equal:
+    + actual - expected
     
-      assert.ok(coordinator>=0)
+    + 'https://valuescope.local/undefined'
+    - 'https://valuescope.local/data/paper-trading/latest-report.json'
     
   code: 'ERR_ASSERTION'
   name: 'AssertionError'
-  expected: true
-  actual: false
-  operator: '=='
+  expected: 'https://valuescope.local/data/paper-trading/latest-report.json'
+  actual: 'https://valuescope.local/undefined'
+  operator: 'strictEqual'
   stack: |-
-    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/performance-loading.test.mjs:15:10)
-    async Test.run (node:internal/test_runner/test:1054:7)
+    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/data-client.test.mjs:10:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
     async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
   ...
-# Subtest: coordinator provides one shared compact quote request and timeout
-ok 53 - coordinator provides one shared compact quote request and timeout
+# Subtest: portfolio status is derived from a compact quote payload
+ok 22 - portfolio status is derived from a compact quote payload
   ---
-  duration_ms: 6.101525
+  duration_ms: 0.652163
   type: 'test'
   ...
-# Subtest: fast bootstrap displays static daily data before live quotes
-ok 54 - fast bootstrap displays static daily data before live quotes
+# Subtest: stale age and static summary are explicit
+ok 23 - stale age and static summary are explicit
   ---
-  duration_ms: 1.604519
+  duration_ms: 1.832987
   type: 'test'
   ...
-# Subtest: quote API uses bounded parallel fast path
-ok 55 - quote API uses bounded parallel fast path
+# Subtest: paper decision labels are explicit
+ok 24 - paper decision labels are explicit
   ---
-  duration_ms: 8.511624
+  duration_ms: 1.521534
   type: 'test'
   ...
-# Subtest: data client is injected before consumers
-ok 56 - data client is injected before consumers
+# Subtest: CSV separates fundamental and technical columns
+ok 25 - CSV separates fundamental and technical columns
   ---
-  duration_ms: 2.638243
+  duration_ms: 0.882255
+  type: 'test'
+  ...
+# Subtest: plan impact explains upgrade without promising profit
+ok 26 - plan impact explains upgrade without promising profit
+  ---
+  duration_ms: 0.357691
+  type: 'test'
+  ...
+# Subtest: calculates per-position unrealized result
+ok 27 - calculates per-position unrealized result
+  ---
+  duration_ms: 1.409032
+  type: 'test'
+  ...
+# Subtest: aggregates portfolio and falls back to entry on unusable quote
+ok 28 - aggregates portfolio and falls back to entry on unusable quote
+  ---
+  duration_ms: 0.527028
+  type: 'test'
+  ...
+# Subtest: formats Japanese currency and signed percent
+ok 29 - formats Japanese currency and signed percent
+  ---
+  duration_ms: 38.993809
+  type: 'test'
+  ...
+# Subtest: canonical key removes cache busters and unifies quote consumers
+ok 30 - canonical key removes cache busters and unifies quote consumers
+  ---
+  duration_ms: 3.789206
+  type: 'test'
+  ...
+# Subtest: full quote payload can be normalized for compact consumers
+ok 31 - full quote payload can be normalized for compact consumers
+  ---
+  duration_ms: 0.648847
+  type: 'test'
+  ...
+# Subtest: preset applies detailed thresholds and weights
+ok 32 - preset applies detailed thresholds and weights
+  ---
+  duration_ms: 1.052103
+  type: 'test'
+  ...
+# Subtest: Free conservative preset keeps complete strong data and excludes weak data
+ok 33 - Free conservative preset keeps complete strong data and excludes weak data
+  ---
+  duration_ms: 3.384107
+  type: 'test'
+  ...
+# Subtest: missing policy neutral preserves score and exclude rejects enabled missing field
+ok 34 - missing policy neutral preserves score and exclude rejects enabled missing field
+  ---
+  duration_ms: 0.852268
+  type: 'test'
+  ...
+# Subtest: CSV includes raw metrics and no credentials
+ok 35 - CSV includes raw metrics and no credentials
+  ---
+  duration_ms: 0.904346
+  type: 'test'
+  ...
+# Subtest: high and low direction percentiles reward the correct issue
+ok 36 - high and low direction percentiles reward the correct issue
+  ---
+  duration_ms: 2.964099
+  type: 'test'
+  ...
+# Subtest: raw threshold uses display units and missing exclude is respected
+ok 37 - raw threshold uses display units and missing exclude is respected
+  ---
+  duration_ms: 1.533436
+  type: 'test'
+  ...
+# Subtest: cash flow preset enables FCF metrics and formula explains weights
+ok 38 - cash flow preset enables FCF metrics and formula explains weights
+  ---
+  duration_ms: 0.721362
+  type: 'test'
+  ...
+# Subtest: contributions sum to custom score and CSV is secret-free
+ok 39 - contributions sum to custom score and CSV is secret-free
+  ---
+  duration_ms: 0.84781
+  type: 'test'
+  ...
+# Subtest: raw fundamental metrics are converted to percentages
+ok 40 - raw fundamental metrics are converted to percentages
+  ---
+  duration_ms: 1.825153
+  type: 'test'
+  ...
+# Subtest: quality preset filters weak company
+ok 41 - quality preset filters weak company
+  ---
+  duration_ms: 2.031159
+  type: 'test'
+  ...
+# Subtest: missing exclude rejects missing ROE when ROE threshold is active
+ok 42 - missing exclude rejects missing ROE when ROE threshold is active
+  ---
+  duration_ms: 1.586205
+  type: 'test'
+  ...
+# Subtest: composite respects user weights
+ok 43 - composite respects user weights
+  ---
+  duration_ms: 0.363021
+  type: 'test'
+  ...
+# Subtest: shared data client is loaded before live-data startup modules
+ok 44 - shared data client is loaded before live-data startup modules
+  ---
+  duration_ms: 11.714538
+  type: 'test'
+  ...
+# Subtest: data client includes in-flight deduplication timeout fallback and background refresh
+ok 45 - data client includes in-flight deduplication timeout fallback and background refresh
+  ---
+  duration_ms: 3.177279
+  type: 'test'
+  ...
+# Subtest: quote function has bounded concurrency stable cache and partial response
+ok 46 - quote function has bounded concurrency stable cache and partial response
+  ---
+  duration_ms: 2.023605
+  type: 'test'
+  ...
+# Subtest: performance analytics module loads and preserves missing values
+ok 47 - performance analytics module loads and preserves missing values
+  ---
+  duration_ms: 1.616081
+  type: 'test'
+  ...
+# Subtest: one observation is not converted into fake returns
+ok 48 - one observation is not converted into fake returns
+  ---
+  duration_ms: 1.851731
+  type: 'test'
+  ...
+# Subtest: range filtering preserves observed points only
+ok 49 - range filtering preserves observed points only
+  ---
+  duration_ms: 8.03516
+  type: 'test'
+  ...
+# Subtest: adjustable settings recalculate risk reward and ratios
+ok 50 - adjustable settings recalculate risk reward and ratios
+  ---
+  duration_ms: 1.421817
+  type: 'test'
+  ...
+# Subtest: chart modes and CSV expose all series without secrets
+ok 51 - chart modes and CSV expose all series without secrets
+  ---
+  duration_ms: 0.336251
+  type: 'test'
+  ...
+# Subtest: period filter keeps recent points
+ok 52 - period filter keeps recent points
+  ---
+  duration_ms: 1.990563
+  type: 'test'
+  ...
+# Subtest: live equity is appended using entry basis
+ok 53 - live equity is appended using entry basis
+  ---
+  duration_ms: 0.536025
+  type: 'test'
+  ...
+# Subtest: metric state preserves insufficient history
+ok 54 - metric state preserves insufficient history
+  ---
+  duration_ms: 0.211146
+  type: 'test'
+  ...
+# Subtest: contribution view prefers live quote P&L
+ok 55 - contribution view prefers live quote P&L
+  ---
+  duration_ms: 0.353763
+  type: 'test'
+  ...
+# Subtest: chart bounds include zero when requested
+ok 56 - chart bounds include zero when requested
+  ---
+  duration_ms: 0.400511
+  type: 'test'
+  ...
+# Subtest: shared data client is inserted before quote-consuming scripts
+ok 57 - shared data client is inserted before quote-consuming scripts
+  ---
+  duration_ms: 5.864018
+  type: 'test'
+  ...
+# Subtest: shared client provides one live request, timeout, saved fallback and update event
+ok 58 - shared client provides one live request, timeout, saved fallback and update event
+  ---
+  duration_ms: 1.855259
+  type: 'test'
+  ...
+# Subtest: quote API uses bounded concurrency, source timeout and stable edge cache
+ok 59 - quote API uses bounded concurrency, source timeout and stable edge cache
+  ---
+  duration_ms: 6.503717
+  type: 'test'
+  ...
+# Subtest: data client module is injected before consumers
+ok 60 - data client module is injected before consumers
+  ---
+  duration_ms: 1.744171
   type: 'test'
   ...
 # Subtest: responsive layer includes iPhone breakpoint and safe areas
-ok 57 - responsive layer includes iPhone breakpoint and safe areas
+ok 61 - responsive layer includes iPhone breakpoint and safe areas
   ---
-  duration_ms: 8.405723
+  duration_ms: 6.528714
   type: 'test'
   ...
 # Subtest: responsive script installs viewport indicator and five mobile destinations
-ok 58 - responsive script installs viewport indicator and five mobile destinations
+ok 62 - responsive script installs viewport indicator and five mobile destinations
   ---
-  duration_ms: 1.971614
+  duration_ms: 1.822828
   type: 'test'
   ...
 # Subtest: risk diagnostics module loads with stable default limits
-ok 59 - risk diagnostics module loads with stable default limits
+ok 63 - risk diagnostics module loads with stable default limits
   ---
-  duration_ms: 1.033815
+  duration_ms: 1.282796
   type: 'test'
   ...
 # Subtest: robust score ranks quality value above trap
-ok 60 - robust score ranks quality value above trap
+ok 64 - robust score ranks quality value above trap
   ---
-  duration_ms: 5.296317
+  duration_ms: 4.960333
   type: 'test'
   ...
 # Subtest: missing metrics are not converted to zero
-ok 61 - missing metrics are not converted to zero
+ok 65 - missing metrics are not converted to zero
   ---
-  duration_ms: 0.823967
+  duration_ms: 0.782908
   type: 'test'
   ...
 # Subtest: weights must sum to 100
-ok 62 - weights must sum to 100
+ok 66 - weights must sum to 100
   ---
-  duration_ms: 0.552456
+  duration_ms: 0.58125
   type: 'test'
   ...
 # Subtest: csv parser and exporter preserve quoted values
-ok 63 - csv parser and exporter preserve quoted values
+ok 67 - csv parser and exporter preserve quoted values
   ---
-  duration_ms: 0.681942
+  duration_ms: 0.699201
   type: 'test'
   ...
 # Subtest: summary reports eligible and median
-ok 64 - summary reports eligible and median
+ok 68 - summary reports eligible and median
   ---
-  duration_ms: 2.02147
+  duration_ms: 2.134312
   type: 'test'
   ...
 # Subtest: merges ranking and daily technical data
-ok 65 - merges ranking and daily technical data
+ok 69 - merges ranking and daily technical data
   ---
-  duration_ms: 1.799934
+  duration_ms: 1.814963
   type: 'test'
   ...
 # Subtest: Free safe preset excludes weak record
-ok 66 - Free safe preset excludes weak record
+ok 70 - Free safe preset excludes weak record
   ---
-  duration_ms: 3.500939
+  duration_ms: 3.26867
   type: 'test'
   ...
 # Subtest: missing policy neutral produces score while exclude rejects
-ok 67 - missing policy neutral produces score while exclude rejects
+ok 71 - missing policy neutral produces score while exclude rejects
   ---
-  duration_ms: 0.426595
+  duration_ms: 0.457418
   type: 'test'
   ...
 # Subtest: CSV contains separate pillars and no secrets
-ok 68 - CSV contains separate pillars and no secrets
+ok 72 - CSV contains separate pillars and no secrets
   ---
-  duration_ms: 0.772219
+  duration_ms: 0.600446
   type: 'test'
   ...
 # Subtest: insufficient history cannot be promoted
-ok 69 - insufficient history cannot be promoted
+ok 73 - insufficient history cannot be promoted
   ---
-  duration_ms: 0.892551
+  duration_ms: 0.967013
   type: 'test'
   ...
 # Subtest: research CSV exposes baseline comparison and no secrets
-ok 70 - research CSV exposes baseline comparison and no secrets
+ok 74 - research CSV exposes baseline comparison and no secrets
   ---
-  duration_ms: 0.444843
+  duration_ms: 0.41035
   type: 'test'
   ...
-1..70
-# tests 70
+1..74
+# tests 74
 # suites 0
-# pass 68
-# fail 2
+# pass 73
+# fail 1
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 587.986657
+# duration_ms 664.380217
 exit_code=1
