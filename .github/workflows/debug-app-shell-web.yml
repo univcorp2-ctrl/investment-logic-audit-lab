@@ -1,0 +1,39 @@
+name: Temporary app shell web diagnostic
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Capture unit-test output
+        shell: bash
+        run: |
+          cd web
+          npm ci
+          set +e
+          npm test > ../app-shell-test-output.txt 2>&1
+          code=$?
+          set -e
+          echo "exit_code=$code" >> ../app-shell-test-output.txt
+      - name: Commit diagnostic output
+        shell: bash
+        run: |
+          mkdir -p debug
+          mv app-shell-test-output.txt debug/app-shell-test-output.txt
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add debug/app-shell-test-output.txt
+          git commit -m 'debug: capture app shell web test output [skip ci]'
+          git push
