@@ -1,0 +1,6 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mobileTargetToScreen, parsePhoneRoute, phoneRouteHash } from '../mobile-screen-router-core.js';
+
+test('phone route parses screen and performance panel',()=>{const route=parsePhoneRoute('#screen=performance&panel=chart&parameters=abc');assert.equal(route.screen,'performance');assert.equal(route.panel,'chart');assert.equal(route.params.get('parameters'),'abc')});
+test('phone route preserves unrelated hash parameters',()=>{const hash=phoneRouteHash('screening','current','#parameters=abc&screen=overview');const route=parsePhoneRoute(hash);assert.equal(route.screen,'screening');assert.equal(route.params.get('parameters'),'abc');assert.equal(route.params.has('panel'),false)});test('invalid phone routes fall back safely',()=>{assert.deepEqual(parsePhoneRoute('#screen=unknown&panel=nope').screen,'overview');assert.equal(parsePhoneRoute('#screen=performance&panel=nope').panel,'current')});test('adaptive targets map to five primary screens',()=>{assert.equal(mobileTargetToScreen('strategy'),'data');assert.equal(mobileTargetToScreen('performance'),'performance');assert.equal(mobileTargetToScreen('missing'),'overview')});
