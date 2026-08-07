@@ -12,10 +12,11 @@ const staticFiles = [
   'performance-dashboard.js','performance-dashboard-core.js','performance-dashboard.css',
   'risk-diagnostics.js','risk-diagnostics-core.js','risk-diagnostics.css',
   'decision-report.js','decision-report-core.js','decision-report.css','jquants-plans.json',
+  'responsive-mode.js','responsive-enhancements.css',
   'screening-lab.js','screening-lab-core.js','screening-lab.css',
   'fundamental-tuning.js','fundamental-tuning-core.js','fundamental-tuning.css',
   'strategy-lab-view.js','strategy-lab-view-core.js','strategy-lab-view.css',
-  'adaptive-shell.js','adaptive-shell.css',
+  'app-shell-core.js','app-shell.js','app-shell.css','app-shell-polish.css',
 ];
 for (const file of staticFiles) await cp(resolve(root, file), resolve(dist, file));
 for (const file of ['jquants-ranking.json','jquants-ranking.csv','live-ranking.json','live-ranking.csv']) {
@@ -33,7 +34,8 @@ for (const marker of [
   '<link rel="stylesheet" href="./screening-lab.css" />',
   '<link rel="stylesheet" href="./fundamental-tuning.css" />',
   '<link rel="stylesheet" href="./strategy-lab-view.css" />',
-  '<link rel="stylesheet" href="./adaptive-shell.css" />',
+  '<link rel="stylesheet" href="./app-shell.css" />',
+  '<link rel="stylesheet" href="./app-shell-polish.css" />',
 ]) {
   if (!index.includes(marker)) index = index.replace('</head>', `  ${marker}\n  </head>`);
 }
@@ -46,7 +48,7 @@ for (const marker of [
   '<script type="module" src="./strategy-lab-view.js"></script>',
   '<script type="module" src="./screening-lab.js"></script>',
   '<script type="module" src="./fundamental-tuning.js"></script>',
-  '<script type="module" src="./adaptive-shell.js"></script>',
+  '<script type="module" src="./app-shell.js"></script>',
 ]) {
   if (!index.includes(marker)) index = index.replace('</body>', `  ${marker}\n  </body>`);
 }
