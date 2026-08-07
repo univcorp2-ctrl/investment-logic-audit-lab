@@ -12,6 +12,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -45,4 +47,5 @@ jobs:
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add debug/parameter-e2e-output.txt
           git commit -m 'debug: capture parameter E2E output [skip ci]'
-          git push
+          git pull --rebase origin main
+          git push origin main
