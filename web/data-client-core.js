@@ -1,17 +1,14 @@
-const TRANSIENT_PARAMS = new Set(['ts', 'refresh', 'cacheBust', '_']);
-
+const TRANSIENT_PARAMS = new Set(['ts', 'refresh', 'cacheBust', '_', 'adaptive', 'final', 'verify', 'summary', 'count']);
 export function normalizeDataUrl(input, base = 'https://valuescope.local/') {
   const url = new URL(typeof input === 'string' ? input : input.url, base);
   for (const key of [...url.searchParams.keys()]) {
     if (TRANSIENT_PARAMS.has(key)) url.searchParams.delete(key);
   }
-  const entries = [...url.searchParams.entries()].sort(([aKey, aValue], [bKey, bValue]) =>
-    aKey.localeCompare(bKey) || aValue.localeCompare(bValue));
+  const entries = [...url.searchParams.entries()].sort(([aKey, aValue], [bKey, bValue]) => aKey.localeCompare(bKey) || aValue.localeCompare(bValue));
   url.search = '';
   for (const [key, value] of entries) url.searchParams.append(key, value);
   return url.toString();
 }
-
 export function normalizeRequestKey(input, base = 'https://valuescope.local/') {
   const url = new URL(typeof input === 'string' ? input : input.url, base);
   if (url.pathname === '/api/portfolio-status' || url.pathname === '/api/quotes') {
@@ -22,7 +19,6 @@ export function normalizeRequestKey(input, base = 'https://valuescope.local/') {
   }
   return normalizeDataUrl(url, base);
 }
-
 export function requestKind(input, base = 'https://valuescope.local/') {
   const url = new URL(typeof input === 'string' ? input : input.url, base);
   if (url.pathname === '/api/quotes') return 'quotes';
@@ -30,43 +26,44 @@ export function requestKind(input, base = 'https://valuescope.local/') {
   if (url.pathname.endsWith('.json')) return 'static-json';
   return 'other';
 }
-
 export function isForcedQuoteRefresh(input, base = 'https://valuescope.local/') {
   const url = new URL(typeof input === 'string' ? input : input.url, base);
   return url.searchParams.has('refresh') || url.searchParams.get('force') === '1';
 }
-
 export function staleAgeSeconds(timestamp, nowMs = Date.now()) {
   const parsed = Date.parse(timestamp);
   return Number.isFinite(parsed) ? Math.max(0, Math.floor((nowMs - parsed) / 1000)) : null;
 }
-
+const numberOrNull = value => {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
 export function summaryFromStatic(report = {}, metrics = {}) {
   return {
-    totalPnl: Number(report?.summary?.total_pnl),
-    totalReturnPct: Number(report?.summary?.cumulative_return_pct),
-    unrealizedPnl: Number(report?.summary?.unrealized_pnl),
-    currentDrawdownPct: Number(metrics?.risk?.current_drawdown_pct?.value ?? report?.summary?.max_drawdown_pct),
+    totalPnl: numberOrNull(report?.summary?.total_pnl),
+    totalReturnPct: numberOrNull(report?.summary?.cumulative_return_pct),
+    unrealizedPnl: numberOrNull(report?.summary?.unrealized_pnl),
+    currentDrawdownPct: numberOrNull(metrics?.risk?.current_drawdown_pct?.value ?? report?.summary?.max_drawdown_pct),
     plan: report?.fundamental_source?.plan?.name ?? report?.fundamental_source?.plan ?? null,
     effectiveCutoff: report?.fundamental_source?.effective_data_cutoff ?? null,
     generatedAt: report?.generated_at ?? null,
   };
 }
-
-export function deriveCompactQuotePayload(fullPayload) {
-  const quotes = Array.isArray(fullPayload?.quotes) ? fullPayload.quotes : [];
+export function deriveCompactQuotePayload(fullPayload = {}) {
+  const quotes = Array.isArray(fullPayload.quotes) ? fullPayload.quotes : Array.isArray(fullPayload.positions) ? fullPayload.positions : [];
   return {
-    generated_at: fullPayload?.generated_at ?? null,
-    timezone: fullPayload?.timezone ?? 'Asia/Tokyo',
-    refresh_seconds: fullPayload?.refresh_seconds ?? 60,
-    source_policy: fullPayload?.source_policy ?? {},
-    source_status: fullPayload?.source_status ?? {},
-    partial: Boolean(fullPayload?.partial),
-    portfolio: fullPayload?.portfolio ?? {},
+    generated_at: fullPayload.generated_at ?? null,
+    timezone: fullPayload.timezone ?? 'Asia/Tokyo',
+    refresh_seconds: fullPayload.refresh_seconds ?? 60,
+    source_policy: fullPayload.source_policy ?? {},
+    source_status: fullPayload.source_status ?? {},
+    partial: Boolean(fullPayload.partial),
+    portfolio: fullPayload.portfolio ?? {},
     positions: quotes.map(quote => ({
       symbol: quote.symbol,
       code: quote.code,
-      name: quote.name,
+      name: quote.name ?? quote.company_name,
       entry_price: quote.entry_price,
       current_price: quote.current_price,
       quote_time: quote.quote_time,
@@ -81,13 +78,6 @@ export function deriveCompactQuotePayload(fullPayload) {
     })),
   };
 }
-
-const numberOrNull = value => {
-  if (value === null || value === undefined || value === '') return null;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-};
-
 export function buildSavedQuotePayload(report = {}, demo = {}, compact = false) {
   const decisions = new Map();
   for (const item of report?.decisions ?? []) {
@@ -109,8 +99,7 @@ export function buildSavedQuotePayload(report = {}, demo = {}, compact = false) 
     const currentValue = currentPrice * quantity;
     const pnl = currentValue - entryValue;
     return {
-      symbol,
-      code,
+      symbol, code,
       name: position.company_name ?? decision.company_name ?? code,
       current_price: currentPrice,
       quote_time: decision?.quote?.quote_time ?? report?.generated_at ?? null,
@@ -134,13 +123,8 @@ export function buildSavedQuotePayload(report = {}, demo = {}, compact = false) 
   const totalPnl = totalCurrentValue - totalEntryValue;
   const full = {
     generated_at: report?.generated_at ?? new Date().toISOString(),
-    timezone: 'Asia/Tokyo',
-    refresh_seconds: 60,
-    source_policy: {
-      primary: '保存済み日次レポート',
-      live_enhancement: '現在値はバックグラウンドで更新',
-      warning: 'ライブ取得完了までは最新の日次保存値を表示します。',
-    },
+    timezone: 'Asia/Tokyo', refresh_seconds: 60,
+    source_policy: { primary: '保存済み日次レポート', live_enhancement: '現在値はバックグラウンドで更新', warning: 'ライブ取得完了までは最新の日次保存値を表示します。' },
     source_status: { mode:'saved-fallback', live_pending:true, usable:quotes.filter(quote => quote.usable).length, total:quotes.length },
     partial: true,
     portfolio: {
@@ -158,14 +142,15 @@ export function buildSavedQuotePayload(report = {}, demo = {}, compact = false) 
   };
   return compact ? deriveCompactQuotePayload(full) : full;
 }
-
 export function portfolioStatusText(payload, offset = 0, limit = 10) {
-  const positions = (payload?.positions ?? []).slice(offset, offset + limit);
+  const start = Math.max(0, Number(offset) || 0);
+  const size = Math.min(10, Math.max(1, Number(limit) || 10));
+  const positions = (payload?.positions ?? []).slice(start, start + size);
   const portfolio = payload?.portfolio ?? {};
   const lines = [
     `generated_at\t${payload?.generated_at ?? ''}`,
     `total\t${portfolio.total_entry_value ?? ''}\t${portfolio.total_current_value ?? ''}\t${portfolio.total_unrealized_pnl ?? ''}\t${portfolio.total_return_pct ?? ''}\t${portfolio.winners ?? ''}\t${portfolio.losers ?? ''}\t${portfolio.unchanged ?? ''}\t${portfolio.usable_quotes ?? ''}\t${portfolio.double_checked ?? ''}`,
-    `range\t${offset}\t${offset + positions.length}`,
+    `range\t${start}\t${start + positions.length}`,
     'code\tname\tentry\tcurrent\tpnl\treturn_pct\tverification\tusable\tquote_time\tmax_diff_pct',
     ...positions.map(position => [position.code, position.name, position.entry_price, position.current_price, position.unrealized_pnl, position.return_pct, position.verification, position.usable, position.quote_time, position.max_difference_pct].map(value => value ?? '').join('\t')),
   ];
