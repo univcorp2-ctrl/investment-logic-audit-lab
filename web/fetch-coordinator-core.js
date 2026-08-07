@@ -1,11 +1,12 @@
-const TRANSIENT_PARAMS = new Set(['ts','refresh','final','verify','summary','count','cacheBust']);
+const TRANSIENT_PARAMS = new Set(['ts','refresh','final','verify','summary','count','cacheBust','adaptive','_']);
 
 export function canonicalUrl(input, base = 'https://valuescope.invalid/') {
   const url = new URL(typeof input === 'string' ? input : input.url, base);
   for (const key of [...url.searchParams.keys()]) {
     if (TRANSIENT_PARAMS.has(key)) url.searchParams.delete(key);
   }
-  if (url.pathname === '/api/quotes') {
+  if (url.pathname === '/api/quotes' || url.pathname === '/api/portfolio-status') {
+    url.pathname = '/api/quotes';
     url.search = '';
     url.searchParams.set('compact', '1');
   }
