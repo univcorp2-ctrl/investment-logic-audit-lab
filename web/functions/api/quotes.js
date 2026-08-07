@@ -1,254 +1,102 @@
 const SECURITIES = Object.freeze([
-  { symbol:'8035.T', code:'8035', name:'東京エレクトロン' },
-  { symbol:'6857.T', code:'6857', name:'アドバンテスト' },
-  { symbol:'5803.T', code:'5803', name:'フジクラ' },
-  { symbol:'5016.T', code:'5016', name:'JX金属' },
-  { symbol:'6920.T', code:'6920', name:'レーザーテック' },
-  { symbol:'9983.T', code:'9983', name:'ファーストリテイリング' },
-  { symbol:'7974.T', code:'7974', name:'任天堂' },
-  { symbol:'285A.T', code:'285A', name:'キオクシアホールディングス' },
-  { symbol:'9984.T', code:'9984', name:'ソフトバンクグループ' },
-  { symbol:'5706.T', code:'5706', name:'三井金属' },
+  { symbol: '8035.T', code: '8035', name: '東京エレクトロン' },
+  { symbol: '6857.T', code: '6857', name: 'アドバンテスト' },
+  { symbol: '5803.T', code: '5803', name: 'フジクラ' },
+  { symbol: '5016.T', code: '5016', name: 'JX金属' },
+  { symbol: '6920.T', code: '6920', name: 'レーザーテック' },
+  { symbol: '9983.T', code: '9983', name: 'ファーストリテイリング' },
+  { symbol: '7974.T', code: '7974', name: '任天堂' },
+  { symbol: '285A.T', code: '285A', name: 'キオクシアホールディングス' },
+  { symbol: '9984.T', code: '9984', name: 'ソフトバンクグループ' },
+  { symbol: '5706.T', code: '5706', name: '三井金属' },
 ]);
-const ENTRY_PRICES = Object.freeze({
-  '8035.T':54720,'6857.T':31260,'5803.T':4294,'5016.T':3827,'6920.T':41060,
-  '9983.T':79030,'7974.T':7588,'285A.T':49190,'9984.T':5412,'5706.T':30840,
-});
+const ENTRY_PRICES = Object.freeze({ '8035.T':54720,'6857.T':31260,'5803.T':4294,'5016.T':3827,'6920.T':41060,'9983.T':79030,'7974.T':7588,'285A.T':49190,'9984.T':5412,'5706.T':30840 });
 const QUANTITY = 100;
-const EXTERNAL_TIMEOUT_MS = 3500;
+const UPSTREAM_TIMEOUT_MS = 2500;
 
 const cleanNumber = value => {
   if (value === null || value === undefined || String(value).trim() === '') return null;
   const parsed = Number(String(value).replaceAll(',', ''));
   return Number.isFinite(parsed) ? parsed : null;
 };
-const decode = text => text
-  .replaceAll('&nbsp;', ' ')
-  .replaceAll('&amp;', '&')
-  .replaceAll('&#x2F;', '/')
-  .replaceAll('&#47;', '/')
-  .replaceAll('&minus;', '-')
-  .replaceAll('−', '-');
-const stripHtml = html => decode(html)
-  .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
-  .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' ')
-  .replace(/<[^>]+>/g, ' ')
-  .replace(/\s+/g, ' ')
-  .trim();
-const pause = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
-const tokyoDate = () => {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone:'Asia/Tokyo', year:'numeric', month:'2-digit', day:'2-digit',
-  }).formatToParts(new Date());
-  const value = type => parts.find(part => part.type === type)?.value;
-  return `${value('year')}-${value('month')}-${value('day')}`;
-};
-const timeToIso = time => time ? `${tokyoDate()}T${time}:00+09:00` : null;
 
-async function fetchWithTimeout(url, init = {}, timeoutMs = EXTERNAL_TIMEOUT_MS) {
+async function timedFetch(url, options = {}, timeoutMs = UPSTREAM_TIMEOUT_MS) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort('timeout'), timeoutMs);
-  try {
-    return await fetch(url, { ...init, signal: controller.signal });
-  } finally {
-    clearTimeout(timer);
-  }
+  const timer = setTimeout(() => controller.abort(new Error('upstream timeout')), timeoutMs);
+  try { return await fetch(url, { ...options, signal: controller.signal }); }
+  finally { clearTimeout(timer); }
 }
 
-function parseYahooJapan(html) {
-  const text = stripHtml(html);
-  const priceMatch = text.match(/([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*前日比[\s\S]{0,160}?リアルタイム株価\s*(\d{1,2}:\d{2})/);
-  if (!priceMatch) throw new Error('Yahoo Japan real-time quote pattern was not found');
-  const highMatch = text.match(/高値\s*(?:用語\s*)?([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*\((\d{1,2}:\d{2})\)/);
-  const lowMatch = text.match(/安値\s*(?:用語\s*)?([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*\((\d{1,2}:\d{2})\)/);
-  const price = cleanNumber(priceMatch[1]);
-  const dayHigh = cleanNumber(highMatch?.[1]);
-  const dayLow = cleanNumber(lowMatch?.[1]);
-  return {
-    price,
-    quote_time: timeToIso(priceMatch[2]),
-    day_high: dayHigh,
-    day_low: dayLow,
-    in_day_range: price !== null && (dayHigh === null || price <= dayHigh) && (dayLow === null || price >= dayLow),
-    source:'Yahoo!ファイナンス日本版',
-    source_mode:'realtime-labelled',
-  };
-}
-
-async function fetchYahooJapan(security) {
-  const response = await fetchWithTimeout(`https://finance.yahoo.co.jp/quote/${security.symbol}`, {
-    headers:{
-      Accept:'text/html,application/xhtml+xml',
-      'Accept-Language':'ja-JP,ja;q=0.9',
-      'User-Agent':'Mozilla/5.0 (compatible; ValueScopeDemo/2.0)',
-    },
-  });
-  if (!response.ok) throw new Error(`Yahoo Japan HTTP ${response.status}`);
-  return parseYahooJapan(await response.text());
-}
-
-async function fetchGoogleFinance(security) {
-  const response = await fetchWithTimeout(`https://www.google.com/finance/quote/${security.code}:TYO?hl=ja`, {
-    headers:{
-      Accept:'text/html,application/xhtml+xml',
-      'Accept-Language':'ja-JP,ja;q=0.9',
-      'User-Agent':'Mozilla/5.0 (compatible; ValueScopeDemo/2.0)',
-    },
-  });
-  if (!response.ok) throw new Error(`Google Finance HTTP ${response.status}`);
-  const html = await response.text();
-  const patterns = [
-    /data-last-price=["']?([0-9.]+)/i,
-    /<[^>]*class=["'][^"']*YMlKec[^"']*["'][^>]*>\s*[¥￥]?\s*([0-9,.]+)/i,
-  ];
-  let price = null;
-  for (const pattern of patterns) {
-    const match = html.match(pattern);
-    price = cleanNumber(match?.[1]);
-    if (price !== null) break;
-  }
-  const timestampMatch = html.match(/data-last-normal-market-timestamp=["']?([0-9]+)/i);
-  if (price === null) throw new Error('Google Finance price pattern was not found');
-  return {
-    price,
-    quote_time: timestampMatch ? new Date(Number(timestampMatch[1]) * 1000).toISOString() : null,
-    source:'Google Finance',
-    source_mode:'secondary-check',
-  };
-}
-
-async function fetchYahooChart(security) {
-  const response = await fetchWithTimeout(`https://query2.finance.yahoo.com/v8/finance/chart/${security.symbol}?interval=1m&range=1d&includePrePost=false`, {
-    headers:{ Accept:'application/json', 'User-Agent':'Mozilla/5.0 (compatible; ValueScopeDemo/2.0)' },
+async function fetchChart(security) {
+  const response = await timedFetch(`https://query2.finance.yahoo.com/v8/finance/chart/${security.symbol}?interval=1m&range=1d&includePrePost=false`, {
+    headers: { Accept: 'application/json', 'User-Agent': 'Mozilla/5.0 (compatible; ValueScopeFast/2.0)' },
   });
   if (!response.ok) throw new Error(`Yahoo chart HTTP ${response.status}`);
   const payload = await response.json();
   const result = payload?.chart?.result?.[0];
   const meta = result?.meta;
   if (!meta) throw new Error('Yahoo chart result is empty');
+  const price = cleanNumber(meta.regularMarketPrice);
+  if (price === null) throw new Error('Yahoo chart price is unavailable');
   return {
-    price:cleanNumber(meta.regularMarketPrice),
-    quote_time:Number.isFinite(Number(meta.regularMarketTime)) ? new Date(Number(meta.regularMarketTime) * 1000).toISOString() : null,
-    day_high:cleanNumber(meta.regularMarketDayHigh),
-    day_low:cleanNumber(meta.regularMarketDayLow),
-    source:'Yahoo Finance chart API',
-    source_mode:'minute-chart-check',
+    price,
+    quote_time: Number.isFinite(Number(meta.regularMarketTime)) ? new Date(Number(meta.regularMarketTime) * 1000).toISOString() : null,
+    day_high: cleanNumber(meta.regularMarketDayHigh),
+    day_low: cleanNumber(meta.regularMarketDayLow),
+    source: 'Yahoo Finance chart API',
+    source_mode: 'fast-chart',
   };
 }
 
-const settled = result => result.status === 'fulfilled' ? result.value : null;
-const errorName = result => result.status === 'rejected' ? String(result.reason?.message ?? result.reason ?? 'unknown error') : null;
-
-async function fetchInitial(security) {
-  const [yahooResult, googleResult] = await Promise.allSettled([
-    fetchYahooJapan(security),
-    fetchGoogleFinance(security),
-  ]);
-  return {
-    security,
-    yahoo:settled(yahooResult),
-    google:settled(googleResult),
-    errors:[errorName(yahooResult), errorName(googleResult)].filter(Boolean),
-  };
-}
-
-async function mapWithConcurrency(items, concurrency, mapper, batchDelayMs = 75) {
-  const results = new Array(items.length);
-  let cursor = 0;
-  async function worker() {
-    while (true) {
-      const index = cursor++;
-      if (index >= items.length) return;
-      results[index] = await mapper(items[index], index);
-      if (batchDelayMs > 0) await pause(batchDelayMs);
-    }
-  }
-  await Promise.all(Array.from({ length:Math.min(concurrency, items.length) }, worker));
-  return results;
-}
-
-function finalizeQuote(initial, chart, chartError) {
-  const { security, yahoo, google } = initial;
-  const primary = yahoo ?? google ?? chart;
-  const checks = [yahoo, google, chart].filter(item => item && item !== primary && cleanNumber(item.price) !== null);
-  const entryPrice = ENTRY_PRICES[security.symbol];
-  if (!primary?.price) {
-    return {
-      ...security,
-      current_price:null,
-      usable:false,
-      verification:'unavailable',
-      entry_price:entryPrice,
-      quantity:QUANTITY,
-      position_value:entryPrice * QUANTITY,
-      unrealized_pnl:0,
-      return_pct:0,
-      errors:[...initial.errors, chartError].filter(Boolean),
-    };
-  }
-  const differences = checks.map(check => Math.abs(primary.price - check.price) / primary.price * 100);
-  const maxDifference = differences.length ? Math.max(...differences) : null;
-  const discrepancy = maxDifference !== null && maxDifference > 3;
-  const dayHigh = yahoo?.day_high ?? chart?.day_high ?? null;
-  const dayLow = yahoo?.day_low ?? chart?.day_low ?? null;
-  const inRange = (dayHigh === null || primary.price <= dayHigh) && (dayLow === null || primary.price >= dayLow);
-  const usable = inRange && !discrepancy;
-  let verification = 'single-source';
-  if (checks.length && maxDifference !== null && maxDifference <= 1) verification = 'double-checked';
-  else if (checks.length && maxDifference !== null && maxDifference <= 3) verification = 'checked-with-time-skew';
-  else if (discrepancy) verification = 'price-discrepancy';
-  const secondary = google && google !== primary ? google : chart && chart !== primary ? chart : yahoo && yahoo !== primary ? yahoo : null;
-  const valuationPrice = usable ? primary.price : entryPrice;
-  const pnl = (valuationPrice - entryPrice) * QUANTITY;
-  return {
-    ...security,
-    current_price:primary.price,
-    quote_time:primary.quote_time,
-    primary_source:primary.source,
-    primary_source_mode:primary.source_mode,
-    day_high:dayHigh,
-    day_low:dayLow,
-    secondary_price:secondary?.price ?? null,
-    secondary_time:secondary?.quote_time ?? null,
-    secondary_source:secondary?.source ?? null,
-    max_difference_pct:maxDifference,
-    verification,
-    usable,
-    entry_price:entryPrice,
-    quantity:QUANTITY,
-    position_value:valuationPrice * QUANTITY,
-    unrealized_pnl:pnl,
-    return_pct:entryPrice ? pnl / (entryPrice * QUANTITY) * 100 : 0,
-    errors:[...initial.errors, chartError].filter(Boolean),
-  };
-}
-
-function cachedResponse(cached) {
-  const headers = new Headers(cached.headers);
-  headers.set('X-Valuescope-Cache', 'HIT');
-  headers.set('Server-Timing', 'cache;dur=1');
-  return new Response(cached.body, { status:cached.status, statusText:cached.statusText, headers });
-}
-
-export async function onRequestGet(context) {
-  const started = Date.now();
-  const requestUrl = new URL(context.request.url);
-  const compact = requestUrl.searchParams.get('compact') === '1';
-  const cacheUrl = new URL(requestUrl.origin + requestUrl.pathname);
-  cacheUrl.searchParams.set('mode', compact ? 'compact' : 'full');
-  const cacheKey = new Request(cacheUrl.toString(), { method:'GET' });
-  const cached = await caches.default.match(cacheKey);
-  if (cached) return cachedResponse(cached);
-
-  const initial = await Promise.all(SECURITIES.map(fetchInitial));
-  const charts = await mapWithConcurrency(initial, 2, async item => {
-    try {
-      return { chart:await fetchYahooChart(item.security), error:null };
-    } catch (error) {
-      return { chart:null, error:String(error?.message ?? error) };
-    }
+async function fetchGoogleFinance(security) {
+  const response = await timedFetch(`https://www.google.com/finance/quote/${security.code}:TYO?hl=ja`, {
+    headers: { Accept: 'text/html,application/xhtml+xml', 'Accept-Language': 'ja-JP,ja;q=0.9', 'User-Agent': 'Mozilla/5.0 (compatible; ValueScopeVerify/2.0)' },
   });
-  const quotes = initial.map((item, index) => finalizeQuote(item, charts[index].chart, charts[index].error));
+  if (!response.ok) throw new Error(`Google Finance HTTP ${response.status}`);
+  const html = await response.text();
+  const match = html.match(/data-last-price=["']?([0-9.]+)/i) ?? html.match(/class=["'][^"']*YMlKec[^"']*["'][^>]*>\s*[¥￥]?\s*([0-9,.]+)/i);
+  const price = cleanNumber(match?.[1]);
+  if (price === null) throw new Error('Google Finance price pattern was not found');
+  const timestamp = html.match(/data-last-normal-market-timestamp=["']?([0-9]+)/i)?.[1];
+  return { price, quote_time: timestamp ? new Date(Number(timestamp) * 1000).toISOString() : null, source: 'Google Finance', source_mode: 'deep-check' };
+}
+
+function fallbackQuote(security, error) {
+  const entryPrice = ENTRY_PRICES[security.symbol];
+  return { ...security, current_price:null, quote_time:null, primary_source:null, primary_source_mode:'entry-fallback', day_high:null, day_low:null, secondary_price:null, secondary_time:null, secondary_source:null, max_difference_pct:null, verification:'unavailable', usable:false, entry_price:entryPrice, quantity:QUANTITY, position_value:entryPrice*QUANTITY, unrealized_pnl:0, return_pct:0, errors:[String(error?.message ?? error ?? 'unavailable')] };
+}
+
+function finalizeFast(security, chart) {
+  const entryPrice = ENTRY_PRICES[security.symbol];
+  const high = chart.day_high;
+  const low = chart.day_low;
+  const usable = (high === null || chart.price <= high) && (low === null || chart.price >= low);
+  const valuationPrice = usable ? chart.price : entryPrice;
+  const pnl = (valuationPrice - entryPrice) * QUANTITY;
+  return { ...security, current_price:chart.price, quote_time:chart.quote_time, primary_source:chart.source, primary_source_mode:chart.source_mode, day_high:high, day_low:low, secondary_price:null, secondary_time:null, secondary_source:null, max_difference_pct:null, verification:usable?'internally-checked':'price-discrepancy', usable, entry_price:entryPrice, quantity:QUANTITY, position_value:valuationPrice*QUANTITY, unrealized_pnl:pnl, return_pct:entryPrice?pnl/(entryPrice*QUANTITY)*100:0, errors:usable?[]:['price outside reported daily range'] };
+}
+
+async function buildFastQuotes() {
+  const settled = await Promise.allSettled(SECURITIES.map(fetchChart));
+  return settled.map((result, index) => result.status === 'fulfilled' ? finalizeFast(SECURITIES[index], result.value) : fallbackQuote(SECURITIES[index], result.reason));
+}
+
+async function buildDeepQuotes() {
+  return Promise.all(SECURITIES.map(async security => {
+    const [chartResult, googleResult] = await Promise.allSettled([fetchChart(security), fetchGoogleFinance(security)]);
+    if (chartResult.status !== 'fulfilled') return fallbackQuote(security, chartResult.reason);
+    const fast = finalizeFast(security, chartResult.value);
+    if (googleResult.status !== 'fulfilled') return fast;
+    const difference = Math.abs(chartResult.value.price - googleResult.value.price) / chartResult.value.price * 100;
+    const usable = fast.usable && difference <= 3;
+    const entryPrice = ENTRY_PRICES[security.symbol];
+    const valuationPrice = usable ? chartResult.value.price : entryPrice;
+    const pnl = (valuationPrice - entryPrice) * QUANTITY;
+    return { ...fast, secondary_price:googleResult.value.price, secondary_time:googleResult.value.quote_time, secondary_source:googleResult.value.source, max_difference_pct:difference, verification:difference<=1?'double-checked':difference<=3?'checked-with-time-skew':'price-discrepancy', usable, position_value:valuationPrice*QUANTITY, unrealized_pnl:pnl, return_pct:entryPrice?pnl/(entryPrice*QUANTITY)*100:0 };
+  }));
+}
+
+function payloadFor(quotes, durationMs, verified) {
   const totalEntryValue = quotes.reduce((sum, quote) => sum + quote.entry_price * quote.quantity, 0);
   const totalCurrentValue = quotes.reduce((sum, quote) => sum + quote.position_value, 0);
   const totalPnl = totalCurrentValue - totalEntryValue;
@@ -256,58 +104,39 @@ export async function onRequestGet(context) {
     total_entry_value:totalEntryValue,
     total_current_value:totalCurrentValue,
     total_unrealized_pnl:totalPnl,
-    total_return_pct:totalEntryValue ? totalPnl / totalEntryValue * 100 : 0,
-    winners:quotes.filter(quote => quote.unrealized_pnl > 0).length,
-    losers:quotes.filter(quote => quote.unrealized_pnl < 0).length,
-    unchanged:quotes.filter(quote => quote.unrealized_pnl === 0).length,
-    usable_quotes:quotes.filter(quote => quote.usable).length,
-    double_checked:quotes.filter(quote => quote.verification === 'double-checked').length,
-    checked_with_time_skew:quotes.filter(quote => quote.verification === 'checked-with-time-skew').length,
+    total_return_pct:totalEntryValue?totalPnl/totalEntryValue*100:0,
+    winners:quotes.filter(quote=>quote.unrealized_pnl>0).length,
+    losers:quotes.filter(quote=>quote.unrealized_pnl<0).length,
+    unchanged:quotes.filter(quote=>quote.unrealized_pnl===0).length,
+    usable_quotes:quotes.filter(quote=>quote.usable).length,
+    double_checked:quotes.filter(quote=>quote.verification==='double-checked').length,
+    checked_with_time_skew:quotes.filter(quote=>quote.verification==='checked-with-time-skew').length,
   };
-  const generatedAt = new Date().toISOString();
-  const payload = compact ? {
-    generated_at:generatedAt,
-    portfolio,
-    positions:quotes.map(quote => ({
-      symbol:quote.symbol,
-      code:quote.code,
-      name:quote.name,
-      entry_price:quote.entry_price,
-      current_price:quote.current_price,
-      quote_time:quote.quote_time,
-      unrealized_pnl:quote.unrealized_pnl,
-      return_pct:quote.return_pct,
-      verification:quote.verification,
-      usable:quote.usable,
-      max_difference_pct:quote.max_difference_pct,
-      primary_source:quote.primary_source,
-      secondary_source:quote.secondary_source,
-      secondary_price:quote.secondary_price,
-    })),
-  } : {
-    generated_at:generatedAt,
+  const positions = quotes.map(quote => ({ symbol:quote.symbol, code:quote.code, name:quote.name, entry_price:quote.entry_price, current_price:quote.current_price, quote_time:quote.quote_time, unrealized_pnl:quote.unrealized_pnl, return_pct:quote.return_pct, verification:quote.verification, usable:quote.usable, max_difference_pct:quote.max_difference_pct }));
+  return {
+    generated_at:new Date().toISOString(),
     timezone:'Asia/Tokyo',
     refresh_seconds:60,
-    source_policy:{
-      primary:'Yahoo!ファイナンス日本版のリアルタイム表示',
-      secondary:'Yahoo Finance query2分足API（同時実行数2）',
-      additional:'Google Finance（取得可能時）',
-      entry_check:'仮想約定時はYahoo日本版・Google Finance・Yahoo分足APIで照合済み',
-      warning:'取引所認定の直接配信ではなく、配信元により遅延・停止・訂正される場合があります。',
-    },
+    mode:verified?'deep-verified':'fast-chart',
+    source_policy:{ primary:'Yahoo Finance query2 chart API（高速並列）', optional_verification:'verify=1 のみGoogle Finance照合', entry_check:'仮想約定価格は開始時に複数ソースで照合済み', warning:'通常画面は高速な単一チャートソースです。double-checkedとは表示しません。' },
+    timing:{ server_ms:Math.round(durationMs), upstream_timeout_ms:UPSTREAM_TIMEOUT_MS },
     portfolio,
+    positions,
     quotes,
   };
-  const duration = Date.now() - started;
-  const response = Response.json(payload, {
-    headers:{
-      'Cache-Control':'public, max-age=60, s-maxage=120, stale-while-revalidate=300',
-      'Content-Type':'application/json; charset=utf-8',
-      'X-Content-Type-Options':'nosniff',
-      'X-Valuescope-Cache':'MISS',
-      'Server-Timing':`quotes;dur=${duration}, usable;desc="${portfolio.usable_quotes}", checked;desc="${portfolio.double_checked}"`,
-    },
-  });
+}
+
+export async function onRequestGet(context) {
+  const started = Date.now();
+  const requestUrl = new URL(context.request.url);
+  const verified = requestUrl.searchParams.get('verify') === '1';
+  const cacheUrl = new URL(requestUrl.origin + requestUrl.pathname);
+  cacheUrl.searchParams.set('mode', verified ? 'verified' : 'fast');
+  const cacheKey = new Request(cacheUrl.toString(), { method:'GET' });
+  const cached = await caches.default.match(cacheKey);
+  if (cached) return cached;
+  const quotes = verified ? await buildDeepQuotes() : await buildFastQuotes();
+  const response = Response.json(payloadFor(quotes, Date.now()-started, verified), { headers:{ 'Cache-Control':'public, max-age=45, s-maxage=60, stale-while-revalidate=300', 'Content-Type':'application/json; charset=utf-8', 'Server-Timing':`quotes;dur=${Date.now()-started}`, 'X-Content-Type-Options':'nosniff' } });
   context.waitUntil(caches.default.put(cacheKey, response.clone()));
   return response;
 }
