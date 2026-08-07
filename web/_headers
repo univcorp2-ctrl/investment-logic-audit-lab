@@ -1,0 +1,17 @@
+/*.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.css
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/jquants-ranking.json
+  Cache-Control: public, max-age=60, must-revalidate
+
+/data/*
+  Cache-Control: public, max-age=60, must-revalidate
+
+/demo-portfolio.json
+  Cache-Control: public, max-age=60, must-revalidate
