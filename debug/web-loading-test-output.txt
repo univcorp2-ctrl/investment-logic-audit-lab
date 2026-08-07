@@ -1,0 +1,825 @@
+
+> valuescope-japan-web@1.7.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: two-mode boundary assigns 767 to iPhone and 768 to large mode
+ok 1 - two-mode boundary assigns 767 to iPhone and 768 to large mode
+  ---
+  duration_ms: 9.209998
+  type: 'test'
+  ...
+# Subtest: large navigation has six destinations and iPhone navigation has five
+ok 2 - large navigation has six destinations and iPhone navigation has five
+  ---
+  duration_ms: 3.560536
+  type: 'test'
+  ...
+# Subtest: stable section IDs, safe areas and accessible tap targets are present
+ok 3 - stable section IDs, safe areas and accessible tap targets are present
+  ---
+  duration_ms: 4.793564
+  type: 'test'
+  ...
+# Subtest: advanced content uses disclosures and paper-only status remains visible
+ok 4 - advanced content uses disclosures and paper-only status remains visible
+  ---
+  duration_ms: 1.34264
+  type: 'test'
+  ...
+# Subtest: production build loads the authoritative app shell last
+ok 5 - production build loads the authoritative app shell last
+  ---
+  duration_ms: 5.793476
+  type: 'test'
+  ...
+# Subtest: app shell avoids nested main and keeps five primary destinations
+ok 6 - app shell avoids nested main and keeps five primary destinations
+  ---
+  duration_ms: 1.385573
+  type: 'test'
+  ...
+# Subtest: polish layer has separate iPhone iPad and desktop layouts
+ok 7 - polish layer has separate iPhone iPad and desktop layouts
+  ---
+  duration_ms: 0.850049
+  type: 'test'
+  ...
+# Subtest: phone tables are converted to cards with labels
+ok 8 - phone tables are converted to cards with labels
+  ---
+  duration_ms: 2.266248
+  type: 'test'
+  ...
+# Subtest: CSS contains dedicated desktop tablet and phone modes
+ok 9 - CSS contains dedicated desktop tablet and phone modes
+  ---
+  duration_ms: 7.675434
+  type: 'test'
+  ...
+# Subtest: shell source exposes all five primary views
+ok 10 - shell source exposes all five primary views
+  ---
+  duration_ms: 2.038862
+  type: 'test'
+  ...
+# Subtest: viewport modes separate phone tablet and desktop
+ok 11 - viewport modes separate phone tablet and desktop
+  ---
+  duration_ms: 1.1674
+  type: 'test'
+  ...
+# Subtest: view routing preserves screening configuration hash
+ok 12 - view routing preserves screening configuration hash
+  ---
+  duration_ms: 0.476065
+  type: 'test'
+  ...
+# Subtest: direct anchors map to their primary view
+ok 13 - direct anchors map to their primary view
+  ---
+  duration_ms: 0.380223
+  type: 'test'
+  ...
+# Subtest: phone always uses comfortable density
+ok 14 - phone always uses comfortable density
+  ---
+  duration_ms: 0.220046
+  type: 'test'
+  ...
+# Subtest: section map groups existing dynamic modules once
+ok 15 - section map groups existing dynamic modules once
+  ---
+  duration_ms: 1.412453
+  type: 'test'
+  ...
+# Subtest: normalizes J-Quants metadata and reasons
+ok 16 - normalizes J-Quants metadata and reasons
+  ---
+  duration_ms: 1.296361
+  type: 'test'
+  ...
+# Subtest: filters and sorts deterministically
+ok 17 - filters and sorts deterministically
+  ---
+  duration_ms: 0.346303
+  type: 'test'
+  ...
+# Subtest: summaries and CSV contain sanitized display columns
+ok 18 - summaries and CSV contain sanitized display columns
+  ---
+  duration_ms: 0.608452
+  type: 'test'
+  ...
+# Subtest: normalizes transient cache-busting parameters while preserving compact mode
+ok 19 - normalizes transient cache-busting parameters while preserving compact mode
+  ---
+  duration_ms: 1.908047
+  type: 'test'
+  ...
+# Subtest: builds an immediate saved quote fallback from daily report and demo entries
+ok 20 - builds an immediate saved quote fallback from daily report and demo entries
+  ---
+  duration_ms: 0.95813
+  type: 'test'
+  ...
+# file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/data-client.test.mjs:3
+# import { normalizeRequestKey, portfolioStatusText, staleAgeSeconds, summaryFromStatic } from '../data-client-core.js';
+#          ^^^^^^^^^^^^^^^^^^^
+# SyntaxError: The requested module '../data-client-core.js' does not provide an export named 'normalizeRequestKey'
+#     at ModuleJob._instantiate (node:internal/modules/esm/module_job:226:21)
+#     at async ModuleJob.run (node:internal/modules/esm/module_job:335:5)
+#     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+#     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+# Node.js v22.23.1
+# Subtest: tests/data-client.test.mjs
+not ok 7 - tests/data-client.test.mjs
+  ---
+  duration_ms: 47.839013
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/data-client.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: paper decision labels are explicit
+ok 22 - paper decision labels are explicit
+  ---
+  duration_ms: 1.090486
+  type: 'test'
+  ...
+# Subtest: CSV separates fundamental and technical columns
+ok 23 - CSV separates fundamental and technical columns
+  ---
+  duration_ms: 0.704625
+  type: 'test'
+  ...
+# Subtest: plan impact explains upgrade without promising profit
+ok 24 - plan impact explains upgrade without promising profit
+  ---
+  duration_ms: 0.272734
+  type: 'test'
+  ...
+# Subtest: calculates per-position unrealized result
+ok 25 - calculates per-position unrealized result
+  ---
+  duration_ms: 1.373225
+  type: 'test'
+  ...
+# Subtest: aggregates portfolio and falls back to entry on unusable quote
+ok 26 - aggregates portfolio and falls back to entry on unusable quote
+  ---
+  duration_ms: 0.513611
+  type: 'test'
+  ...
+# Subtest: formats Japanese currency and signed percent
+ok 27 - formats Japanese currency and signed percent
+  ---
+  duration_ms: 34.449411
+  type: 'test'
+  ...
+# Subtest: canonical URL removes cache busters and unifies quote mode
+ok 28 - canonical URL removes cache busters and unifies quote mode
+  ---
+  duration_ms: 1.56544
+  type: 'test'
+  ...
+# Subtest: compact quote payload is normalized for all consumers
+ok 29 - compact quote payload is normalized for all consumers
+  ---
+  duration_ms: 0.319113
+  type: 'test'
+  ...
+# Subtest: portfolio status can be synthesized from shared quote payload
+ok 30 - portfolio status can be synthesized from shared quote payload
+  ---
+  duration_ms: 0.491328
+  type: 'test'
+  ...
+# Subtest: static JSON detection is same-origin only
+ok 31 - static JSON detection is same-origin only
+  ---
+  duration_ms: 0.244001
+  type: 'test'
+  ...
+# Subtest: preset applies detailed thresholds and weights
+ok 32 - preset applies detailed thresholds and weights
+  ---
+  duration_ms: 1.000583
+  type: 'test'
+  ...
+# Subtest: Free conservative preset keeps complete strong data and excludes weak data
+ok 33 - Free conservative preset keeps complete strong data and excludes weak data
+  ---
+  duration_ms: 3.81251
+  type: 'test'
+  ...
+# Subtest: missing policy neutral preserves score and exclude rejects enabled missing field
+ok 34 - missing policy neutral preserves score and exclude rejects enabled missing field
+  ---
+  duration_ms: 0.770241
+  type: 'test'
+  ...
+# Subtest: CSV includes raw metrics and no credentials
+ok 35 - CSV includes raw metrics and no credentials
+  ---
+  duration_ms: 0.9039
+  type: 'test'
+  ...
+# Subtest: high and low direction percentiles reward the correct issue
+ok 36 - high and low direction percentiles reward the correct issue
+  ---
+  duration_ms: 2.61164
+  type: 'test'
+  ...
+# Subtest: raw threshold uses display units and missing exclude is respected
+ok 37 - raw threshold uses display units and missing exclude is respected
+  ---
+  duration_ms: 1.385794
+  type: 'test'
+  ...
+# Subtest: cash flow preset enables FCF metrics and formula explains weights
+ok 38 - cash flow preset enables FCF metrics and formula explains weights
+  ---
+  duration_ms: 0.74202
+  type: 'test'
+  ...
+# Subtest: contributions sum to custom score and CSV is secret-free
+ok 39 - contributions sum to custom score and CSV is secret-free
+  ---
+  duration_ms: 0.834777
+  type: 'test'
+  ...
+# Subtest: raw fundamental metrics are converted to percentages
+ok 40 - raw fundamental metrics are converted to percentages
+  ---
+  duration_ms: 1.558189
+  type: 'test'
+  ...
+# Subtest: quality preset filters weak company
+ok 41 - quality preset filters weak company
+  ---
+  duration_ms: 1.785015
+  type: 'test'
+  ...
+# Subtest: missing exclude rejects missing ROE when ROE threshold is active
+ok 42 - missing exclude rejects missing ROE when ROE threshold is active
+  ---
+  duration_ms: 2.531361
+  type: 'test'
+  ...
+# Subtest: composite respects user weights
+ok 43 - composite respects user weights
+  ---
+  duration_ms: 0.307756
+  type: 'test'
+  ...
+# Subtest: shared data client is loaded before live-data startup modules
+not ok 44 - shared data client is loaded before live-data startup modules
+  ---
+  duration_ms: 15.248116
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/loading-performance.test.mjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(client >= 0)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/loading-performance.test.mjs:12:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: data client includes in-flight deduplication timeout fallback and background refresh
+ok 45 - data client includes in-flight deduplication timeout fallback and background refresh
+  ---
+  duration_ms: 20.95963
+  type: 'test'
+  ...
+# Subtest: quote function has bounded concurrency stable cache and partial response
+ok 46 - quote function has bounded concurrency stable cache and partial response
+  ---
+  duration_ms: 2.817846
+  type: 'test'
+  ...
+# Subtest: performance analytics module loads and preserves missing values
+ok 47 - performance analytics module loads and preserves missing values
+  ---
+  duration_ms: 1.852665
+  type: 'test'
+  ...
+# Subtest: one observation is not converted into fake returns
+ok 48 - one observation is not converted into fake returns
+  ---
+  duration_ms: 2.595756
+  type: 'test'
+  ...
+# Subtest: range filtering preserves observed points only
+ok 49 - range filtering preserves observed points only
+  ---
+  duration_ms: 10.841036
+  type: 'test'
+  ...
+# Subtest: adjustable settings recalculate risk reward and ratios
+ok 50 - adjustable settings recalculate risk reward and ratios
+  ---
+  duration_ms: 2.272918
+  type: 'test'
+  ...
+# Subtest: chart modes and CSV expose all series without secrets
+ok 51 - chart modes and CSV expose all series without secrets
+  ---
+  duration_ms: 0.470277
+  type: 'test'
+  ...
+# Subtest: period filter keeps recent points
+ok 52 - period filter keeps recent points
+  ---
+  duration_ms: 2.067103
+  type: 'test'
+  ...
+# Subtest: live equity is appended using entry basis
+ok 53 - live equity is appended using entry basis
+  ---
+  duration_ms: 0.782259
+  type: 'test'
+  ...
+# Subtest: metric state preserves insufficient history
+ok 54 - metric state preserves insufficient history
+  ---
+  duration_ms: 0.331051
+  type: 'test'
+  ...
+# Subtest: contribution view prefers live quote P&L
+ok 55 - contribution view prefers live quote P&L
+  ---
+  duration_ms: 0.461775
+  type: 'test'
+  ...
+# Subtest: chart bounds include zero when requested
+ok 56 - chart bounds include zero when requested
+  ---
+  duration_ms: 0.413743
+  type: 'test'
+  ...
+# Subtest: fetch coordinator is inserted before quote-consuming scripts
+not ok 57 - fetch coordinator is inserted before quote-consuming scripts
+  ---
+  duration_ms: 17.659179
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/performance-loading.test.mjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(coordinator>=0)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/performance-loading.test.mjs:15:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: coordinator provides one shared compact quote request and timeout
+ok 58 - coordinator provides one shared compact quote request and timeout
+  ---
+  duration_ms: 3.526355
+  type: 'test'
+  ...
+# Subtest: fast bootstrap displays static daily data before live quotes
+ok 59 - fast bootstrap displays static daily data before live quotes
+  ---
+  duration_ms: 2.103727
+  type: 'test'
+  ...
+# Subtest: quote API uses bounded parallel fast path
+not ok 60 - quote API uses bounded parallel fast path
+  ---
+  duration_ms: 8.724669
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/quote-api-performance.test.mjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Promise\.allSettled\(SECURITIES\.map\(fetchChart\)\)/. Input:
+    
+    'const SECURITIES = Object.freeze([\n' +
+      "  { symbol:'8035.T', code:'8035', name:'東京エレクトロン' },\n" +
+      "  { symbol:'6857.T', code:'6857', name:'アドバンテスト' },\n" +
+      "  { symbol:'5803.T', code:'5803', name:'フジクラ' },\n" +
+      "  { symbol:'5016.T', code:'5016', name:'JX金属' },\n" +
+      "  { symbol:'6920.T', code:'6920', name:'レーザーテック' },\n" +
+      "  { symbol:'9983.T', code:'9983', name:'ファーストリテイリング' },\n" +
+      "  { symbol:'7974.T', code:'7974', name:'任天堂' },\n" +
+      "  { symbol:'285A.T', code:'285A', name:'キオクシアホールディングス' },\n" +
+      "  { symbol:'9984.T', code:'9984', name:'ソフトバンクグループ' },\n" +
+      "  { symbol:'5706.T', code:'5706', name:'三井金属' },\n" +
+      ']);\n' +
+      "const ENTRY_PRICES = Object.freeze({'8035.T':54720,'6857.T':31260,'5803.T':4294,'5016.T':3827,'6920.T':41060,'9983.T':79030,'7974.T':7588,'285A.T':49190,'9984.T':5412,'5706.T':30840});\n" +
+      'const QUANTITY = 100;\n' +
+      'const SOURCE_TIMEOUT_MS = 2800;\n' +
+      'const CONCURRENCY = 4;\n' +
+      '\n' +
+      'const cleanNumber = value => {\n' +
+      "  if (value === null || value === undefined || String(value).trim() === '') return null;\n" +
+      "  const parsed = Number(String(value).replaceAll(',', ''));\n" +
+      '  return Number.isFinite(parsed) ? parsed : null;\n' +
+      '};\n' +
+      "const decode = text => text.replaceAll('&nbsp;',' ').replaceAll('&amp;','&').replaceAll('&#x2F;','/').replaceAll('&#47;','/').replaceAll('&minus;','-').replaceAll('−','-');\n" +
+      "const stripHtml = html => decode(html).replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi,' ').replace(/<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/\\s+/g,' ').trim();\n" +
+      'const tokyoDate = () => {\n' +
+      "  const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());\n" +
+      '  const value = type => parts.find(part => part.type === type)?.value;\n' +
+      "  return `${value('year')}-${value('month')}-${value('day')}`;\n" +
+      '};\n' +
+      'const timeToIso = time => time ? `${tokyoDate()}T${time}:00+09:00` : null;\n' +
+      "const settled = result => result.status === 'fulfilled' ? result.value : null;\n" +
+      "const errorName = result => result.status === 'rejected' ? String(result.reason?.message ?? result.reason ?? 'unknown error') : null;\n" +
+      '\n' +
+      'async function fetchWithTimeout(url, init = {}, timeoutMs = SOURCE_TIMEOUT_MS) {\n' +
+      '  const controller = new AbortController();\n' +
+      '  const timer = setTimeout(() => controller.abort(), timeoutMs);\n' +
+      '  try {\n' +
+      '    return await fetch(url, { ...init, signal: controller.signal });\n' +
+      '  } finally {\n' +
+      '    clearTimeout(timer);\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'function parseYahooJapan(html) {\n' +
+      '  const text = stripHtml(html);\n' +
+      '  const priceMatch = text.match(/([0-9]{1,3}(?:,[0-9]{3})*(?:\\.[0-9]+)?)\\s*前日比[\\s\\S]{0,160}?リアルタイム株価\\s*(\\d{1,2}:\\d{2})/);\n' +
+      "  if (!priceMatch) throw new Error('Yahoo Japan quote pattern not found');\n" +
+      '  const highMatch = text.match(/高値\\s*(?:用語\\s*)?([0-9]{1,3}(?:,[0-9]{3})*(?:\\.[0-9]+)?)\\s*\\((\\d{1,2}:\\d{2})\\)/);\n' +
+      '  const lowMatch = text.match(/安値\\s*(?:用語\\s*)?([0-9]{1,3}(?:,[0-9]{3})*(?:\\.[0-9]+)?)\\s*\\((\\d{1,2}:\\d{2})\\)/);\n' +
+      '  const price = cleanNumber(priceMatch[1]);\n' +
+      '  const dayHigh = cleanNumber(highMatch?.[1]);\n' +
+      '  const dayLow = cleanNumber(lowMatch?.[1]);\n' +
+      "  return { price, quote_time:timeToIso(priceMatch[2]), day_high:dayHigh, day_low:dayLow, in_day_range:price !== null && (dayHigh === null || price <= dayHigh) && (dayLow === null || price >= dayLow), source:'Yahoo!ファイナンス日本版', source_mode:'realtime-labelled' };\n" +
+      '}\n' +
+      '\n' +
+      'async function fetchYahooJapan(security) {\n' +
+      "  const response = await fetchWithTimeout(`https://finance.yahoo.co.jp/quote/${security.symbol}`, { headers:{Accept:'text/html,application/xhtml+xml','Accept-Language':'ja-JP,ja;q=0.9','User-Agent':'Mozilla/5.0 (compatible; ValueScopeDemo/2.0)'} });\n" +
+      '  if (!response.ok) throw new Error(`Yahoo Japan HTTP ${response.status}`);\n' +
+      '  return parseYahooJapan(await response.text());\n' +
+      '}\n' +
+      'async function fetchGoogleFinance(security) {\n' +
+      "  const response = await fetchWithTimeout(`https://www.google.com/finance/quote/${security.code}:TYO?hl=ja`, { headers:{Accept:'text/html,application/xhtml+xml','Accept-Language':'ja-JP,ja;q=0.9','User-Agent':'Mozilla/5.0 (compatible; ValueScopeDemo/2.0)'} });\n" +
+      '  if (!response.ok) throw new Error(`Google Finance HTTP ${response.status}`);\n' +
+      '  const html = await response.text();\n' +
+      `  const patterns = [/data-last-price=["']?([0-9.]+)/i, /<[^>]*class=["'][^"']*YMlKec[^"']*["'][^>]*>\\s*[¥￥]?\\s*([0-9,.]+)/i];\n` +
+      '  let price = null;\n' +
+      '  for (const pattern of patterns) { price = cleanNumber(html.match(pattern)?.[1]); if (price !== null) break; }\n' +
+      "  if (price === null) throw new Error('Google Finance quote pattern not found');\n" +
+      `  const timestamp = html.match(/data-last-normal-market-timestamp=["']?([0-9]+)/i)?.[1];\n` +
+      "  return { price, quote_time:timestamp ? new Date(Number(timestamp) * 1000).toISOString() : null, source:'Google Finance', source_mode:'secondary-check' };\n" +
+      '}\n' +
+      'async function fetchYahooChart(security) {\n' +
+      "  const response = await fetchWithTimeout(`https://query2.finance.yahoo.com/v8/finance/chart/${security.symbol}?interval=1m&range=1d&includePrePost=false`, { headers:{Accept:'application/json','User-Agent':'Mozilla/5.0 (compatible; ValueScopeDemo/2.0)'} });\n" +
+      '  if (!response.ok) throw new Error(`Yahoo chart HTTP ${response.status}`);\n' +
+      '  const result = (await response.json())?.chart?.result?.[0];\n' +
+      '  const meta = result?.meta;\n' +
+      "  if (!meta) throw new Error('Yahoo chart result empty');\n" +
+      "  return { price:cleanNumber(meta.regularMarketPrice), quote_time:Number.isFinite(Number(meta.regularMarketTime)) ? new Date(Number(meta.regularMarketTime) * 1000).toISOString() : null, day_high:cleanNumber(meta.regularMarketDayHigh), day_low:cleanNumber(meta.regularMarketDayLow), source:'Yahoo Finance chart API', source_mode:'minute-chart-check' };\n" +
+      '}\n' +
+      '\n' +
+      'function finalizeQuote(security, yahooResult, googleResult, chartResult) {\n' +
+      '  const yahoo = settled(yahooResult);\n' +
+      '  const google = settled(googleResult);\n' +
+      '  const chart = settled(chartResult);\n' +
+      '  const sourceErrors = [errorName(yahooResult), errorName(googleResult), errorName(chartResult)].filter(Boolean);\n' +
+      '  const primary = yahoo ?? chart ?? google;\n' +
+      '  const entryPrice = ENTRY_PRICES[security.symbol];\n' +
+      "  if (!primary?.price) return { ...security, current_price:null, usable:false, verification:'unavailable', entry_price:entryPrice, quantity:QUANTITY, position_value:entryPrice * QUANTITY, unrealized_pnl:0, return_pct:0, errors:sourceErrors };\n" +
+      '  const checks = [yahoo, google, chart].filter(item => item && item !== primary && cleanNumber(item.price) !== null);\n' +
+      '  const differences = checks.map(check => Math.abs(primary.price - check.price) / primary.price * 100);\n' +
+      '  const maxDifference = differences.length ? Math.max(...differences) : null;\n' +
+      '  const discrepancy = maxDifference !== null && maxDifference > 3;\n' +
+      '  const dayHigh = yahoo?.day_high ?? chart?.day_high ?? null;\n' +
+      '  const dayLow = yahoo?.day_low ?? chart?.day_low ?? null;\n' +
+      '  const inRange = (dayHigh === null || primary.price <= dayHigh) && (dayLow === null || primary.price >= dayLow);\n' +
+      '  const usable = inRange && !discrepancy;\n' +
+      "  let verification = 'single-source';\n" +
+      "  if (checks.length && maxDifference !== null && maxDifference <= 1) verification = 'double-checked';\n" +
+      "  else if (checks.length && maxDifference !== null && maxDifference <= 3) verification = 'checked-with-time-skew';\n" +
+      "  else if (discrepancy) verification = 'price-discrepancy';\n" +
+      '  const secondary = google && google !== primary ? google : chart && chart !== primary ? chart : yahoo && yahoo !== primary ? yahoo : null;\n' +
+      '  const valuationPrice = usable ? primary.price : entryPrice;\n' +
+      '  const pnl = (valuationPrice - entryPrice) * QUANTITY;\n' +
+      '  return { ...security, current_price:primary.price, quote_time:primary.quote_time, primary_source:primary.source, primary_source_mode:primary.source_mode, day_high:dayHigh, day_low:dayLow, secondary_price:secondary?.price ?? null, secondary_time:secondary?.quote_time ?? null, secondary_source:secondary?.source ?? null, max_difference_pct:maxDifference, verification, usable, entry_price:entryPrice, quantity:QUANTITY, position_value:valuationPrice * QUANTITY, unrealized_pnl:pnl, return_pct:entryPrice ? pnl / (entryPrice * QUANTITY) * 100 : 0, errors:sourceErrors };\n' +
+      '}\n' +
+      '\n' +
+      'async function buildQuote(security) {\n' +
+      '  const [yahooResult, googleResult, chartResult] = await Promise.allSettled([fetchYahooJapan(security), fetchGoogleFinance(security), fetchYahooChart(security)]);\n' +
+      '  return finalizeQuote(security, yahooResult, googleResult, chartResult);\n' +
+      '}\n' +
+      '\n' +
+      'async function mapWithConcurrency(items, limit, mapper) {\n' +
+      '  const results = new Array(items.length);\n' +
+      '  let nextIndex = 0;\n' +
+      '  const worker = async () => {\n' +
+      '    while (nextIndex < items.length) {\n' +
+      '      const index = nextIndex++;\n' +
+      '      try { results[index] = await mapper(items[index], index); }\n' +
+      "      catch (error) { results[index] = { ...items[index], current_price:null, usable:false, verification:'unavailable', entry_price:ENTRY_PRICES[items[index].symbol], quantity:QUANTITY, position_value:ENTRY_PRICES[items[index].symbol] * QUANTITY, unrealized_pnl:0, return_pct:0, errors:[String(error?.message ?? error)] }; }\n" +
+      '    }\n' +
+      '  };\n' +
+      '  await Promise.all(Array.from({ length:Math.min(limit, items.length) }, worker));\n' +
+      '  return results;\n' +
+      '}\n' +
+      '\n' +
+      'function compactPayload(full) {\n' +
+      '  return { generated_at:full.generated_at, timezone:full.timezone, refresh_seconds:full.refresh_seconds, source_policy:full.source_policy, source_status:full.source_status, partial:full.partial, portfolio:full.portfolio, positions:full.quotes.map(quote => ({ symbol:quote.symbol, code:quote.code, name:quote.name, entry_price:quote.entry_price, current_price:quote.current_price, quote_time:quote.quote_time, unrealized_pnl:quote.unrealized_pnl, return_pct:quote.return_pct, verification:quote.verification, usable:quote.usable, max_difference_pct:quote.max_difference_pct, primary_source:quote.primary_source, secondary_source:quote.secondary_source, errors:quote.errors ?? [] })) };\n' +
+      '}\n' +
+      '\n' +
+      'export async function onRequestGet(context) {\n' +
+      '  const requestUrl = new URL(context.request.url);\n' +
+      "  const compact = requestUrl.searchParams.get('compact') === '1';\n" +
+      "  const force = requestUrl.searchParams.get('force') === '1';\n" +
+      '  const cacheUrl = new URL(requestUrl.origin + requestUrl.pathname);\n' +
+      '  cacheUrl.searc'... 2254 more characters
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    const SECURITIES = Object.freeze([
+      { symbol:'8035.T', code:'8035', name:'東京エレクトロン' },
+      { symbol:'6857.T', code:'6857', name:'アドバンテスト' },
+      { symbol:'5803.T', code:'5803', name:'フジクラ' },
+      { symbol:'5016.T', code:'5016', name:'JX金属' },
+      { symbol:'6920.T', code:'6920', name:'レーザーテック' },
+      { symbol:'9983.T', code:'9983', name:'ファーストリテイリング' },
+      { symbol:'7974.T', code:'7974', name:'任天堂' },
+      { symbol:'285A.T', code:'285A', name:'キオクシアホールディングス' },
+      { symbol:'9984.T', code:'9984', name:'ソフトバンクグループ' },
+      { symbol:'5706.T', code:'5706', name:'三井金属' },
+    ]);
+    const ENTRY_PRICES = Object.freeze({'8035.T':54720,'6857.T':31260,'5803.T':4294,'5016.T':3827,'6920.T':41060,'9983.T':79030,'7974.T':7588,'285A.T':49190,'9984.T':5412,'5706.T':30840});
+    const QUANTITY = 100;
+    const SOURCE_TIMEOUT_MS = 2800;
+    const CONCURRENCY = 4;
+    
+    const cleanNumber = value => {
+      if (value === null || value === undefined || String(value).trim() === '') return null;
+      const parsed = Number(String(value).replaceAll(',', ''));
+      return Number.isFinite(parsed) ? parsed : null;
+    };
+    const decode = text => text.replaceAll('&nbsp;',' ').replaceAll('&amp;','&').replaceAll('&#x2F;','/').replaceAll('&#47;','/').replaceAll('&minus;','-').replaceAll('−','-');
+    const stripHtml = html => decode(html).replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,' ').replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+    const tokyoDate = () => {
+      const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+      const value = type => parts.find(part => part.type === type)?.value;
+      return `${value('year')}-${value('month')}-${value('day')}`;
+    };
+    const timeToIso = time => time ? `${tokyoDate()}T${time}:00+09:00` : null;
+    const settled = result => result.status === 'fulfilled' ? result.value : null;
+    const errorName = result => result.status === 'rejected' ? String(result.reason?.message ?? result.reason ?? 'unknown error') : null;
+    
+    async function fetchWithTimeout(url, init = {}, timeoutMs = SOURCE_TIMEOUT_MS) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        return await fetch(url, { ...init, signal: controller.signal });
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+    
+    function parseYahooJapan(html) {
+      const text = stripHtml(html);
+      const priceMatch = text.match(/([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*前日比[\s\S]{0,160}?リアルタイム株価\s*(\d{1,2}:\d{2})/);
+      if (!priceMatch) throw new Error('Yahoo Japan quote pattern not found');
+      const highMatch = text.match(/高値\s*(?:用語\s*)?([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*\((\d{1,2}:\d{2})\)/);
+      const lowMatch = text.match(/安値\s*(?:用語\s*)?([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*\((\d{1,2}:\d{2})\)/);
+      const price = cleanNumber(priceMatch[1]);
+      const dayHigh = cleanNumber(highMatch?.[1]);
+      const dayLow = cleanNumber(lowMatch?.[1]);
+      return { price, quote_time:timeToIso(priceMatch[2]), day_high:dayHigh, day_low:dayLow, in_day_range:price !== null && (dayHigh === null || price <= dayHigh) && (dayLow === null || price >= dayLow), source:'Yahoo!ファイナンス日本版', source_mode:'realtime-labelled' };
+    }
+    
+    async function fetchYahooJapan(security) {
+      const response = await fetchWithTimeout(`https://finance.yahoo.co.jp/quote/${security.symbol}`, { headers:{Accept:'text/html,application/xhtml+xml','Accept-Language':'ja-JP,ja;q=0.9','User-Agent':'Mozilla/5.0 (compatible; ValueScopeDemo/2.0)'} });
+      if (!response.ok) throw new Error(`Yahoo Japan HTTP ${response.status}`);
+      return parseYahooJapan(await response.text());
+    }
+    async function fetchGoogleFinance(security) {
+      const response = await fetchWithTimeout(`https://www.google.com/finance/quote/${security.code}:TYO?hl=ja`, { headers:{Accept:'text/html,application/xhtml+xml','Accept-Language':'ja-JP,ja;q=0.9','User-Agent':'Mozilla/5.0 (compatible; ValueScopeDemo/2.0)'} });
+      if (!response.ok) throw new Error(`Google Finance HTTP ${response.status}`);
+      const html = await response.text();
+      const patterns = [/data-last-price=["']?([0-9.]+)/i, /<[^>]*class=["'][^"']*YMlKec[^"']*["'][^>]*>\s*[¥￥]?\s*([0-9,.]+)/i];
+      let price = null;
+      for (const pattern of patterns) { price = cleanNumber(html.match(pattern)?.[1]); if (price !== null) break; }
+      if (price === null) throw new Error('Google Finance quote pattern not found');
+      const timestamp = html.match(/data-last-normal-market-timestamp=["']?([0-9]+)/i)?.[1];
+      return { price, quote_time:timestamp ? new Date(Number(timestamp) * 1000).toISOString() : null, source:'Google Finance', source_mode:'secondary-check' };
+    }
+    async function fetchYahooChart(security) {
+      const response = await fetchWithTimeout(`https://query2.finance.yahoo.com/v8/finance/chart/${security.symbol}?interval=1m&range=1d&includePrePost=false`, { headers:{Accept:'application/json','User-Agent':'Mozilla/5.0 (compatible; ValueScopeDemo/2.0)'} });
+      if (!response.ok) throw new Error(`Yahoo chart HTTP ${response.status}`);
+      const result = (await response.json())?.chart?.result?.[0];
+      const meta = result?.meta;
+      if (!meta) throw new Error('Yahoo chart result empty');
+      return { price:cleanNumber(meta.regularMarketPrice), quote_time:Number.isFinite(Number(meta.regularMarketTime)) ? new Date(Number(meta.regularMarketTime) * 1000).toISOString() : null, day_high:cleanNumber(meta.regularMarketDayHigh), day_low:cleanNumber(meta.regularMarketDayLow), source:'Yahoo Finance chart API', source_mode:'minute-chart-check' };
+    }
+    
+    function finalizeQuote(security, yahooResult, googleResult, chartResult) {
+      const yahoo = settled(yahooResult);
+      const google = settled(googleResult);
+      const chart = settled(chartResult);
+      const sourceErrors = [errorName(yahooResult), errorName(googleResult), errorName(chartResult)].filter(Boolean);
+      const primary = yahoo ?? chart ?? google;
+      const entryPrice = ENTRY_PRICES[security.symbol];
+      if (!primary?.price) return { ...security, current_price:null, usable:false, verification:'unavailable', entry_price:entryPrice, quantity:QUANTITY, position_value:entryPrice * QUANTITY, unrealized_pnl:0, return_pct:0, errors:sourceErrors };
+      const checks = [yahoo, google, chart].filter(item => item && item !== primary && cleanNumber(item.price) !== null);
+      const differences = checks.map(check => Math.abs(primary.price - check.price) / primary.price * 100);
+      const maxDifference = differences.length ? Math.max(...differences) : null;
+      const discrepancy = maxDifference !== null && maxDifference > 3;
+      const dayHigh = yahoo?.day_high ?? chart?.day_high ?? null;
+      const dayLow = yahoo?.day_low ?? chart?.day_low ?? null;
+      const inRange = (dayHigh === null || primary.price <= dayHigh) && (dayLow === null || primary.price >= dayLow);
+      const usable = inRange && !discrepancy;
+      let verification = 'single-source';
+      if (checks.length && maxDifference !== null && maxDifference <= 1) verification = 'double-checked';
+      else if (checks.length && maxDifference !== null && maxDifference <= 3) verification = 'checked-with-time-skew';
+      else if (discrepancy) verification = 'price-discrepancy';
+      const secondary = google && google !== primary ? google : chart && chart !== primary ? chart : yahoo && yahoo !== primary ? yahoo : null;
+      const valuationPrice = usable ? primary.price : entryPrice;
+      const pnl = (valuationPrice - entryPrice) * QUANTITY;
+      return { ...security, current_price:primary.price, quote_time:primary.quote_time, primary_source:primary.source, primary_source_mode:primary.source_mode, day_high:dayHigh, day_low:dayLow, secondary_price:secondary?.price ?? null, secondary_time:secondary?.quote_time ?? null, secondary_source:secondary?.source ?? null, max_difference_pct:maxDifference, verification, usable, entry_price:entryPrice, quantity:QUANTITY, position_value:valuationPrice * QUANTITY, unrealized_pnl:pnl, return_pct:entryPrice ? pnl / (entryPrice * QUANTITY) * 100 : 0, errors:sourceErrors };
+    }
+    
+    async function buildQuote(security) {
+      const [yahooResult, googleResult, chartResult] = await Promise.allSettled([fetchYahooJapan(security), fetchGoogleFinance(security), fetchYahooChart(security)]);
+      return finalizeQuote(security, yahooResult, googleResult, chartResult);
+    }
+    
+    async function mapWithConcurrency(items, limit, mapper) {
+      const results = new Array(items.length);
+      let nextIndex = 0;
+      const worker = async () => {
+        while (nextIndex < items.length) {
+          const index = nextIndex++;
+          try { results[index] = await mapper(items[index], index); }
+          catch (error) { results[index] = { ...items[index], current_price:null, usable:false, verification:'unavailable', entry_price:ENTRY_PRICES[items[index].symbol], quantity:QUANTITY, position_value:ENTRY_PRICES[items[index].symbol] * QUANTITY, unrealized_pnl:0, return_pct:0, errors:[String(error?.message ?? error)] }; }
+        }
+      };
+      await Promise.all(Array.from({ length:Math.min(limit, items.length) }, worker));
+      return results;
+    }
+    
+    function compactPayload(full) {
+      return { generated_at:full.generated_at, timezone:full.timezone, refresh_seconds:full.refresh_seconds, source_policy:full.source_policy, source_status:full.source_status, partial:full.partial, portfolio:full.portfolio, positions:full.quotes.map(quote => ({ symbol:quote.symbol, code:quote.code, name:quote.name, entry_price:quote.entry_price, current_price:quote.current_price, quote_time:quote.quote_time, unrealized_pnl:quote.unrealized_pnl, return_pct:quote.return_pct, verification:quote.verification, usable:quote.usable, max_difference_pct:quote.max_difference_pct, primary_source:quote.primary_source, secondary_source:quote.secondary_source, errors:quote.errors ?? [] })) };
+    }
+    
+    export async function onRequestGet(context) {
+      const requestUrl = new URL(context.request.url);
+      const compact = requestUrl.searchParams.get('compact') === '1';
+      const force = requestUrl.searchParams.get('force') === '1';
+      const cacheUrl = new URL(requestUrl.origin + requestUrl.pathname);
+      cacheUrl.searchParams.set('mode', compact ? 'compact' : 'full');
+      const cacheKey = new Request(cacheUrl.toString(), { method:'GET' });
+      if (!force) {
+        const cached = await caches.default.match(cacheKey);
+        if (cached) return cached;
+      }
+      const quotes = await mapWithConcurrency(SECURITIES, CONCURRENCY, buildQuote);
+      const totalEntryValue = quotes.reduce((sum, quote) => sum + quote.entry_price * quote.quantity, 0);
+      const totalCurrentValue = quotes.reduce((sum, quote) => sum + quote.position_value, 0);
+      const totalPnl = totalCurrentValue - totalEntryValue;
+      const usable = quotes.filter(quote => quote.usable).length;
+      const failed = quotes.filter(quote => quote.current_price === null).length;
+      const sourceErrors = quotes.reduce((sum, quote) => sum + (quote.errors?.length ?? 0), 0);
+      const full = {
+        generated_at:new Date().toISOString(),
+        timezone:'Asia/Tokyo',
+        refresh_seconds:60,
+        source_policy:{ primary:'Yahoo!ファイナンス日本版', secondary:'Yahoo Finance chart / Google Finance', validation:'3%超の価格差は評価へ不使用', warning:'公開データは遅延・停止・訂正される場合があります。' },
+        source_status:{ usable, failed, total:quotes.length, source_errors:sourceErrors, concurrency:CONCURRENCY, timeout_ms:SOURCE_TIMEOUT_MS },
+        partial:usable < quotes.length,
+        portfolio:{ total_entry_value:totalEntryValue, total_current_value:totalCurrentValue, total_unrealized_pnl:totalPnl, total_return_pct:totalEntryValue ? totalPnl / totalEntryValue * 100 : 0, winners:quotes.filter(quote => quote.unrealized_pnl > 0).length, losers:quotes.filter(quote => quote.unrealized_pnl < 0).length, unchanged:quotes.filter(quote => quote.unrealized_pnl === 0).length, usable_quotes:usable, double_checked:quotes.filter(quote => quote.verification === 'double-checked').length, checked_with_time_skew:quotes.filter(quote => quote.verification === 'checked-with-time-skew').length },
+        quotes,
+      };
+      const payload = compact ? compactPayload(full) : full;
+      const response = Response.json(payload, { headers:{ 'Cache-Control':'public, max-age=45, s-maxage=55, stale-while-revalidate=120', 'Content-Type':'application/json; charset=utf-8', 'X-Content-Type-Options':'nosniff' } });
+      if (usable > 0) context.waitUntil(caches.default.put(cacheKey, response.clone()));
+      return response;
+    }
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/quote-api-performance.test.mjs:10:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: data client is injected before consumers
+ok 61 - data client is injected before consumers
+  ---
+  duration_ms: 4.850678
+  type: 'test'
+  ...
+# Subtest: responsive layer includes iPhone breakpoint and safe areas
+ok 62 - responsive layer includes iPhone breakpoint and safe areas
+  ---
+  duration_ms: 8.407564
+  type: 'test'
+  ...
+# Subtest: responsive script installs viewport indicator and five mobile destinations
+ok 63 - responsive script installs viewport indicator and five mobile destinations
+  ---
+  duration_ms: 5.106978
+  type: 'test'
+  ...
+# Subtest: risk diagnostics module loads with stable default limits
+ok 64 - risk diagnostics module loads with stable default limits
+  ---
+  duration_ms: 0.919924
+  type: 'test'
+  ...
+# Subtest: robust score ranks quality value above trap
+ok 65 - robust score ranks quality value above trap
+  ---
+  duration_ms: 4.619085
+  type: 'test'
+  ...
+# Subtest: missing metrics are not converted to zero
+ok 66 - missing metrics are not converted to zero
+  ---
+  duration_ms: 0.726777
+  type: 'test'
+  ...
+# Subtest: weights must sum to 100
+ok 67 - weights must sum to 100
+  ---
+  duration_ms: 0.53966
+  type: 'test'
+  ...
+# Subtest: csv parser and exporter preserve quoted values
+ok 68 - csv parser and exporter preserve quoted values
+  ---
+  duration_ms: 0.713257
+  type: 'test'
+  ...
+# Subtest: summary reports eligible and median
+ok 69 - summary reports eligible and median
+  ---
+  duration_ms: 2.679841
+  type: 'test'
+  ...
+# Subtest: merges ranking and daily technical data
+ok 70 - merges ranking and daily technical data
+  ---
+  duration_ms: 1.331763
+  type: 'test'
+  ...
+# Subtest: Free safe preset excludes weak record
+ok 71 - Free safe preset excludes weak record
+  ---
+  duration_ms: 2.196195
+  type: 'test'
+  ...
+# Subtest: missing policy neutral produces score while exclude rejects
+ok 72 - missing policy neutral produces score while exclude rejects
+  ---
+  duration_ms: 0.312203
+  type: 'test'
+  ...
+# Subtest: CSV contains separate pillars and no secrets
+ok 73 - CSV contains separate pillars and no secrets
+  ---
+  duration_ms: 0.547822
+  type: 'test'
+  ...
+# Subtest: insufficient history cannot be promoted
+ok 74 - insufficient history cannot be promoted
+  ---
+  duration_ms: 0.884481
+  type: 'test'
+  ...
+# Subtest: research CSV exposes baseline comparison and no secrets
+ok 75 - research CSV exposes baseline comparison and no secrets
+  ---
+  duration_ms: 0.448795
+  type: 'test'
+  ...
+1..75
+# tests 75
+# suites 0
+# pass 71
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 621.076958
+exit_code=1
