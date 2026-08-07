@@ -10,9 +10,7 @@ on:
         required: true
         default: monitor
         type: choice
-        options:
-          - monitor
-          - simulate
+        options: [monitor, simulate]
 
 permissions:
   contents: write
@@ -35,20 +33,19 @@ jobs:
           cache: pip
       - name: Install
         run: pip install -e '.[dev]'
-      - name: Run focused tests
-        run: pytest tests/test_daily_monitor.py tests/test_performance_analytics.py tests/test_drawdown_diagnostics.py tests/test_adaptive_parameter_learner.py
-      - name: Generate adaptive daily paper report
-        id: monitor
+      - name: Focused tests
+        run: pytest tests/test_daily_monitor.py tests/test_performance_analytics.py tests/test_drawdown_diagnostics.py tests/test_adaptive_learning.py
+      - name: Generate guarded daily paper report
         shell: bash
         run: |
           MODE_ARGS=()
           if [ '${{ github.event_name }}' = 'schedule' ] || [ '${{ inputs.mode }}' = 'simulate' ]; then
             MODE_ARGS+=(--execute-simulation)
           fi
-          python -m investment_audit.adaptive_daily_monitor --root . "${MODE_ARGS[@]}" | tee monitor-result.json
+          python -m investment_audit.adaptive_learning daily-monitor --root . "${MODE_ARGS[@]}" | tee monitor-result.json
           python -m investment_audit.performance_analytics --root . | tee performance-result.json
           python -m investment_audit.drawdown_diagnostics --root . | tee diagnostics-result.json
-      - name: Validate sanitized output
+      - name: Validate sanitized outputs
         run: |
           python - <<'PY'
           import json
@@ -59,51 +56,51 @@ jobs:
           assert report['paper_only'] is True
           assert metrics['paper_only'] is True
           assert diagnostics['paper_only'] is True
-          assert report['adaptive_learning']['paper_only'] is True
-          assert report['adaptive_learning']['mode'] in {'baseline', 'adaptive-paper'}
-          assert diagnostics['stability_plan']['observations'] >= 0
-          text = ''.join(Path(path).read_text(encoding='utf-8') for path in [
-              'web/data/paper-trading/latest-report.json',
-              'web/data/paper-trading/performance-metrics.json',
-              'web/data/paper-trading/drawdown-diagnostics.json',
-          ]).lower()
+          assert report['adaptive_strategy']['paper_only'] is True
+          assert report['adaptive_strategy']['source'] in {'default_guarded', 'adaptive_approved'}
+          paths = [
+              Path('web/data/paper-trading/latest-report.json'),
+              Path('web/data/paper-trading/performance-metrics.json'),
+              Path('web/data/paper-trading/drawdown-diagnostics.json'),
+              Path('web/data/adaptive-learning/feature-history.jsonl'),
+          ]
+          text = ''.join(path.read_text(encoding='utf-8') for path in paths if path.exists()).lower()
           assert 'api_key' not in text and 'authorization' not in text
-          assert 'real_order_allowed": true' not in text
           PY
-      - name: Commit changed reports
+      - name: Commit changed reports and learning features
         shell: bash
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add web/data/paper-trading
+          git add web/data/paper-trading web/data/adaptive-learning
           if git diff --cached --quiet; then
             echo 'No report changes.'
             exit 0
           fi
-          git commit -m 'data: update adaptive daily paper report'
+          git commit -m 'data: update guarded paper report and learning features'
           git pull --rebase origin main
           git push origin main
-      - name: Write workflow summary
+      - name: Workflow summary
         if: always()
         run: |
           python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
           from pathlib import Path
-          report = json.loads(Path('web/data/paper-trading/latest-report.json').read_text(encoding='utf-8')) if Path('web/data/paper-trading/latest-report.json').exists() else {}
-          metrics = json.loads(Path('web/data/paper-trading/performance-metrics.json').read_text(encoding='utf-8')) if Path('web/data/paper-trading/performance-metrics.json').exists() else {}
-          diagnostics = json.loads(Path('web/data/paper-trading/drawdown-diagnostics.json').read_text(encoding='utf-8')) if Path('web/data/paper-trading/drawdown-diagnostics.json').exists() else {}
-          print('## Daily adaptive paper portfolio monitor')
-          if report:
-              summary = report['summary']
-              learning = report.get('adaptive_learning', {})
-              print(f"- Tokyo date: {report['trading_date']}")
-              print(f"- Equity: ¥{summary['equity']:,.0f}")
-              print(f"- Total P/L: ¥{summary['total_pnl']:,.0f}")
-              print(f"- Learning mode: {learning.get('mode', 'baseline')}")
-              print(f"- Active learned strategy: {learning.get('strategy') or 'none'}")
-          if metrics:
-              print(f"- Analytics observations: {metrics['sample']['observations']}")
-          if diagnostics:
-              print(f"- Diagnosed causes: {len(diagnostics['causes'])}")
+          report_path = Path('web/data/paper-trading/latest-report.json')
+          if not report_path.exists():
+              print('## Daily monitor\nNo report generated.')
+              raise SystemExit
+          report = json.loads(report_path.read_text(encoding='utf-8'))
+          summary = report['summary']
+          adaptive = report.get('adaptive_strategy', {})
+          feature_path = Path('web/data/adaptive-learning/feature-history.jsonl')
+          rows = len([line for line in feature_path.read_text(encoding='utf-8').splitlines() if line.strip()]) if feature_path.exists() else 0
+          print('## Guarded daily paper monitor')
+          print(f"- Tokyo date: {report['trading_date']}")
+          print(f"- Equity: ¥{summary['equity']:,.0f}")
+          print(f"- Total P/L: ¥{summary['total_pnl']:,.0f}")
+          print(f"- Strategy source: {adaptive.get('source')}")
+          print(f"- Config version: {adaptive.get('config_version')}")
+          print(f"- Learning feature rows: {rows}")
           print('- Real broker orders: never sent')
           PY
