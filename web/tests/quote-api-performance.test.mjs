@@ -5,20 +5,21 @@ import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
 
-test('quote API has bounded concurrency timeouts partial fallback and cache', async () => {
+test('quote API uses bounded concurrency, source timeouts and partial output', async () => {
   const source = await readFile(resolve(root, 'functions/api/quotes.js'), 'utf8');
-  assert.match(source, /SOURCE_TIMEOUT_MS/);
-  assert.match(source, /CONCURRENCY/);
+  assert.match(source, /CONCURRENCY = 4/);
+  assert.match(source, /SOURCE_TIMEOUT_MS = 2800/);
   assert.match(source, /mapWithConcurrency/);
-  assert.match(source, /Promise\.allSettled/);
-  assert.match(source, /partial:/);
-  assert.match(source, /stale-while-revalidate/);
   assert.doesNotMatch(source, /pause\(120\)/);
+  assert.doesNotMatch(source, /for\s*\(const item of initial\)/);
+  assert.match(source, /source_status/);
+  assert.match(source, /stale-while-revalidate=120/);
 });
 
-test('data client module is injected before consumers', async () => {
+test('coordinator is injected before consumers and adaptive shell last', async () => {
   const build = await readFile(resolve(root, 'scripts/build.mjs'), 'utf8');
-  const dataClient = build.indexOf('<script type="module" src="./data-client.js"></script>');
+  const coordinator = build.indexOf('<script type="module" src="./fetch-coordinator.js"></script>');
   const demo = build.indexOf('<script type="module" src="./demo-trade.js"></script>');
-  assert.ok(dataClient >= 0 && demo > dataClient);
+  const adaptive = build.indexOf('<script type="module" src="./adaptive-shell.js"></script>');
+  assert.ok(coordinator >= 0 && demo > coordinator && adaptive > demo);
 });
