@@ -1,24 +1,217 @@
-const TIMEOUT_MS=4500;
-const CACHE_SECONDS=900;
-const finite=value=>{if(value===null||value===undefined||value==='')return null;const parsed=Number(value);return Number.isFinite(parsed)?parsed:null};
-const code4=value=>{const raw=String(value??'').trim().toUpperCase().replace(/\.T$/,'');if(/^[0-9]{5}$/.test(raw)&&raw.endsWith('0'))return raw.slice(0,-1);return /^[0-9]{4}$/.test(raw)||/^[0-9]{3}[A-Z]$/.test(raw)?raw:''};
-const splitReasons=value=>String(value??'').split(/\s*\/\s*|\n/).map(item=>item.trim()).filter(Boolean);
-async function timedFetch(url,init={},timeout=TIMEOUT_MS){const controller=new AbortController();const timer=setTimeout(()=>controller.abort('timeout'),timeout);try{return await fetch(url,{...init,signal:controller.signal})}finally{clearTimeout(timer)}}
-async function jsonOr(url,fallback){try{const response=await timedFetch(url,{headers:{Accept:'application/json'}});return response.ok?await response.json():fallback}catch{return fallback}}
-async function jqAll(path,key){if(!key)return{status:'not_configured',data:[]};let pagination=null;const data=[];for(let page=0;page<8;page+=1){const url=new URL(`https://api.jquants.com${path}`);if(pagination)url.searchParams.set('pagination_key',pagination);let response;try{response=await timedFetch(url,{headers:{Accept:'application/json','x-api-key':key}})}catch(error){return{status:'error',error:String(error?.name??'network_error'),data}}if(response.status===401||response.status===403)return{status:'not_entitled',data};if(!response.ok)return{status:`http_${response.status}`,data};const payload=await response.json();data.push(...(payload.data??[]));pagination=payload.pagination_key;if(!pagination)break}return{status:'ok',data}}
-function chartMetrics(rows){const closes=rows.map(row=>finite(row.close)).filter(value=>value!==null);const last=closes.at(-1)??null;const avg=window=>closes.length>=window?closes.slice(-window).reduce((a,b)=>a+b,0)/window:null;let rsi14=null;if(closes.length>=15){let gains=0,losses=0;for(let i=closes.length-14;i<closes.length;i+=1){const delta=closes[i]-closes[i-1];if(delta>0)gains+=delta;else losses-=delta}rsi14=losses===0?100:100-100/(1+(gains/14)/(losses/14))}const returns=[];for(let i=Math.max(1,closes.length-20);i<closes.length;i+=1)returns.push(closes[i]/closes[i-1]-1);const mean=returns.length?returns.reduce((a,b)=>a+b,0)/returns.length:0;const variance=returns.length?returns.reduce((sum,value)=>sum+(value-mean)**2,0)/returns.length:0;const peak=closes.length?Math.max(...closes.slice(-20)):null;return{price:last,sma20:avg(20),sma60:avg(60),rsi14,momentum20_pct:last!==null&&closes.length>=21?(last/closes.at(-21)-1)*100:null,momentum60_pct:last!==null&&closes.length>=61?(last/closes.at(-61)-1)*100:null,volatility20_pct:returns.length>=10?Math.sqrt(variance)*Math.sqrt(252)*100:null,drawdown20_pct:last!==null&&peak?(last/peak-1)*100:null}}
-async function yahooChart(code){const symbol=`${code}.T`;try{const response=await timedFetch(`https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1y&includePrePost=false&events=div%2Csplits`,{headers:{Accept:'application/json','User-Agent':'Mozilla/5.0 (compatible; ValueScopeSecurityDetail/1.0)'}});if(!response.ok)return{status:`http_${response.status}`,rows:[]};const payload=await response.json(),result=payload?.chart?.result?.[0],quote=result?.indicators?.quote?.[0]??{},timestamps=result?.timestamp??[];const rows=timestamps.map((timestamp,index)=>({date:new Date(timestamp*1000).toISOString().slice(0,10),open:finite(quote.open?.[index]),high:finite(quote.high?.[index]),low:finite(quote.low?.[index]),close:finite(quote.close?.[index]),volume:finite(quote.volume?.[index])})).filter(row=>[row.open,row.high,row.low,row.close].every(value=>value!==null)).slice(-260);return{status:rows.length?'ok':'empty',rows,meta:result?.meta??{}}}catch(error){return{status:String(error?.name??'error'),rows:[]}}}
-function normalizeFinancial(record){return{disclosure_date:record.DiscDate??null,disclosure_time:record.DiscTime??null,document_type:record.DocType??null,period_type:record.CurPerType??null,fiscal_year_start:record.CurFYSt??null,fiscal_year_end:record.CurFYEn??null,sales:finite(record.Sales),operating_profit:finite(record.OP),ordinary_profit:finite(record.OdP),net_profit:finite(record.NP),eps:finite(record.EPS),forecast_sales:finite(record.ForecastSales),forecast_operating_profit:finite(record.ForecastOP),forecast_ordinary_profit:finite(record.ForecastOdP),forecast_net_profit:finite(record.ForecastNP),forecast_eps:finite(record.ForecastEPS),dividend_forecast:finite(record.ForecastDividendPerShareAnnual),disclosure_number:record.DiscNo??null}}
-function compatibleChange(current,prior,key){const now=finite(current?.[key]),before=finite(prior?.[key]);if(now===null||before===null||before===0)return null;if(current.period_type&&prior.period_type&&current.period_type!==prior.period_type)return null;return(now/before-1)*100}
-function technicalReasons(metrics,decision){const positive=[...(decision?.technical?.positive_reasons??[])],risks=[...(decision?.technical?.risk_reasons??[])];if(metrics.price!==null&&metrics.sma20!==null)(metrics.price>=metrics.sma20?positive:risks).push(metrics.price>=metrics.sma20?'株価がSMA20を上回る':'株価がSMA20を下回る');if(metrics.sma20!==null&&metrics.sma60!==null)(metrics.sma20>=metrics.sma60?positive:risks).push(metrics.sma20>=metrics.sma60?'SMA20がSMA60を上回る':'SMA20がSMA60を下回る');if(metrics.momentum20_pct!==null)(metrics.momentum20_pct>0?positive:risks).push(`20日Momentum ${metrics.momentum20_pct.toFixed(1)}%`);if(metrics.rsi14!==null&&metrics.rsi14>=80)risks.push(`RSI ${metrics.rsi14.toFixed(1)}で過熱圏`);return{positive:[...new Set(positive)],risks:[...new Set(risks)]}}
-function compactDetails(record){if(!record)return null;const output={};for(const[key,value]of Object.entries(record)){if(['Code','DiscDate','DiscTime','DiscNo'].includes(key))continue;if(value===null||value===undefined||value==='')continue;if(typeof value==='string'||typeof value==='number'||typeof value==='boolean')output[key]=value;if(Object.keys(output).length>=60)break}return output}
-export async function onRequestGet(context){const started=Date.now(),requestUrl=new URL(context.request.url),code=code4(requestUrl.searchParams.get('code'));if(!code)return Response.json({error:'invalid_code'},{status:400});const cacheKey=new Request(`${requestUrl.origin}${requestUrl.pathname}?code=${code}`,{method:'GET'}),cached=await caches.default.match(cacheKey);if(cached)return cached;
-  const[ranking,report,chart]=await Promise.all([jsonOr(new URL('/jquants-ranking.json',requestUrl),{rows:[],metadata:{}}),jsonOr(new URL('/data/paper-trading/latest-report.json',requestUrl),{decisions:[]}),yahooChart(code)]);
-  const row=(ranking.rows??[]).find(item=>code4(item.code)===code)??null,decision=(report.decisions??[]).find(item=>code4(item.code??item.symbol)===code)??null,name=row?.company_name??decision?.company_name??code,key=context.env?.JQUANTS_API_KEY??null;
-  const jqCode=`${code}0`,base=`?code=${encodeURIComponent(jqCode)}`;
-  const[summaryResult,detailsResult,earningsResult,tdResult]=await Promise.all([jqAll(`/v2/fins/summary${base}`,key),jqAll(`/v2/fins/details${base}`,key),jqAll(`/v2/fins/earnings-date${base}`,key),jqAll(`/v2/td/list${base}`,key)]);
-  const financials=summaryResult.data.map(normalizeFinancial).sort((a,b)=>`${b.disclosure_date??''}${b.disclosure_time??''}`.localeCompare(`${a.disclosure_date??''}${a.disclosure_time??''}`)).slice(0,8);for(let index=0;index<financials.length;index+=1){const current=financials[index],prior=financials.slice(index+1).find(item=>item.period_type===current.period_type);current.changes={sales_pct:compatibleChange(current,prior,'sales'),operating_profit_pct:compatibleChange(current,prior,'operating_profit'),net_profit_pct:compatibleChange(current,prior,'net_profit'),eps_pct:compatibleChange(current,prior,'eps')}}
-  const metrics=chartMetrics(chart.rows),tech=technicalReasons(metrics,decision),fundamentalPositive=[...(decision?.fundamental?.positive_reasons??[]),...splitReasons(row?.positive_reasons)],fundamentalRisks=[...(decision?.fundamental?.risk_reasons??[]),...splitReasons(row?.negative_reasons)];if(row?.value_trap_risk>=60)fundamentalRisks.push(`Value Trap Risk ${Number(row.value_trap_risk).toFixed(1)}`);if(row?.data_completeness<45)fundamentalRisks.push(`データ充足率 ${Number(row.data_completeness).toFixed(1)}%`);if(row?.value_score>=65)fundamentalPositive.push(`割安スコア ${Number(row.value_score).toFixed(1)}`);if(row?.quality_score>=65)fundamentalPositive.push(`品質スコア ${Number(row.quality_score).toFixed(1)}`);
-  const latestDetail=detailsResult.data.sort((a,b)=>String(b.DiscDate??'').localeCompare(String(a.DiscDate??'')))[0]??null,earnings=earningsResult.data.map(item=>({publication_date:item.PubDate??null,scheduled_date:item.SchDate||null,quarter:item.FQName??null,fiscal_year_end:item.FYE??null})).sort((a,b)=>String(b.publication_date??'').localeCompare(String(a.publication_date??''))),disclosures=tdResult.data.map(item=>({disclosure_number:item.DiscNo??null,date:item.DiscDate??null,time:item.DiscTime??null,title:item.Title??null,status:item.DiscStatus??null,revision:item.RevNo??null,items:item.DiscItems??[],document_types:item.Docs??[]})).sort((a,b)=>`${b.date??''}${b.time??''}`.localeCompare(`${a.date??''}${a.time??''}`)).slice(0,30);
-  const action=decision?.decision?.action??(row?.eligible?'WATCH':'NO_DATA'),payload={schema_version:1,generated_at:new Date().toISOString(),code,name,symbol:`${code}.T`,market:row?.market??null,sector:row?.sector??null,rank:row?.rank??decision?.rank??null,action,confidence:decision?.decision?.confidence??row?.confidence??null,data_dates:{ranking_generated_at:ranking.metadata?.generated_at??null,effective_fundamental_cutoff:ranking.metadata?.effective_data_cutoff??report.fundamental_source?.effective_data_cutoff??null,latest_disclosure_date:row?.latest_disclosure_date??decision?.fundamental?.latest_disclosure_date??null,latest_price_date:chart.rows.at(-1)?.date??row?.latest_price_date??null},fundamental:{score:decision?.fundamental?.score??null,value_score:row?.value_score??decision?.fundamental?.value_score??null,quality_score:row?.quality_score??decision?.fundamental?.quality_score??null,growth_stability_score:row?.growth_stability_score??decision?.fundamental?.growth_stability_score??null,value_trap_risk:row?.value_trap_risk??decision?.fundamental?.value_trap_risk??null,data_completeness:row?.data_completeness??decision?.fundamental?.data_completeness??null,earnings_yield:row?.earnings_yield??decision?.fundamental?.earnings_yield??null,book_to_market:row?.book_to_market??decision?.fundamental?.book_to_market??null,fcf_yield:row?.fcf_yield??decision?.fundamental?.fcf_yield??null,roe:row?.roe??decision?.fundamental?.roe??null,operating_margin:row?.operating_margin??decision?.fundamental?.operating_margin??null,missing:decision?.fundamental?.missing??[]},technical:{...metrics,score:decision?.technical?.score??null,regime:decision?.technical?.regime??null},recommendation:{summary:action==='SIM_BUY'?'買い候補':action==='SIM_SELL'?'売却候補':action==='SIM_HOLD'?'保有継続':'監視',fundamental_reasons_positive:[...new Set(fundamentalPositive)],fundamental_risks:[...new Set(fundamentalRisks)],technical_reasons_positive:tech.positive,technical_risks:tech.risks,evidence_dates:{fundamental:ranking.metadata?.effective_data_cutoff??null,technical:chart.rows.at(-1)?.date??null},data_quality:row?.data_completeness??null},financials:{status:summaryResult.status,periods:financials,details_status:detailsResult.status,latest_details:compactDetails(latestDetail),missing:financials.length?[]:['quarterly_financial_summary']},earnings:{status:earningsResult.status,history:earnings,next:earnings.filter(item=>item.scheduled_date&&item.scheduled_date>=new Date().toISOString().slice(0,10)).sort((a,b)=>a.scheduled_date.localeCompare(b.scheduled_date))[0]??null},disclosures:{status:tdResult.status,items:disclosures,requires_addon:tdResult.status==='not_entitled'||tdResult.status==='not_configured',search_url:`https://www.google.com/search?q=${encodeURIComponent(`${name} 株 ニュース 決算短信`)}`},chart:{status:chart.status,source:'Yahoo Finance query2 daily OHLC',rows:chart.rows},capabilities:{jquants_api_key:key?'configured':'not_configured',financial_summary:summaryResult.status,financial_details:detailsResult.status,earnings_dates:earningsResult.status,tdnet:tdResult.status},warnings:[...(ranking.metadata?.warnings??[]),...(key?[]:['J-Quants API key is not configured in the Pages environment; sanitized fallback data is shown.']),...(tdResult.status==='not_entitled'||tdResult.status==='not_configured'?['TDnet/Company Disclosure add-on is unavailable; no headlines are fabricated.']:[])],paper_only:true};
-  const response=Response.json(payload,{headers:{'Cache-Control':`public, max-age=${CACHE_SECONDS}, s-maxage=${CACHE_SECONDS}, stale-while-revalidate=3600`,'Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Server-Timing':`detail;dur=${Date.now()-started}`}});context.waitUntil(caches.default.put(cacheKey,response.clone()));return response}
+const SOURCE_TIMEOUT_MS = 4500;
+const CACHE_CONTROL = 'public, max-age=120, s-maxage=300, stale-while-revalidate=900';
+const JQUANTS_BASE = 'https://api.jquants.com/v2';
+
+const finite = value => {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(String(value).replaceAll(',', ''));
+  return Number.isFinite(parsed) ? parsed : null;
+};
+const code4 = value => {
+  const text = String(value ?? '').trim().toUpperCase().replace(/\.T$/, '');
+  const normalized = text.length === 5 && text.endsWith('0') ? text.slice(0, -1) : text;
+  return /^[0-9A-Z]{4}$/.test(normalized) ? normalized : null;
+};
+const decodeXml = value => String(value ?? '').replace(/^<!\[CDATA\[|\]\]>$/g, '').replaceAll('&amp;', '&').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&#39;', "'").trim();
+
+async function timedFetch(url, init = {}, timeoutMs = SOURCE_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort('timeout'), timeoutMs);
+  try { return await fetch(url, { ...init, signal:controller.signal }); }
+  finally { clearTimeout(timer); }
+}
+
+async function assetJson(context, path, fallback) {
+  const url = new URL(path, context.request.url);
+  try {
+    const response = context.env?.ASSETS?.fetch
+      ? await context.env.ASSETS.fetch(new Request(url))
+      : await fetch(url);
+    return response.ok ? await response.json() : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function findByCode(rows, code) {
+  return (rows ?? []).find(row => code4(row.code ?? row.symbol) === code) ?? null;
+}
+
+async function jqAll(env, path, params = {}) {
+  const key = env?.JQUANTS_API_KEY;
+  if (!key) return { status:'not_configured', rows:[], error:null };
+  const rows = [];
+  let paginationKey = null;
+  try {
+    do {
+      const url = new URL(`${JQUANTS_BASE}${path}`);
+      Object.entries(params).forEach(([name, value]) => value !== null && value !== undefined && value !== '' && url.searchParams.set(name, value));
+      if (paginationKey) url.searchParams.set('pagination_key', paginationKey);
+      const response = await timedFetch(url, { headers:{ 'x-api-key':key, Accept:'application/json' } });
+      if (response.status === 401 || response.status === 403) return { status:'not_entitled', rows:[], error:`HTTP ${response.status}` };
+      if (!response.ok) return { status:'error', rows:[], error:`HTTP ${response.status}` };
+      const payload = await response.json();
+      const batch = payload.data ?? payload.info ?? payload.statements ?? payload.results ?? [];
+      if (Array.isArray(batch)) rows.push(...batch);
+      paginationKey = payload.pagination_key ?? null;
+    } while (paginationKey && rows.length < 5000);
+    return { status:'ok', rows, error:null };
+  } catch (error) {
+    return { status:error?.name === 'AbortError' ? 'timeout' : 'error', rows:[], error:String(error?.message ?? error) };
+  }
+}
+
+async function yahooChart(code) {
+  const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(`${code}.T`)}?interval=1d&range=1y&includePrePost=false&events=div%2Csplits`;
+  const response = await timedFetch(url, { headers:{ Accept:'application/json', 'User-Agent':'Mozilla/5.0 (compatible; ValueScopeResearch/2.0)' } });
+  if (!response.ok) throw new Error(`Yahoo chart HTTP ${response.status}`);
+  const result = (await response.json())?.chart?.result?.[0];
+  if (!result) throw new Error('Yahoo chart result is empty');
+  const timestamps = result.timestamp ?? [];
+  const quote = result.indicators?.quote?.[0] ?? {};
+  const adjusted = result.indicators?.adjclose?.[0]?.adjclose ?? quote.close ?? [];
+  return timestamps.map((timestamp, index) => ({
+    date:new Date(Number(timestamp) * 1000).toISOString().slice(0, 10),
+    open:finite(quote.open?.[index]), high:finite(quote.high?.[index]), low:finite(quote.low?.[index]), close:finite(quote.close?.[index]),
+    adjusted_close:finite(adjusted?.[index]), volume:finite(quote.volume?.[index]),
+  })).filter(row => row.open !== null && row.high !== null && row.low !== null && row.close !== null);
+}
+
+function parseGeneralNewsRss(xml, limit = 8) {
+  const tag = (body, name) => decodeXml(body.match(new RegExp(`<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`, 'i'))?.[1] ?? '');
+  return [...String(xml).matchAll(/<item>([\s\S]*?)<\/item>/gi)].slice(0, limit).map(match => {
+    const body = match[1];
+    const source = body.match(/<source(?:\s+url="([^"]*)")?[^>]*>([\s\S]*?)<\/source>/i);
+    return {
+      title:tag(body, 'title'),
+      source:decodeXml(source?.[2] ?? '') || 'Google News',
+      published_at:tag(body, 'pubDate') || null,
+      link:tag(body, 'link'),
+    };
+  }).filter(item => item.title && /^https?:\/\//.test(item.link));
+}
+
+async function generalNews(name, code) {
+  const query = encodeURIComponent(`"${name}" ${code} 株 決算`);
+  const response = await timedFetch(`https://news.google.com/rss/search?q=${query}&hl=ja&gl=JP&ceid=JP:ja`, { headers:{ Accept:'application/rss+xml,application/xml,text/xml', 'User-Agent':'Mozilla/5.0 (compatible; ValueScopeResearch/2.0)' } });
+  if (!response.ok) throw new Error(`Google News RSS HTTP ${response.status}`);
+  return parseGeneralNewsRss(await response.text());
+}
+
+function periodType(row) {
+  const raw = String(row.TypeOfDocument ?? row.DocType ?? row.document_type ?? '').toLowerCase();
+  if (raw.includes('1q') || raw.includes('first quarter')) return 'Q1';
+  if (raw.includes('2q') || raw.includes('second quarter')) return 'Q2';
+  if (raw.includes('3q') || raw.includes('third quarter')) return 'Q3';
+  if (raw.includes('fy') || raw.includes('annual')) return 'FY';
+  return row.TypeOfDocument ?? row.DocType ?? row.document_type ?? '決算';
+}
+
+function normalizeFinancial(row) {
+  const get = (...keys) => keys.map(key => row[key]).find(value => value !== undefined && value !== null && value !== '');
+  return {
+    code:get('Code','code'),
+    disclosure_date:get('DisclosedDate','DiscDate','disclosed_date','disclosure_date'),
+    period_end:get('CurrentPeriodEndDate','CurPerEn','period_end'),
+    fiscal_year_end:get('CurrentFiscalYearEndDate','FYE','fiscal_year_end'),
+    document_type:get('TypeOfDocument','DocType','document_type'),
+    period_type:periodType(row),
+    sales:finite(get('NetSales','Sales','net_sales','sales')),
+    operating_profit:finite(get('OperatingProfit','OP','operating_profit')),
+    ordinary_profit:finite(get('OrdinaryProfit','OdP','ordinary_profit')),
+    net_profit:finite(get('Profit','net_profit','profit')),
+    eps:finite(get('EarningsPerShare','EPS','eps')),
+    total_assets:finite(get('TotalAssets','TA','total_assets')),
+    equity:finite(get('Equity','Eq','equity')),
+    operating_cash_flow:finite(get('CashFlowsFromOperatingActivities','CFO','operating_cash_flow')),
+    investing_cash_flow:finite(get('CashFlowsFromInvestingActivities','CFI','investing_cash_flow')),
+    financing_cash_flow:finite(get('CashFlowsFromFinancingActivities','CFF','financing_cash_flow')),
+  };
+}
+
+function changes(current, previous) {
+  const growth = field => current.period_type === previous?.period_type && current[field] !== null && previous?.[field] !== null && previous?.[field] !== 0
+    ? (current[field] / Math.abs(previous[field]) - Math.sign(previous[field])) * 100 : null;
+  return { sales_pct:growth('sales'), operating_profit_pct:growth('operating_profit'), ordinary_profit_pct:growth('ordinary_profit'), net_profit_pct:growth('net_profit'), eps_pct:growth('eps') };
+}
+
+function splitReasons(decision) {
+  const fundamental = decision?.fundamental ?? {};
+  const technical = decision?.technical ?? {};
+  return {
+    fundamental_reasons_positive:[...(fundamental.positive_reasons ?? [])],
+    fundamental_risks:[...(fundamental.risk_reasons ?? []), ...(fundamental.missing ?? []).map(name => `欠損: ${name}`)],
+    technical_reasons_positive:[...(technical.positive_reasons ?? [])],
+    technical_risks:[...(technical.risk_reasons ?? []), ...(technical.missing ?? []).map(name => `欠損: ${name}`)],
+  };
+}
+
+function localFinancialRows(local) {
+  return (local?.financial_summaries ?? []).map(normalizeFinancial);
+}
+
+export async function onRequestGet(context) {
+  const started = Date.now();
+  const requestUrl = new URL(context.request.url);
+  const code = code4(requestUrl.searchParams.get('code'));
+  if (!code) return Response.json({ error:'invalid_code' }, { status:400, headers:{ 'Cache-Control':'no-store' } });
+  const cacheKey = new Request(`${requestUrl.origin}${requestUrl.pathname}?code=${code}`, { method:'GET' });
+  const cached = await caches.default.match(cacheKey);
+  if (cached) return cached;
+
+  const [index, ranking, report, local] = await Promise.all([
+    assetJson(context, '/data/stock-details/index.json', {securities:[]}),
+    assetJson(context, '/jquants-ranking.json', {rows:[],metadata:{}}),
+    assetJson(context, '/data/paper-trading/latest-report.json', {decisions:[]}),
+    assetJson(context, `/data/stock-details/${code}.json`, {}),
+  ]);
+  const known = findByCode(index.securities, code) ?? findByCode(ranking.rows, code) ?? findByCode(report.decisions, code);
+  if (!known) return Response.json({ error:'unknown_code' }, { status:404, headers:{ 'Cache-Control':'no-store' } });
+  const rankingRow = findByCode(ranking.rows, code) ?? {};
+  const decision = findByCode(report.decisions, code) ?? {};
+  const name = known.company_name ?? rankingRow.company_name ?? decision.company_name ?? code;
+  const jqCode = `${code}0`;
+  const [chartSettled, newsSettled, summary, details, earnings, tdnet] = await Promise.all([
+    Promise.allSettled([yahooChart(code)]).then(([result]) => result),
+    Promise.allSettled([generalNews(name, code)]).then(([result]) => result),
+    jqAll(context.env, '/fins/summary', { code:jqCode }),
+    jqAll(context.env, '/fins/details', { code:jqCode }),
+    jqAll(context.env, '/fins/earnings-date', { code:jqCode }),
+    jqAll(context.env, '/td/list', { code:jqCode }),
+  ]);
+  const chartRows = chartSettled.status === 'fulfilled' ? chartSettled.value : [];
+  const newsItems = newsSettled.status === 'fulfilled' ? newsSettled.value : [];
+  const remotePeriods = summary.rows.map(normalizeFinancial).sort((a,b) => String(b.disclosure_date ?? '').localeCompare(String(a.disclosure_date ?? ''))).slice(0,8);
+  const periods = remotePeriods.length ? remotePeriods : localFinancialRows(local).slice(0,8);
+  periods.forEach((period,index) => { period.changes = changes(period, periods.slice(index+1).find(candidate => candidate.period_type === period.period_type)); });
+  const earningsHistory = earnings.rows.map(row => ({ scheduled_date:row.Date ?? row.EarningsDate ?? row.earnings_date ?? null, publication_date:row.PublicationDate ?? null, quarter:row.Quarter ?? row.TypeOfDocument ?? null })).filter(row => row.scheduled_date);
+  if (!earningsHistory.length && local?.next_earnings_date) earningsHistory.push({ scheduled_date:local.next_earnings_date, publication_date:null, quarter:null });
+  const localDisclosures = local?.official_disclosures ?? [];
+  const disclosures = tdnet.rows.length ? tdnet.rows : localDisclosures;
+  const technical = decision.technical ?? {};
+  const fundamental = decision.fundamental ?? {};
+  const recommendation = { summary:decision.decision?.action ?? 'WATCH', confidence:decision.decision?.confidence ?? null, evidence_dates:{ fundamental:fundamental.latest_disclosure_date ?? report.fundamental_source?.effective_data_cutoff ?? null, technical:technical.price_date ?? decision.quote?.quote_time ?? null }, ...splitReasons(decision) };
+  const warnings = [...(report.fundamental_source?.warnings ?? [])];
+  if (!periods.length) warnings.push('決算サマリーを取得できませんでした。欠損を0として扱いません。');
+  if (!chartRows.length) warnings.push('日足チャートを取得できませんでした。');
+  const payload = {
+    generated_at:new Date().toISOString(), code, name, security:{ code, symbol:`${code}.T`, company_name:name, market:rankingRow.market ?? known.market ?? null, sector:rankingRow.sector ?? known.sector ?? null },
+    fundamental:{ score:fundamental.score ?? rankingRow.fundamental_score ?? null, value_score:fundamental.value_score ?? rankingRow.value_score ?? null, quality_score:fundamental.quality_score ?? rankingRow.quality_score ?? null, growth_stability_score:fundamental.growth_stability_score ?? rankingRow.growth_stability_score ?? null, value_trap_risk:fundamental.value_trap_risk ?? rankingRow.value_trap_risk ?? null, data_completeness:fundamental.data_completeness ?? rankingRow.data_completeness ?? null, earnings_yield:fundamental.earnings_yield ?? null, book_to_market:fundamental.book_to_market ?? null, fcf_yield:fundamental.fcf_yield ?? null, roe:fundamental.roe ?? null, operating_margin:fundamental.operating_margin ?? null },
+    technical:{ score:technical.score ?? rankingRow.technical_score ?? null, price:technical.price ?? rankingRow.last_price ?? null, sma20:technical.sma20 ?? null, sma60:technical.sma60 ?? null, rsi14:technical.rsi14 ?? null, momentum20_pct:technical.momentum20_pct ?? null, momentum60_pct:technical.momentum60_pct ?? null, volatility20_pct:technical.volatility20_pct ?? null, drawdown20_pct:technical.drawdown20_pct ?? null },
+    recommendation,
+    holding:decision.holding ?? {quantity:0,avg_cost:null},
+    quote:decision.quote ?? {},
+    financials:{ status:remotePeriods.length ? summary.status : periods.length ? 'local_sanitized' : summary.status, periods, details_status:details.status, latest_details:details.rows[0] ?? null, full_statements_entitled:details.status !== 'not_entitled', full_statements_available:Boolean(details.rows.length) },
+    earnings:{ status:earnings.rows.length ? earnings.status : earningsHistory.length ? 'local_sanitized' : earnings.status, history:earningsHistory, next:earningsHistory[0] ?? null },
+    disclosures:{ status:disclosures.length ? (tdnet.rows.length ? tdnet.status : 'local_sanitized') : (local?.official_disclosure_status ?? tdnet.status), items:disclosures, search_url:`https://www.google.com/search?q=${encodeURIComponent(`${name} ${code} 適時開示 決算短信`)}` },
+    general_news:newsItems,
+    chart:{ status:chartRows.length ? 'ok' : (chartSettled.reason?.name === 'AbortError' ? 'timeout' : 'unavailable'), rows:chartRows },
+    data_dates:{ effective_fundamental_cutoff:report.fundamental_source?.effective_data_cutoff ?? ranking.metadata?.effective_data_cutoff ?? null, latest_disclosure_date:fundamental.latest_disclosure_date ?? periods[0]?.disclosure_date ?? null, latest_price_date:chartRows.at(-1)?.date ?? technical.price_date ?? null },
+    source_status:{ chart:{ok:Boolean(chartRows.length),error:chartSettled.status === 'rejected' ? String(chartSettled.reason?.message ?? chartSettled.reason) : null}, general_news:{ok:Boolean(newsItems.length),error:newsSettled.status === 'rejected' ? String(newsSettled.reason?.message ?? newsSettled.reason) : null}, financial_summary:{status:summary.status,local_fallback:!remotePeriods.length && periods.length>0}, financial_details:{status:details.status}, earnings:{status:earnings.status,local_fallback:!earnings.rows.length && earningsHistory.length>0}, tdnet:{status:tdnet.status,local_fallback:!tdnet.rows.length && localDisclosures.length>0} },
+    warnings, paper_only:true,
+  };
+  const duration = Date.now() - started;
+  const response = Response.json(payload, { headers:{ 'Cache-Control':CACHE_CONTROL, 'Content-Type':'application/json; charset=utf-8', 'X-Content-Type-Options':'nosniff', 'Server-Timing':`security-detail;dur=${duration}, chart;desc="${chartRows.length?'ok':'failed'}", news;desc="${newsItems.length?'ok':'failed'}"` } });
+  context.waitUntil(caches.default.put(cacheKey, response.clone()));
+  return response;
+}
