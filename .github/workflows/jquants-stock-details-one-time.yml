@@ -1,0 +1,117 @@
+name: One-time J-Quants stock detail refresh
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: one-time-jquants-stock-details
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install
+        run: pip install -e '.[dev,jquants]' openpyxl
+      - name: Load only the user-authorized J-Quants credential
+        shell: bash
+        env:
+          SHEET_ID: 1q_k5JhznTsOpBHoUFsEivfKVFIUgLkUP
+        run: |
+          python - <<'PY'
+          import io, os, re, sys
+          import requests
+          from openpyxl import load_workbook
+          sheet_id = os.environ['SHEET_ID']
+          url = f'https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx'
+          response = requests.get(url, timeout=30, headers={'User-Agent': 'ValueScopeOneTimeRefresh/1.0'})
+          response.raise_for_status()
+          wb = load_workbook(io.BytesIO(response.content), read_only=True, data_only=True)
+          key = None
+          for ws in wb.worksheets:
+              for row in ws.iter_rows(values_only=True):
+                  values = ['' if value is None else str(value).strip() for value in row]
+                  joined = ' '.join(values).lower().replace('_', '-').replace(' ', '')
+                  if 'j-quants' not in joined and 'jquants' not in joined:
+                      continue
+                  candidates = []
+                  for value in values:
+                      lower = value.lower()
+                      if not value or 'j-quants' in lower or 'jquants' in lower or lower.startswith('http'):
+                          continue
+                      compact = value.strip()
+                      if len(compact) >= 20 and not re.search(r'\s', compact):
+                          candidates.append(compact)
+                  if candidates:
+                      key = max(candidates, key=len)
+                      break
+              if key:
+                  break
+          if not key:
+              raise SystemExit('Authorized J-Quants credential row was not found; no secret was printed.')
+          print(f'::add-mask::{key}')
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as env:
+              env.write(f'JQUANTS_API_KEY={key}\n')
+          print('Loaded and masked the J-Quants credential for this job only.')
+          PY
+      - name: Focused tests
+        run: pytest tests/test_stock_detail_pipeline.py tests/test_stock_detail_rate_limit.py
+      - name: Generate fresh Free-plan financial summaries
+        run: python -m investment_audit.stock_detail_pipeline --root . --plan free --limit 10 | tee stock-detail-result.json
+      - name: Validate fresh sanitized data
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('web/data/stock-details')
+          index = json.loads((root / 'index.json').read_text(encoding='utf-8'))
+          updated = int(index.get('updated', 0))
+          assert updated >= 8, f'Expected at least 8 securities with financial data, got {updated}'
+          nonempty = 0
+          for security in index.get('securities', []):
+              code = security['code']
+              path = root / f'{code}.json'
+              payload = json.loads(path.read_text(encoding='utf-8'))
+              if payload.get('financial_summaries'):
+                  nonempty += 1
+              text = path.read_text(encoding='utf-8').lower()
+              assert 'api_key' not in text and 'authorization' not in text
+          assert nonempty >= 8
+          print(f'validated_nonempty={nonempty}')
+          PY
+      - name: Commit sanitized data only
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add web/data/stock-details
+          git commit -m 'data: populate J-Quants stock financial details'
+          git pull --rebase origin main
+          git push origin main
+      - name: Summary
+        if: always()
+        run: |
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          print('## One-time sanitized J-Quants stock detail refresh')
+          path = Path('web/data/stock-details/index.json')
+          if path.exists():
+              data = json.loads(path.read_text(encoding='utf-8'))
+              print(f"- Updated: {data.get('updated', 0)}")
+              print(f"- Preserved/empty: {data.get('preserved', 0)}")
+              print(f"- Paced API calls: {data.get('api_calls', 0)}")
+          print('- Credential persisted to repository: no')
+          print('- Output committed: sanitized JSON only')
+          PY
