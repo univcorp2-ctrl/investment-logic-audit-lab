@@ -24,12 +24,17 @@ def strategy_config_from_policy(root: Path) -> tuple[StrategyConfig, dict[str, A
         "status": policy.get("status", "default"),
         "applied": False,
         "reason": "default_strategy",
+        "operational_data_verified": policy.get("operational_data_verified") is True,
+        "paper_only": True,
     }
     if not (
         policy.get("paper_only") is True
         and policy.get("status") == "active"
         and policy.get("guardrails_passed") is True
+        and policy.get("operational_data_verified") is True
+        and policy.get("real_order_allowed") is not True
     ):
+        metadata["reason"] = "unverified_or_inactive_policy"
         return StrategyConfig(), metadata
     fundamental = policy.get("fundamental", {})
     technical = policy.get("technical", {})
@@ -46,7 +51,7 @@ def strategy_config_from_policy(root: Path) -> tuple[StrategyConfig, dict[str, A
         stop_loss_pct=float(risk.get("stop_loss_pct", -8.0)),
         max_drawdown_pct=float(risk.get("max_drawdown_pct", -12.0)),
     )
-    metadata.update({"applied": True, "reason": "guarded_active_policy"})
+    metadata.update({"applied": True, "reason": "verified_operational_policy"})
     return config, metadata
 
 
@@ -67,12 +72,17 @@ def main(argv: list[str] | None = None) -> int:
     data_dir = args.root / "web" / "data" / "paper-trading"
     write_json(data_dir / "latest-report.json", report)
     write_json(data_dir / "daily-reports" / f"{report['trading_date']}.json", report)
-    print(json.dumps({
-        "trading_date": report["trading_date"],
-        "adaptive_policy": policy_metadata,
-        "equity": report["summary"]["equity"],
-        "paper_only": True,
-    }, ensure_ascii=False))
+    print(
+        json.dumps(
+            {
+                "trading_date": report["trading_date"],
+                "adaptive_policy": policy_metadata,
+                "equity": report["summary"]["equity"],
+                "paper_only": True,
+            },
+            ensure_ascii=False,
+        )
+    )
     return 0
 
 
