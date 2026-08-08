@@ -69,9 +69,22 @@ def test_plan_capability_flags_are_honest() -> None:
     security = {"code": "8035", "symbol": "8035.T", "company_name": "Example"}
     free = build_stock_detail_payload(security, pd.DataFrame(), pd.DataFrame(), "free", "now")
     premium = build_stock_detail_payload(security, pd.DataFrame(), pd.DataFrame(), "premium", "now")
+    premium_with_output = build_stock_detail_payload(
+        security,
+        pd.DataFrame(),
+        pd.DataFrame(),
+        "premium",
+        "now",
+        detailed_statements=[{"TotalAssets": 100}],
+    )
     assert free["financial_capabilities"]["summary"] is True
-    assert free["financial_capabilities"]["full_statements"] is False
-    assert premium["financial_capabilities"]["full_statements"] is True
+    assert free["financial_capabilities"]["full_statements_entitled"] is False
+    assert free["financial_capabilities"]["full_statements_available"] is False
+    assert premium["financial_capabilities"]["full_statements_entitled"] is True
+    assert premium["financial_capabilities"]["full_statements_available"] is False
+    assert premium["financial_capabilities"]["full_statements_status"] == "not_generated"
+    assert premium_with_output["financial_capabilities"]["full_statements_available"] is True
+    assert premium_with_output["financial_capabilities"]["full_statements"] is True
     assert free["official_disclosures"] == []
 
 
@@ -92,6 +105,7 @@ def test_pipeline_generates_sanitized_files(tmp_path: Path) -> None:
     payload = json.loads((tmp_path / "web/data/stock-details/8035.json").read_text())
     assert payload["financial_history_status"] == "available"
     assert payload["next_earnings_date"] == "2026-10-30"
+    assert payload["financial_capabilities"]["full_statements_available"] is False
     text = json.dumps(payload).lower()
     assert "api_key" not in text and "secretcolumn" not in text
 
