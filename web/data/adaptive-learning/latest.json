@@ -1,21 +1,41 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-08T00:00:00+09:00",
+  "generated_at": "2026-08-08T00:23:06.841594+00:00",
   "mode": "guarded_auto",
   "status": "collecting_data",
   "paper_only": true,
   "gates": {
     "passed": false,
-    "checks": {"training_days": false, "matured_rows": false, "securities": false},
-    "actual": {"training_days": 0, "matured_rows": 0, "securities": 0},
-    "required": {"training_days": 126, "matured_rows": 500, "securities": 8}
+    "checks": {
+      "training_days": false,
+      "matured_rows": false,
+      "securities": false
+    },
+    "actual": {
+      "training_days": 0,
+      "matured_rows": 0,
+      "securities": 0
+    },
+    "required": {
+      "training_days": 126,
+      "matured_rows": 500,
+      "securities": 8
+    }
   },
   "engine": null,
   "oos": null,
-  "feature_importance": {"Fundamental": [], "Technical": []},
+  "feature_importance": {
+    "Fundamental": [],
+    "Technical": []
+  },
   "proposal": null,
   "applied": false,
   "active_config_version": 1,
-  "rollback": {"checked": false, "triggered": false},
-  "warnings": ["学習に必要な履歴が不足しています。現在は特徴量と翌営業日リターンの収集中です。"]
+  "rollback": {
+    "checked": false,
+    "triggered": false
+  },
+  "warnings": [
+    "学習に必要な履歴が不足しています。現在は特徴量と翌営業日リターンの収集中です。"
+  ]
 }
