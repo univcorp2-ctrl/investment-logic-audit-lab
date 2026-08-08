@@ -1,0 +1,58 @@
+src/investment_audit/adaptive_guard.py:6:25: F401 [*] `dataclasses.asdict` imported but unused
+src/investment_audit/adaptive_guard.py:40:82: B008 Do not perform function call `PostPromotionGuardConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/adaptive_operational_guard.py:81:38: B008 Do not perform function call `OperationalGuardConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/adaptive_operational_guard.py:84:34: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/adaptive_operational_guard.py:179:38: B008 Do not perform function call `OperationalGuardConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/adaptive_parameter_learner.py:161:40: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/adaptive_parameter_learner.py:162:30: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/adaptive_parameter_learner.py:191:30: B008 Do not perform function call `LearningPolicy` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/adaptive_parameter_learner.py:194:34: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/adaptive_parameter_learner.py:420:30: B008 Do not perform function call `LearningPolicy` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/adaptive_parameter_learner.py:445:28: B008 Do not perform function call `StrategyConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/adaptive_parameter_learner.py:448:34: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/adaptive_strategy.py:182:64: B008 Do not perform function call `AdaptiveConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/adaptive_strategy.py:239:70: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/adaptive_strategy.py:246:47: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/adaptive_strategy.py:254:35: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/adaptive_strategy.py:264:41: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/daily_monitor.py:9:1: UP035 [*] Import from `collections.abc` instead: `Iterable`
+src/investment_audit/daily_monitor.py:503:30: B008 Do not perform function call `StrategyConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/drawdown_diagnostics.py:69:40: B008 Do not perform function call `DiagnosticThresholds` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/drawdown_diagnostics.py:191:41: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/jquants_free_screen.py:4:20: F401 [*] `datetime` imported but unused
+src/investment_audit/jquants_free_screen.py:5:8: F401 [*] `json` imported but unused
+src/investment_audit/jquants_free_screen.py:9:1: UP035 [*] Import from `collections.abc` instead: `Callable`
+src/investment_audit/jquants_pipeline.py:10:1: UP035 [*] Import from `collections.abc` instead: `Callable`
+src/investment_audit/open_source_strategy_lab.py:11:1: UP035 [*] Import from `collections.abc` instead: `Callable`
+src/investment_audit/open_source_strategy_lab.py:321:106: B008 Do not perform function call `LabConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/open_source_strategy_lab.py:358:36: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/operational_strategy_evaluation.py:1:1: I001 [*] Import block is un-sorted or un-formatted
+src/investment_audit/operational_strategy_evaluation.py:7:1: UP035 [*] Import from `collections.abc` instead: `Callable`
+src/investment_audit/operational_strategy_evaluation.py:84:25: B008 Do not perform function call `LabConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/operational_strategy_evaluation.py:147:25: B008 Do not perform function call `LabConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/operational_strategy_evaluation.py:153:45: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/operational_strategy_evaluation.py:169:45: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/performance_analytics.py:245:31: B008 Do not perform function call `AnalyticsConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/performance_analytics.py:433:41: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/performance_analytics.py:467:74: B008 Do not perform function call `AnalyticsConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/performance_analytics_compat.py:1:1: I001 [*] Import block is un-sorted or un-formatted
+src/investment_audit/performance_analytics_compat.py:76:33: B008 Do not perform function call `PerformanceConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/performance_refresh.py:29:65: B008 Do not perform function call `PerformanceConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/performance_report.py:78:33: B008 Do not perform function call `PerformanceConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/security_detail_builder.py:12:1: UP035 [*] Import from `collections.abc` instead: `Callable`
+src/investment_audit/security_detail_builder.py:336:33: B008 Do not perform function call `DetailBuildConfig` in argument defaults; instead, perform the call within the function, or read the default from a module-level singleton variable
+src/investment_audit/security_detail_builder.py:449:45: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/security_detail_builder.py:516:41: UP017 [*] Use `datetime.UTC` alias
+src/investment_audit/stock_detail_pipeline.py:9:1: UP035 [*] Import from `collections.abc` instead: `Callable`
+src/investment_audit/utils.py:1:1: I001 [*] Import block is un-sorted or un-formatted
+tests/test_adaptive_operational_guard.py:79:41: UP017 [*] Use `datetime.UTC` alias
+tests/test_adaptive_parameter_learner.py:8:5: F401 [*] `investment_audit.adaptive_parameter_learner.LearningPolicy` imported but unused
+tests/test_adaptive_parameter_learner.py:72:45: UP017 [*] Use `datetime.UTC` alias
+tests/test_adaptive_parameter_learner.py:106:41: UP017 [*] Use `datetime.UTC` alias
+tests/test_adaptive_parameter_learner.py:114:41: UP017 [*] Use `datetime.UTC` alias
+tests/test_adaptive_strategy.py:1:1: I001 [*] Import block is un-sorted or un-formatted
+tests/test_secret_hygiene.py:1:1: I001 [*] Import block is un-sorted or un-formatted
+tests/test_security_detail_builder.py:52:23: E702 Multiple statements on one line (semicolon)
+Found 55 errors.
+[*] 36 fixable with the `--fix` option.
+ruff_exit_code=1
