@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
@@ -17,7 +17,10 @@ class PostPromotionGuardConfig:
     maximum_drawdown_worsening_pct: float = 2.0
 
 
-def compare_profiles(active_metrics: dict[str, Any], previous_metrics: dict[str, Any]) -> dict[str, Any]:
+def compare_profiles(
+    active_metrics: dict[str, Any],
+    previous_metrics: dict[str, Any],
+) -> dict[str, Any]:
     active_return = float(active_metrics.get("total_return_pct") or 0.0)
     previous_return = float(previous_metrics.get("total_return_pct") or 0.0)
     active_drawdown = float(active_metrics.get("max_drawdown_pct") or 0.0)
@@ -33,21 +36,17 @@ def should_relative_rollback(
     config: PostPromotionGuardConfig,
 ) -> tuple[bool, list[str]]:
     reasons: list[str] = []
-    if float(comparison["relative_return_pct"]) <= -config.maximum_underperformance_pct:
+    if (
+        float(comparison["relative_return_pct"])
+        <= -config.maximum_underperformance_pct
+    ):
         reasons.append("relative_return_underperformance")
-    if float(comparison["relative_drawdown_pct"]) <= -config.maximum_drawdown_worsening_pct:
+    if (
+        float(comparison["relative_drawdown_pct"])
+        <= -config.maximum_drawdown_worsening_pct
+    ):
         reasons.append("relative_drawdown_worsening")
     return bool(reasons), reasons
-
-
-def strategy_metrics_by_name(strategy_lab: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    metrics = dict(_strategy_metrics(strategy_lab))
-    for item in strategy_lab.get("strategies", []):
-        name = str(item.get("name") or "")
-        payload = item.get("metrics")
-        if name and isinstance(payload, dict):
-            metrics.setdefault(name, payload)
-    return metrics
 
 
 def evaluate_post_promotion_guard(
@@ -79,9 +78,14 @@ def evaluate_post_promotion_guard(
         "comparison": None,
         "reasons": [],
     }
-    if active.get("status") != "active" or not isinstance(previous, dict) or not previous.get("name"):
+    if (
+        active.get("status") != "active"
+        or not isinstance(previous, dict)
+        or not previous.get("name")
+    ):
         _write(state_path, result)
         return result
+
     state = _load(state_path, {})
     if (
         state.get("active_profile") != active.get("name")
@@ -97,7 +101,11 @@ def evaluate_post_promotion_guard(
         }
         _write(state_path, state)
         return state
-    elapsed = max(0, observations - int(state.get("promotion_observations", observations)))
+
+    elapsed = max(
+        0,
+        observations - int(state.get("promotion_observations", observations)),
+    )
     result["status"] = "monitoring"
     result["elapsed_observations"] = elapsed
     result["promotion_observations"] = state.get("promotion_observations")
@@ -105,17 +113,19 @@ def evaluate_post_promotion_guard(
     if elapsed < config.evaluation_observations:
         _write(state_path, result)
         return result
+
     strategy_lab = _load(
         root / "web" / "data" / "strategy-lab" / "latest.json",
         {},
     )
-    metrics_by_name = strategy_metrics_by_name(strategy_lab)
+    metrics_by_name = _strategy_metrics(strategy_lab)
     active_metrics = metrics_by_name.get(str(active.get("name")))
     previous_metrics = metrics_by_name.get(str(previous.get("name")))
     if not active_metrics or not previous_metrics:
         result["status"] = "metrics_unavailable"
         _write(state_path, result)
         return result
+
     comparison = compare_profiles(active_metrics, previous_metrics)
     rollback, reasons = should_relative_rollback(comparison, config)
     result["comparison"] = comparison
@@ -128,6 +138,7 @@ def evaluate_post_promotion_guard(
             **previous,
             "status": "active",
             "paper_only": True,
+            "real_order_allowed": False,
             "guardrails_passed": True,
             "effective_from": now,
             "rolled_back_from": active.get("name"),
@@ -179,7 +190,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     result = evaluate_post_promotion_guard(
         args.root,
-        PostPromotionGuardConfig(evaluation_observations=args.evaluation_observations),
+        PostPromotionGuardConfig(
+            evaluation_observations=args.evaluation_observations
+        ),
     )
     print(json.dumps(result, ensure_ascii=False))
     return 0
