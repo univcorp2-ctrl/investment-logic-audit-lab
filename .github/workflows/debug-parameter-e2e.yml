@@ -9,7 +9,7 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,38 +19,81 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Install and run E2E
-        shell: bash
+      - name: Install
+        working-directory: web
         run: |
-          cd web
           npm ci
           npm run build
           npm install --no-save --package-lock=false @playwright/test
           npx playwright install --with-deps chromium
+      - name: Run focused E2E and capture JSON
+        shell: bash
+        working-directory: web
+        run: |
           set +e
-          npm run e2e > ../parameter-e2e-output.txt 2>&1
+          npx playwright test e2e/security-detail-mobile-flow.spec.mjs e2e/security-detail-news.spec.mjs --reporter=json --retries=0 > ../focused-e2e.json 2> ../focused-e2e-stderr.txt
           code=$?
           set -e
-          echo "e2e_exit_code=$code" >> ../parameter-e2e-output.txt
-      - name: Commit unique diagnostic output
+          echo "$code" > ../focused-e2e-exit.txt
+      - name: Extract concise failure report
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          raw = Path('focused-e2e.json')
+          stderr = Path('focused-e2e-stderr.txt').read_text(encoding='utf-8', errors='replace') if Path('focused-e2e-stderr.txt').exists() else ''
+          lines = []
+          try:
+              data = json.loads(raw.read_text(encoding='utf-8', errors='replace'))
+              lines.append(f"status={data.get('status')}")
+              lines.append(f"duration={data.get('duration')}")
+              for suite in data.get('suites', []):
+                  stack = [suite]
+                  while stack:
+                      current = stack.pop()
+                      stack.extend(current.get('suites', []))
+                      for spec in current.get('specs', []):
+                          for test in spec.get('tests', []):
+                              for result in test.get('results', []):
+                                  if result.get('status') not in {'passed', 'skipped'}:
+                                      lines.append('---')
+                                      lines.append(f"title={spec.get('title')}")
+                                      lines.append(f"file={spec.get('file')} line={spec.get('line')} column={spec.get('column')}")
+                                      lines.append(f"status={result.get('status')} duration={result.get('duration')}")
+                                      error = result.get('error') or {}
+                                      lines.append(error.get('message') or '')
+                                      lines.append(error.get('stack') or '')
+                                      for item in result.get('errors', []):
+                                          lines.append(item.get('message') or '')
+                                          lines.append(item.get('stack') or '')
+          except Exception as exc:
+              lines.append(f"json_parse_error={type(exc).__name__}: {exc}")
+          lines.append('--- stderr ---')
+          lines.append(stderr)
+          lines.append(f"exit_code={Path('focused-e2e-exit.txt').read_text().strip()}")
+          Path('focused-e2e-report.txt').write_text('\n'.join(lines), encoding='utf-8')
+          PY
+      - name: Commit diagnostic report
         shell: bash
         run: |
           mkdir -p debug
-          target="debug/parameter-e2e-output-${GITHUB_RUN_ID}.txt"
-          mv parameter-e2e-output.txt "$target"
+          target="debug/focused-e2e-report-${GITHUB_RUN_ID}.txt"
+          mv focused-e2e-report.txt "$target"
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add "$target"
-          git commit -m "debug: parameter E2E output ${GITHUB_RUN_ID} [skip ci]"
+          git commit -m "debug: focused E2E report ${GITHUB_RUN_ID} [skip ci]"
           git pull --rebase origin main
           git push origin main
-      - name: Upload E2E artifacts
+      - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: parameter-e2e-${{ github.run_id }}
+          name: focused-e2e-${{ github.run_id }}
           path: |
-            web/playwright-report
+            focused-e2e.json
+            focused-e2e-stderr.txt
             web/test-results
           if-no-files-found: warn
           retention-days: 2
