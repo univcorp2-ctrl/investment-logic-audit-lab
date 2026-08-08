@@ -36,8 +36,14 @@ jobs:
       - name: Install
         run: pip install -e '.[dev]'
       - name: Run focused tests
-        run: pytest tests/test_daily_monitor.py tests/test_performance_analytics.py tests/test_drawdown_diagnostics.py tests/test_adaptive_strategy.py
-      - name: Generate daily paper report
+        run: |
+          pytest \
+            tests/test_daily_monitor.py \
+            tests/test_performance_analytics.py \
+            tests/test_drawdown_diagnostics.py \
+            tests/test_adaptive_strategy.py \
+            tests/test_adaptive_operational_guard.py
+      - name: Generate guarded adaptive daily paper report
         id: monitor
         shell: bash
         run: |
@@ -45,29 +51,46 @@ jobs:
           if [ '${{ github.event_name }}' = 'schedule' ] || [ '${{ inputs.mode }}' = 'simulate' ]; then
             MODE_ARGS+=(--execute-simulation)
           fi
-          python -m investment_audit.adaptive_daily_monitor --root . "${MODE_ARGS[@]}" | tee monitor-result.json
-          python -m investment_audit.performance_analytics --root . | tee performance-result.json
-          python -m investment_audit.drawdown_diagnostics --root . | tee diagnostics-result.json
+          python -m investment_audit.adaptive_daily_monitor --root . "${MODE_ARGS[@]}" \
+            | tee monitor-result.json
+          python -m investment_audit.performance_analytics --root . \
+            | tee performance-result.json
+          python -m investment_audit.drawdown_diagnostics --root . \
+            | tee diagnostics-result.json
       - name: Validate sanitized output
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          report=json.loads(Path('web/data/paper-trading/latest-report.json').read_text(encoding='utf-8'))
-          metrics=json.loads(Path('web/data/paper-trading/performance-metrics.json').read_text(encoding='utf-8'))
-          diagnostics=json.loads(Path('web/data/paper-trading/drawdown-diagnostics.json').read_text(encoding='utf-8'))
+
+          report = json.loads(
+              Path('web/data/paper-trading/latest-report.json').read_text(encoding='utf-8')
+          )
+          metrics = json.loads(
+              Path('web/data/paper-trading/performance-metrics.json').read_text(encoding='utf-8')
+          )
+          diagnostics = json.loads(
+              Path('web/data/paper-trading/drawdown-diagnostics.json').read_text(encoding='utf-8')
+          )
           assert report['paper_only'] is True
           assert metrics['paper_only'] is True
           assert diagnostics['paper_only'] is True
-          policy=report.get('adaptive_policy',{})
+          policy = report.get('adaptive_policy', {})
+          assert policy.get('paper_only') is True
           if policy.get('applied'):
-              assert policy.get('reason') == 'guarded_active_policy'
-          text=''.join(Path(path).read_text(encoding='utf-8') for path in [
-              'web/data/paper-trading/latest-report.json',
-              'web/data/paper-trading/performance-metrics.json',
-              'web/data/paper-trading/drawdown-diagnostics.json',
-          ]).lower()
+              assert policy.get('reason') == 'verified_operational_policy'
+              assert policy.get('operational_data_verified') is True
+              assert policy.get('mode') == 'active'
+          text = ''.join(
+              Path(path).read_text(encoding='utf-8')
+              for path in [
+                  'web/data/paper-trading/latest-report.json',
+                  'web/data/paper-trading/performance-metrics.json',
+                  'web/data/paper-trading/drawdown-diagnostics.json',
+              ]
+          ).lower()
           assert 'api_key' not in text and 'authorization' not in text
+          assert 'real_order_allowed": true' not in text
           PY
       - name: Commit changed reports
         shell: bash
@@ -79,7 +102,7 @@ jobs:
             echo 'No report changes.'
             exit 0
           fi
-          git commit -m 'data: update daily paper portfolio report'
+          git commit -m 'data: update guarded adaptive daily paper report'
           git pull --rebase origin main
           git push origin main
       - name: Write workflow summary
@@ -88,18 +111,21 @@ jobs:
           python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
           from pathlib import Path
-          report=json.loads(Path('web/data/paper-trading/latest-report.json').read_text(encoding='utf-8')) if Path('web/data/paper-trading/latest-report.json').exists() else {}
-          metrics=json.loads(Path('web/data/paper-trading/performance-metrics.json').read_text(encoding='utf-8')) if Path('web/data/paper-trading/performance-metrics.json').exists() else {}
-          diagnostics=json.loads(Path('web/data/paper-trading/drawdown-diagnostics.json').read_text(encoding='utf-8')) if Path('web/data/paper-trading/drawdown-diagnostics.json').exists() else {}
-          print('## Daily paper portfolio monitor')
-          if report:
-              summary=report['summary']
-              print(f"- Tokyo date: {report['trading_date']}")
-              print(f"- Equity: ¥{summary['equity']:,.0f}")
-              print(f"- Total P/L: ¥{summary['total_pnl']:,.0f}")
-              print(f"- Adaptive policy: {report.get('adaptive_policy',{}).get('name','default')}")
-              print(f"- Adaptive applied: {report.get('adaptive_policy',{}).get('applied',False)}")
-          if metrics: print(f"- Analytics observations: {metrics['sample']['observations']}")
-          if diagnostics: print(f"- Diagnosed causes: {len(diagnostics['causes'])}")
+
+          report_path = Path('web/data/paper-trading/latest-report.json')
+          print('## Daily guarded adaptive paper monitor')
+          if not report_path.exists():
+              print('- No report generated')
+              raise SystemExit
+          report = json.loads(report_path.read_text(encoding='utf-8'))
+          summary = report['summary']
+          policy = report.get('adaptive_policy', {})
+          print(f"- Tokyo date: {report['trading_date']}")
+          print(f"- Equity: ¥{summary['equity']:,.0f}")
+          print(f"- Total P/L: ¥{summary['total_pnl']:,.0f}")
+          print(f"- Adaptive policy: {policy.get('name', 'default')}")
+          print(f"- Adaptive applied: {policy.get('applied', False)}")
+          print(f"- Operational data verified: {policy.get('operational_data_verified', False)}")
+          print('- Counterfactual results: never auto-applied')
           print('- Real broker orders: never sent')
           PY
