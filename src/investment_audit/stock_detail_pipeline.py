@@ -6,7 +6,7 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, TypeVar
 
 import pandas as pd
 
@@ -16,6 +16,8 @@ from .providers.jquants import (
     JQuantsProvider,
     JQuantsProviderError,
 )
+
+T = TypeVar("T")
 
 
 def normalize_code(value: Any) -> str | None:
@@ -112,7 +114,7 @@ class StockDetailJQuantsProvider(JQuantsProvider):
         try:
             frame = self._request(
                 "get_fin_earnings_date",
-                [(('code',), code)],
+                [(("code",), code)],
                 {"code": code},
             )
         except JQuantsProviderError:
@@ -208,6 +210,24 @@ def build_stock_detail_payload(
     }
 
 
+class RequestPacer:
+    def __init__(
+        self,
+        interval_seconds: float,
+        sleep_fn: Callable[[float], None] = time.sleep,
+    ) -> None:
+        self.interval_seconds = max(0.0, interval_seconds)
+        self.sleep_fn = sleep_fn
+        self.calls = 0
+
+    def call(self, fn: Callable[..., T], *args: Any, **kwargs: Any) -> T:
+        if self.calls > 0 and self.interval_seconds > 0:
+            self.sleep_fn(self.interval_seconds)
+        value = fn(*args, **kwargs)
+        self.calls += 1
+        return value
+
+
 def generate_stock_details(
     root: Path,
     provider: StockDetailJQuantsProvider | None = None,
@@ -226,17 +246,18 @@ def generate_stock_details(
             allow_empty=True,
         )
     )
-    delay = 12.2 if plan.lower() == "free" else 1.1
+    interval = 12.2 if plan.lower() == "free" else 1.1
+    pacer = RequestPacer(interval, sleep_fn=sleep_fn)
     updated = 0
     preserved = 0
     errors: list[dict[str, str]] = []
-    for index, security in enumerate(securities):
+    for security in securities:
         code = security["code"]
         jq_code = jquants_code(code)
         path = output / f"{code}.json"
         try:
-            frame = provider.get_financial_summary(code=jq_code)
-            earnings = provider.get_financial_earnings_dates(code=jq_code)
+            frame = pacer.call(provider.get_financial_summary, code=jq_code)
+            earnings = pacer.call(provider.get_financial_earnings_dates, code=jq_code)
             payload = build_stock_detail_payload(
                 security,
                 frame,
@@ -245,7 +266,11 @@ def generate_stock_details(
                 generated_at,
             )
             write_json(path, payload)
-            updated += 1
+            if payload["financial_summaries"]:
+                updated += 1
+            else:
+                preserved += 1
+                errors.append({"code": code, "error": "empty_financial_summary"})
         except (JQuantsAuthError, JQuantsProviderError, ValueError) as exc:
             preserved += 1
             errors.append({"code": code, "error": type(exc).__name__})
@@ -260,8 +285,6 @@ def generate_stock_details(
                         generated_at,
                     ),
                 )
-        if delay > 0 and index + 1 < len(securities):
-            sleep_fn(delay)
     index_payload = {
         "schema_version": 1,
         "generated_at": generated_at,
@@ -270,6 +293,7 @@ def generate_stock_details(
         "updated": updated,
         "preserved": preserved,
         "errors": errors,
+        "api_calls": pacer.calls,
         "paper_only": True,
     }
     write_json(output / "index.json", index_payload)
@@ -293,6 +317,7 @@ def main(argv: list[str] | None = None) -> int:
             "status": "preserved_without_api_key",
             "updated": 0,
             "preserved": len(existing.get("securities", [])),
+            "paper_only": True,
         }
     print(json.dumps(result, ensure_ascii=False))
     return 0
