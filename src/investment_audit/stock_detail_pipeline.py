@@ -170,8 +170,12 @@ def build_stock_detail_payload(
     earnings_frame: pd.DataFrame,
     plan: str,
     generated_at: str,
+    detailed_statements: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     rows = sanitize_financial_rows(frame)
+    details = detailed_statements or []
+    entitled = plan.lower() == "premium"
+    available = bool(details)
     return {
         "schema_version": 1,
         "generated_at": generated_at,
@@ -184,10 +188,19 @@ def build_stock_detail_payload(
         "financial_history_status": "available" if rows else "unavailable_until_jquants_refresh",
         "financial_capabilities": {
             "summary": True,
-            "full_statements": plan.lower() == "premium",
-            "full_statements_status": "not_requested" if plan.lower() == "premium" else "premium_entitlement_required",
+            "full_statements": available,
+            "full_statements_entitled": entitled,
+            "full_statements_available": available,
+            "full_statements_status": (
+                "available"
+                if available
+                else "not_generated"
+                if entitled
+                else "premium_entitlement_required"
+            ),
         },
         "financial_summaries": rows,
+        "financial_details": details,
         "next_earnings_date": next_earnings_date(earnings_frame),
         "official_disclosure_status": "tdnet_addon_not_configured",
         "official_disclosures": [],
