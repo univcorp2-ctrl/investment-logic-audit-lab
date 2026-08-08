@@ -27,25 +27,41 @@ jobs:
       - name: Install research extras
         run: pip install -e '.[dev,quantlab]'
       - name: Run focused tests
-        run: pytest tests/test_open_source_strategy_lab.py tests/test_strategy_lab_availability.py
-      - name: Run research comparison
+        run: |
+          pytest \
+            tests/test_open_source_strategy_lab.py \
+            tests/test_strategy_lab_availability.py \
+            tests/test_operational_strategy_evaluation.py
+      - name: Run counterfactual and operational research
         run: |
           python -m investment_audit.open_source_strategy_lab --root . | tee strategy-lab-result.json
           python -m investment_audit.strategy_lab_availability --root . | tee strategy-availability-result.json
-      - name: Validate research-only output
+          python -m investment_audit.operational_strategy_evaluation --root . | tee operational-strategy-result.json
+      - name: Validate research-only outputs
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
-          payload = json.loads(Path('web/data/strategy-lab/latest.json').read_text(encoding='utf-8'))
-          assert payload['purpose'] == 'research_only'
-          assert payload['auto_adopt'] is False
-          assert payload['research_candidate'] is None
-          assert payload['adoption_status'] == 'not_eligible_operational_history'
-          assert payload['availability_model']['counterfactual_only'] is True
-          assert 'api_key' not in json.dumps(payload).lower()
+
+          counterfactual = json.loads(
+              Path('web/data/strategy-lab/latest.json').read_text(encoding='utf-8')
+          )
+          operational = json.loads(
+              Path('web/data/strategy-lab/operational.json').read_text(encoding='utf-8')
+          )
+          assert counterfactual['purpose'] == 'research_only'
+          assert counterfactual['auto_adopt'] is False
+          assert operational['paper_only'] is True
+          assert operational['lookahead_safe'] is True
+          assert operational['observations'] >= 0
+          if operational['evaluation_start']:
+              assert operational['operational_start'] <= operational['evaluation_start']
+          text = json.dumps(
+              {'counterfactual': counterfactual, 'operational': operational}
+          ).lower()
+          assert 'api_key' not in text and 'authorization' not in text
           PY
-      - name: Commit sanitized research report
+      - name: Commit sanitized research reports
         shell: bash
         run: |
           git config user.name github-actions[bot]
@@ -55,7 +71,7 @@ jobs:
             echo 'No strategy-lab changes.'
             exit 0
           fi
-          git commit -m 'data: update weekly strategy research lab'
+          git commit -m 'data: update counterfactual and operational strategy research'
           git pull --rebase origin main
           git push origin main
       - name: Summary
@@ -64,18 +80,18 @@ jobs:
           python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
           import json
           from pathlib import Path
-          path = Path('web/data/strategy-lab/latest.json')
-          if not path.exists():
-              print('## Strategy lab\nNo report generated.')
-              raise SystemExit
-          data = json.loads(path.read_text(encoding='utf-8'))
-          availability = data.get('availability_model', {})
+
+          counterfactual_path = Path('web/data/strategy-lab/latest.json')
+          operational_path = Path('web/data/strategy-lab/operational.json')
           print('## Open-source strategy lab')
-          print(f"- Counterfactual observations: {availability.get('counterfactual_observations', 0)}")
-          print(f"- Operational observations: {availability.get('operational_observations', 0)}")
-          print(f"- Walk-forward: {data['walk_forward']['status']}")
-          print(f"- Adoption status: {data['adoption_status']}")
-          print('- Auto adoption: disabled')
-          for warning in data['warnings']:
-              print(f"- Warning: {warning}")
+          if counterfactual_path.exists():
+              data = json.loads(counterfactual_path.read_text(encoding='utf-8'))
+              availability = data.get('availability_model', {})
+              print(f"- Counterfactual observations: {availability.get('counterfactual_observations', data.get('observations', 0))}")
+              print('- Counterfactual auto adoption: disabled')
+          if operational_path.exists():
+              operational = json.loads(operational_path.read_text(encoding='utf-8'))
+              print(f"- Operational observations: {operational.get('observations', 0)}")
+              print(f"- Operational walk-forward: {operational.get('walk_forward', {}).get('status', 'unavailable')}")
+              print(f"- Look-ahead safe: {operational.get('lookahead_safe', False)}")
           PY
