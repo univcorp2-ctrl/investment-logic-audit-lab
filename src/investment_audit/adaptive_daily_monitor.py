@@ -19,7 +19,8 @@ def strategy_config_from_policy(root: Path) -> tuple[StrategyConfig, dict[str, A
     path = root / "web" / "data" / "adaptive-strategy" / "active-policy.json"
     policy = _load(path, {})
     metadata = {
-        "source": str(path.relative_to(root)),
+        "source": "default",
+        "policy_path": str(path.relative_to(root)),
         "name": policy.get("name", "default"),
         "status": policy.get("status", "default"),
         "applied": False,
@@ -51,12 +52,20 @@ def strategy_config_from_policy(root: Path) -> tuple[StrategyConfig, dict[str, A
         stop_loss_pct=float(risk.get("stop_loss_pct", -8.0)),
         max_drawdown_pct=float(risk.get("max_drawdown_pct", -12.0)),
     )
-    metadata.update({"applied": True, "reason": "verified_operational_policy"})
+    metadata.update(
+        {
+            "source": str(path.relative_to(root)),
+            "applied": True,
+            "reason": "verified_operational_policy",
+        }
+    )
     return config, metadata
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Daily paper monitor with guarded adaptive policy")
+    parser = argparse.ArgumentParser(
+        description="Daily paper monitor with guarded adaptive policy"
+    )
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--execute-simulation", action="store_true")
     parser.add_argument("--date", type=dt.date.fromisoformat)
