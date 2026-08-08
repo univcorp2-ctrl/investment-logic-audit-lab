@@ -1,6 +1,7 @@
 name: Web CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
@@ -13,6 +14,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: web-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   web:
@@ -39,7 +44,7 @@ jobs:
         run: npm run build
       - name: Install Playwright test runner
         working-directory: web
-        run: npm install --no-save --package-lock=false @playwright/test
+        run: npm install --no-save --package-lock=false @playwright/test@1.55.0
       - name: Install Chromium
         working-directory: web
         run: npx playwright install --with-deps chromium
