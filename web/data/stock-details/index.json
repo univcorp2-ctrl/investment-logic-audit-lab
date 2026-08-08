@@ -1,17 +1,82 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-08T00:00:00+09:00",
-  "source": "ranking_and_paper_report_fallback",
+  "generated_at": "2026-08-08T11:41:03.379632+00:00",
+  "plan": "free",
   "securities": [
-    {"code":"8035","symbol":"8035.T","company_name":"東京エレクトロン"},
-    {"code":"6857","symbol":"6857.T","company_name":"アドバンテスト"},
-    {"code":"5803","symbol":"5803.T","company_name":"フジクラ"},
-    {"code":"5016","symbol":"5016.T","company_name":"JX金属"},
-    {"code":"6920","symbol":"6920.T","company_name":"レーザーテック"},
-    {"code":"9983","symbol":"9983.T","company_name":"ファーストリテイリング"},
-    {"code":"7974","symbol":"7974.T","company_name":"任天堂"},
-    {"code":"285A","symbol":"285A.T","company_name":"キオクシアホールディングス"},
-    {"code":"9984","symbol":"9984.T","company_name":"ソフトバンクグループ"},
-    {"code":"5706","symbol":"5706.T","company_name":"三井金属"}
-  ]
+    {
+      "code": "8035",
+      "symbol": "8035.T",
+      "company_name": "東京エレクトロン",
+      "market": null,
+      "sector": null
+    },
+    {
+      "code": "6857",
+      "symbol": "6857.T",
+      "company_name": "アドバンテスト",
+      "market": null,
+      "sector": null
+    },
+    {
+      "code": "5803",
+      "symbol": "5803.T",
+      "company_name": "フジクラ",
+      "market": null,
+      "sector": null
+    },
+    {
+      "code": "5016",
+      "symbol": "5016.T",
+      "company_name": "JX金属",
+      "market": null,
+      "sector": null
+    },
+    {
+      "code": "6920",
+      "symbol": "6920.T",
+      "company_name": "レーザーテック",
+      "market": null,
+      "sector": null
+    },
+    {
+      "code": "9983",
+      "symbol": "9983.T",
+      "company_name": "ファーストリテイリング",
+      "market": null,
+      "sector": null
+    },
+    {
+      "code": "7974",
+      "symbol": "7974.T",
+      "company_name": "任天堂",
+      "market": null,
+      "sector": null
+    },
+    {
+      "code": "285A",
+      "symbol": "285A.T",
+      "company_name": "キオクシアホールディングス",
+      "market": null,
+      "sector": null
+    },
+    {
+      "code": "9984",
+      "symbol": "9984.T",
+      "company_name": "ソフトバンクグループ",
+      "market": null,
+      "sector": null
+    },
+    {
+      "code": "5706",
+      "symbol": "5706.T",
+      "company_name": "三井金属",
+      "market": null,
+      "sector": null
+    }
+  ],
+  "updated": 10,
+  "preserved": 0,
+  "errors": [],
+  "api_calls": 20,
+  "paper_only": true
 }
