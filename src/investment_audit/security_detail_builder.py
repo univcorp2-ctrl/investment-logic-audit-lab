@@ -4,6 +4,7 @@ import argparse
 import datetime as dt
 import json
 import os
+import re
 import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
@@ -53,7 +54,9 @@ def _safe(value: Any) -> Any:
         return value.isoformat()
     if isinstance(value, float):
         return None if pd.isna(value) else round(value, 8)
-    if value is pd.NA or (not isinstance(value, (str, bytes)) and pd.isna(value)):
+    if value is pd.NA or (
+        not isinstance(value, (str, bytes)) and pd.isna(value)
+    ):
         return None
     if hasattr(value, "item"):
         return _safe(value.item())
@@ -69,7 +72,8 @@ def _load(path: Path, default: Any) -> Any:
 def _write(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
-        json.dumps(_safe(payload), ensure_ascii=False, indent=2, allow_nan=False) + "\n",
+        json.dumps(_safe(payload), ensure_ascii=False, indent=2, allow_nan=False)
+        + "\n",
         encoding="utf-8",
     )
 
@@ -206,10 +210,11 @@ def yahoo_bars(symbol: str, timeout: float = 15.0) -> list[dict[str, Any]]:
     adjusted_close = adjusted.get("adjclose") or []
     rows: list[dict[str, Any]] = []
     for index, timestamp in enumerate(timestamps):
+        quote_close = quote.get("close") or [None] * len(timestamps)
         close = _number(
             adjusted_close[index]
             if index < len(adjusted_close)
-            else (quote.get("close") or [None])[index]
+            else quote_close[index]
         )
         if close is None:
             continue
@@ -223,7 +228,9 @@ def yahoo_bars(symbol: str, timeout: float = 15.0) -> list[dict[str, Any]]:
                 "high": _number((quote.get("high") or [None] * len(timestamps))[index]),
                 "low": _number((quote.get("low") or [None] * len(timestamps))[index]),
                 "close": close,
-                "volume": _number((quote.get("volume") or [None] * len(timestamps))[index]),
+                "volume": _number(
+                    (quote.get("volume") or [None] * len(timestamps))[index]
+                ),
             }
         )
     return add_moving_averages(rows)
@@ -240,9 +247,12 @@ def frame_bars(frame: pd.DataFrame, limit: int) -> list[dict[str, Any]]:
         rows.append(
             {
                 "date": _safe(record.get("date")),
-                "open": _number(record.get("adjusted_open")) or _number(record.get("open")),
-                "high": _number(record.get("adjusted_high")) or _number(record.get("high")),
-                "low": _number(record.get("adjusted_low")) or _number(record.get("low")),
+                "open": _number(record.get("adjusted_open"))
+                or _number(record.get("open")),
+                "high": _number(record.get("adjusted_high"))
+                or _number(record.get("high")),
+                "low": _number(record.get("adjusted_low"))
+                or _number(record.get("low")),
                 "close": close,
                 "volume": _number(record.get("adjusted_volume"))
                 or _number(record.get("volume")),
@@ -275,7 +285,11 @@ def fetch_news(
         seen.add(title)
         published = item.findtext("pubDate")
         source_node = item.find("source")
-        source = source_node.text.strip() if source_node is not None and source_node.text else None
+        source = (
+            source_node.text.strip()
+            if source_node is not None and source_node.text
+            else None
+        )
         published_at: str | None = None
         if published:
             try:
@@ -310,7 +324,9 @@ def _security_codes(root: Path, limit: int) -> list[dict[str, Any]]:
             {
                 "code": code,
                 "symbol": record.get("symbol") or f"{code}.T",
-                "company_name": record.get("company_name") or record.get("name") or code,
+                "company_name": record.get("company_name")
+                or record.get("name")
+                or code,
             }
         )
         if len(items) >= limit:
@@ -318,39 +334,141 @@ def _security_codes(root: Path, limit: int) -> list[dict[str, Any]]:
     return items
 
 
-def generate_security_details(
+def _split_reasons(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple)):
+        return [str(item).strip() for item in value if str(item).strip()]
+    return [
+        part.strip()
+        for part in re.split(r"\s*(?:/|\||;|、|\n)\s*", str(value))
+        if part.strip()
+    ]
+
+
+def _unique(values: list[str]) -> list[str]:
+    return list(dict.fromkeys(value for value in values if value))
+
+
+def recommendation_block(
+    code: str,
+    ranking_row: dict[str, Any] | None,
+    decision: dict[str, Any] | None,
+) -> dict[str, Any]:
+    ranking_row = ranking_row or {}
+    decision = decision or {}
+    fundamental = decision.get("fundamental", {})
+    technical = decision.get("technical", {})
+    action = decision.get("decision", {}).get("action") or "WATCH"
+    confidence = decision.get("decision", {}).get("confidence")
+    fundamental_positive = _unique(
+        [
+            *_split_reasons(ranking_row.get("positive_reasons")),
+            *_split_reasons(fundamental.get("positive_reasons")),
+        ]
+    )
+    fundamental_risks = _unique(
+        [
+            *_split_reasons(ranking_row.get("negative_reasons")),
+            *_split_reasons(fundamental.get("risk_reasons")),
+            *[f"欠損: {name}" for name in fundamental.get("missing", [])],
+        ]
+    )
+    technical_positive = _unique(_split_reasons(technical.get("positive_reasons")))
+    technical_risks = _unique(
+        [
+            *_split_reasons(technical.get("risk_reasons")),
+            *[f"欠損: {name}" for name in technical.get("missing", [])],
+        ]
+    )
+    return {
+        "code": normalize_code(code),
+        "action": action,
+        "confidence": confidence,
+        "fundamental": {
+            "score": fundamental.get("score")
+            or ranking_row.get("fundamental_score")
+            or ranking_row.get("overall_score"),
+            "positive_reasons": fundamental_positive,
+            "risk_reasons": fundamental_risks,
+        },
+        "technical": {
+            "score": technical.get("score") or ranking_row.get("technical_score"),
+            "regime": technical.get("regime"),
+            "positive_reasons": technical_positive,
+            "risk_reasons": technical_risks,
+        },
+    }
+
+
+def _find_row(rows: list[dict[str, Any]], code: str) -> dict[str, Any]:
+    return next(
+        (
+            row
+            for row in rows
+            if normalize_code(row.get("code") or row.get("symbol")) == code
+        ),
+        {},
+    )
+
+
+def _provider_bars(
+    provider: Any,
+    code: str,
+    limit: int,
+) -> list[dict[str, Any]]:
+    method = getattr(provider, "get_daily_bars", None)
+    if not callable(method):
+        return []
+    try:
+        frame = method(f"{code}0")
+    except (JQuantsProviderError, ValueError, TypeError):
+        return []
+    return frame_bars(pd.DataFrame(frame), limit)
+
+
+def _build_security_details(
     root: Path,
-    provider: JQuantsProvider | None = None,
-    config: DetailBuildConfig = DetailBuildConfig(),
-    fetch_news_fn: Callable[[str, str, int, float], list[dict[str, Any]]] = fetch_news,
-    yahoo_bars_fn: Callable[[str, float], list[dict[str, Any]]] = yahoo_bars,
+    provider: Any,
+    config: DetailBuildConfig,
+    sleep_fn: Callable[[float], None],
+    fetch_news_fn: Callable[[str, str, int, float], list[dict[str, Any]]],
+    yahoo_bars_fn: Callable[[str, float], list[dict[str, Any]]],
 ) -> dict[str, Any]:
     output = root / "web" / "data" / "security-details"
     output.mkdir(parents=True, exist_ok=True)
-    provider = provider or JQuantsProvider(
-        JQuantsConfig(
-            api_key=os.getenv("JQUANTS_API_KEY"),
-            cache_dir=root / ".cache" / "security-details",
-            cache_ttl_seconds=86_400,
-            allow_empty=True,
-        )
+    ranking_payload = _load(
+        root / "web" / "jquants-ranking.json",
+        {"rows": [], "metadata": {}},
     )
-    gate = RateGate(config.jquants_interval_seconds)
+    daily_report = _load(
+        root / "web" / "data" / "paper-trading" / "latest-report.json",
+        {"decisions": []},
+    )
+    ranking_rows = ranking_payload.get("rows", [])
+    decisions = daily_report.get("decisions", [])
+    gate = RateGate(config.jquants_interval_seconds, sleep_fn=sleep_fn)
     details: list[dict[str, Any]] = []
     for security in _security_codes(root, config.max_codes):
         code = security["code"]
         symbol = security["symbol"]
+        ranking_row = _find_row(ranking_rows, code)
+        decision = _find_row(decisions, code)
         financials = pd.DataFrame()
-        try:
-            gate.wait()
-            financials = provider.get_financial_summary(code=f"{code}0")
-        except JQuantsProviderError:
-            pass
+        method = getattr(provider, "get_financial_summary", None)
+        if callable(method):
+            try:
+                gate.wait()
+                financials = pd.DataFrame(method(code=f"{code}0"))
+            except (JQuantsProviderError, ValueError, TypeError):
+                financials = pd.DataFrame()
         statements = _frame_records(financials, 12)
-        try:
-            chart = yahoo_bars_fn(symbol, config.request_timeout)
-        except requests.RequestException:
-            chart = []
+        chart = _provider_bars(provider, code, config.chart_days)
+        if not chart:
+            try:
+                chart = yahoo_bars_fn(symbol, config.request_timeout)
+            except requests.RequestException:
+                chart = []
         try:
             news = fetch_news_fn(
                 security["company_name"],
@@ -363,10 +481,14 @@ def generate_security_details(
         payload = {
             **security,
             "generated_at": dt.datetime.now(dt.UTC).isoformat(),
+            "effective_data_cutoff": ranking_payload.get("metadata", {}).get(
+                "effective_data_cutoff"
+            ),
             "financial_summaries": statements,
             "financial_trend": trend_status(statements),
             "chart": chart[-config.chart_days :],
             "general_news": news,
+            "recommendation": recommendation_block(code, ranking_row, decision),
             "official_disclosure_status": "tdnet_addon_not_configured",
             "official_disclosures": [],
             "paper_only": True,
@@ -389,6 +511,55 @@ def generate_security_details(
     }
     _write(output / "index.json", index)
     return index
+
+
+def build_security_details(
+    root: Path,
+    provider: Any | None = None,
+    config: DetailBuildConfig = DetailBuildConfig(),
+    sleep_fn: Callable[[float], None] = time.sleep,
+) -> dict[str, Any]:
+    provider = provider or JQuantsProvider(
+        JQuantsConfig(
+            api_key=os.getenv("JQUANTS_API_KEY"),
+            cache_dir=root / ".cache" / "security-details",
+            cache_ttl_seconds=86_400,
+            allow_empty=True,
+        )
+    )
+    return _build_security_details(
+        root,
+        provider,
+        config,
+        sleep_fn,
+        fetch_news,
+        yahoo_bars,
+    )
+
+
+def generate_security_details(
+    root: Path,
+    provider: JQuantsProvider | None = None,
+    config: DetailBuildConfig = DetailBuildConfig(),
+    fetch_news_fn: Callable[[str, str, int, float], list[dict[str, Any]]] = fetch_news,
+    yahoo_bars_fn: Callable[[str, float], list[dict[str, Any]]] = yahoo_bars,
+) -> dict[str, Any]:
+    provider = provider or JQuantsProvider(
+        JQuantsConfig(
+            api_key=os.getenv("JQUANTS_API_KEY"),
+            cache_dir=root / ".cache" / "security-details",
+            cache_ttl_seconds=86_400,
+            allow_empty=True,
+        )
+    )
+    return _build_security_details(
+        root,
+        provider,
+        config,
+        time.sleep,
+        fetch_news_fn,
+        yahoo_bars_fn,
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
