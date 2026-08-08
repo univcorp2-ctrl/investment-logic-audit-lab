@@ -1,0 +1,1407 @@
+
+> valuescope-japan-web@2.4.0 lint
+> node --check app.js && node --check dashboard.js && node --check scoring.js && node --check demo-data.js && node --check data-client.js && node --check data-client-core.js && node --check fetch-coordinator.js && node --check fetch-coordinator-core.js && node --check fast-data-bootstrap.js && node --check font-boot.js && node --check summary-fix.js && node --check demo-trade.js && node --check demo-trade-core.js && node --check performance-dashboard.js && node --check performance-dashboard-core.js && node --check risk-diagnostics.js && node --check risk-diagnostics-core.js && node --check decision-report.js && node --check decision-report-core.js && node --check screening-lab.js && node --check screening-lab-core.js && node --check fundamental-tuning.js && node --check fundamental-tuning-core.js && node --check strategy-lab-view.js && node --check strategy-lab-view-core.js && node --check adaptive-shell.js && node --check parameter-control.js && node --check parameter-control-core.js && node --check mobile-task-flow.js && node --check mobile-task-flow-core.js && node --check security-detail.js && node --check security-detail-core.js && node --check adaptive-learning.js && node --check adaptive-learning-core.js && node --check parameter-classification.js && node --check e2e-server.mjs && node --check playwright.config.mjs && node --check e2e/parameter-control.spec.mjs && node --check e2e/security-detail-mobile-flow.spec.mjs && node --check functions/api/quotes.js && node --check functions/api/security-detail.js && node --check functions/api/portfolio-status.js && node --check functions/api/daily-report-status.js && node --check scripts/build.mjs
+
+/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:6
+async function mock(page){await page.route('**/api/quotes**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(quotePayload)}));await page.route('**/api/portfolio-status**',route=>route.fulfill({status:200,contentType:'text/plain',body:'generated_at\t2026-08-07T06:30:00Z\ntotal\t100\t105\t5\t5\t1\t0\t0\t1\t1\n'}));await page.route('**/api/security-detail**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(securityFixture)}));await page.route('**/data/adaptive-strategy/status.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(adaptiveFixture)}));await page.route('**/data/adaptive-strategy/candidates.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({candidates:[adaptiveFixture.challenger])}));await page.route('**/data/adaptive-strategy/audit-log.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ^
+
+SyntaxError: Unexpected token ')'
+    at checkSyntax (node:internal/main/check_syntax:74:5)
+
+Node.js v22.23.1
+
+> valuescope-japan-web@2.4.0 test
+> node --test tests/*.test.mjs
+
+TAP version 13
+# Subtest: status and progress are explicit
+not ok 1 - status and progress are explicit
+  ---
+  duration_ms: 2.516797
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/adaptive-learning.test.mjs:1:209'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 33.33333333333333
+    - 33.333333333333336
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 33.333333333333336
+  actual: 33.33333333333333
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/adaptive-learning.test.mjs:1:325)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: parameter classification separates Fundamental Technical and Risk
+not ok 2 - parameter classification separates Fundamental Technical and Risk
+  ---
+  duration_ms: 0.844242
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/adaptive-learning.test.mjs:1:405'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'technical'
+    - 'risk'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'risk'
+  actual: 'technical'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/adaptive-learning.test.mjs:1:619)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: AI policy maps only to local analysis settings
+ok 3 - AI policy maps only to local analysis settings
+  ---
+  duration_ms: 0.475521
+  type: 'test'
+  ...
+# Subtest: defined merge does not overwrite with null
+ok 4 - defined merge does not overwrite with null
+  ---
+  duration_ms: 2.486039
+  type: 'test'
+  ...
+# Subtest: guardrail rows expose pass fail states
+ok 5 - guardrail rows expose pass fail states
+  ---
+  duration_ms: 0.446236
+  type: 'test'
+  ...
+# Subtest: two-mode boundary assigns 767 to iPhone and 768 to large mode
+ok 6 - two-mode boundary assigns 767 to iPhone and 768 to large mode
+  ---
+  duration_ms: 6.970894
+  type: 'test'
+  ...
+# Subtest: large navigation has six destinations and iPhone navigation has five
+ok 7 - large navigation has six destinations and iPhone navigation has five
+  ---
+  duration_ms: 1.853654
+  type: 'test'
+  ...
+# Subtest: stable section IDs, safe areas and accessible tap targets are present
+ok 8 - stable section IDs, safe areas and accessible tap targets are present
+  ---
+  duration_ms: 2.779659
+  type: 'test'
+  ...
+# Subtest: advanced content uses disclosures and paper-only status remains visible
+ok 9 - advanced content uses disclosures and paper-only status remains visible
+  ---
+  duration_ms: 1.436863
+  type: 'test'
+  ...
+# Subtest: production build loads the adaptive shell last
+ok 10 - production build loads the adaptive shell last
+  ---
+  duration_ms: 9.59423
+  type: 'test'
+  ...
+# Subtest: adaptive shell keeps separate large and iPhone navigation
+ok 11 - adaptive shell keeps separate large and iPhone navigation
+  ---
+  duration_ms: 2.757367
+  type: 'test'
+  ...
+# Subtest: phone tables are converted to labelled cards with details
+ok 12 - phone tables are converted to labelled cards with details
+  ---
+  duration_ms: 3.434256
+  type: 'test'
+  ...
+# Subtest: CSS contains dedicated desktop tablet and phone modes
+ok 13 - CSS contains dedicated desktop tablet and phone modes
+  ---
+  duration_ms: 9.08202
+  type: 'test'
+  ...
+# Subtest: shell source exposes all five primary views
+ok 14 - shell source exposes all five primary views
+  ---
+  duration_ms: 2.513367
+  type: 'test'
+  ...
+# Subtest: viewport modes separate phone tablet and desktop
+ok 15 - viewport modes separate phone tablet and desktop
+  ---
+  duration_ms: 1.381228
+  type: 'test'
+  ...
+# Subtest: view routing preserves screening configuration hash
+ok 16 - view routing preserves screening configuration hash
+  ---
+  duration_ms: 0.609142
+  type: 'test'
+  ...
+# Subtest: direct anchors map to their primary view
+ok 17 - direct anchors map to their primary view
+  ---
+  duration_ms: 0.473146
+  type: 'test'
+  ...
+# Subtest: phone always uses comfortable density
+ok 18 - phone always uses comfortable density
+  ---
+  duration_ms: 0.243476
+  type: 'test'
+  ...
+# Subtest: section map groups existing dynamic modules once
+ok 19 - section map groups existing dynamic modules once
+  ---
+  duration_ms: 1.88233
+  type: 'test'
+  ...
+# Subtest: learning modes explain safe paper behavior
+ok 20 - learning modes explain safe paper behavior
+  ---
+  duration_ms: 1.054516
+  type: 'test'
+  ...
+# Subtest: overrides are separated into Fundamental Technical and Risk
+ok 21 - overrides are separated into Fundamental Technical and Risk
+  ---
+  duration_ms: 0.292749
+  type: 'test'
+  ...
+# Subtest: candidate can be copied to browser bundle without real-order fields
+ok 22 - candidate can be copied to browser bundle without real-order fields
+  ---
+  duration_ms: 0.313558
+  type: 'test'
+  ...
+# Subtest: gate progress counts failures
+ok 23 - gate progress counts failures
+  ---
+  duration_ms: 0.784962
+  type: 'test'
+  ...
+# Subtest: deep merge preserves unrelated browser parameters
+ok 24 - deep merge preserves unrelated browser parameters
+  ---
+  duration_ms: 0.339948
+  type: 'test'
+  ...
+# Subtest: normalizes J-Quants metadata and reasons
+ok 25 - normalizes J-Quants metadata and reasons
+  ---
+  duration_ms: 1.511773
+  type: 'test'
+  ...
+# Subtest: filters and sorts deterministically
+ok 26 - filters and sorts deterministically
+  ---
+  duration_ms: 0.460253
+  type: 'test'
+  ...
+# Subtest: summaries and CSV contain sanitized display columns
+ok 27 - summaries and CSV contain sanitized display columns
+  ---
+  duration_ms: 0.670105
+  type: 'test'
+  ...
+# Subtest: normalizes transient cache-busting parameters while preserving compact mode
+ok 28 - normalizes transient cache-busting parameters while preserving compact mode
+  ---
+  duration_ms: 1.820882
+  type: 'test'
+  ...
+# Subtest: builds an immediate saved quote fallback from daily report and demo entries
+ok 29 - builds an immediate saved quote fallback from daily report and demo entries
+  ---
+  duration_ms: 1.473281
+  type: 'test'
+  ...
+# Subtest: quote and portfolio requests share one canonical compact key
+ok 30 - quote and portfolio requests share one canonical compact key
+  ---
+  duration_ms: 1.539315
+  type: 'test'
+  ...
+# Subtest: static JSON cache busting is removed while stable parameters remain
+ok 31 - static JSON cache busting is removed while stable parameters remain
+  ---
+  duration_ms: 0.436148
+  type: 'test'
+  ...
+# Subtest: portfolio status is derived from a compact quote payload
+ok 32 - portfolio status is derived from a compact quote payload
+  ---
+  duration_ms: 0.57614
+  type: 'test'
+  ...
+# Subtest: stale age and static summary remain explicit
+ok 33 - stale age and static summary remain explicit
+  ---
+  duration_ms: 1.438886
+  type: 'test'
+  ...
+# Subtest: paper decision labels are explicit
+ok 34 - paper decision labels are explicit
+  ---
+  duration_ms: 0.967042
+  type: 'test'
+  ...
+# Subtest: CSV separates fundamental and technical columns
+ok 35 - CSV separates fundamental and technical columns
+  ---
+  duration_ms: 0.656049
+  type: 'test'
+  ...
+# Subtest: plan impact explains upgrade without promising profit
+ok 36 - plan impact explains upgrade without promising profit
+  ---
+  duration_ms: 0.237886
+  type: 'test'
+  ...
+# Subtest: calculates per-position unrealized result
+ok 37 - calculates per-position unrealized result
+  ---
+  duration_ms: 1.539014
+  type: 'test'
+  ...
+# Subtest: aggregates portfolio and falls back to entry on unusable quote
+ok 38 - aggregates portfolio and falls back to entry on unusable quote
+  ---
+  duration_ms: 0.514314
+  type: 'test'
+  ...
+# Subtest: formats Japanese currency and signed percent
+ok 39 - formats Japanese currency and signed percent
+  ---
+  duration_ms: 393.626117
+  type: 'test'
+  ...
+# Subtest: canonical key removes cache busters and unifies quote consumers
+ok 40 - canonical key removes cache busters and unifies quote consumers
+  ---
+  duration_ms: 1.086175
+  type: 'test'
+  ...
+# Subtest: full quote payload can be normalized for compact consumers
+ok 41 - full quote payload can be normalized for compact consumers
+  ---
+  duration_ms: 0.511438
+  type: 'test'
+  ...
+# Subtest: font boot supports official normal large and xlarge preferences
+ok 42 - font boot supports official normal large and xlarge preferences
+  ---
+  duration_ms: 5.060163
+  type: 'test'
+  ...
+# Subtest: preset applies detailed thresholds and weights
+ok 43 - preset applies detailed thresholds and weights
+  ---
+  duration_ms: 0.996527
+  type: 'test'
+  ...
+# Subtest: Free conservative preset keeps complete strong data and excludes weak data
+ok 44 - Free conservative preset keeps complete strong data and excludes weak data
+  ---
+  duration_ms: 2.861392
+  type: 'test'
+  ...
+# Subtest: missing policy neutral preserves score and exclude rejects enabled missing field
+ok 45 - missing policy neutral preserves score and exclude rejects enabled missing field
+  ---
+  duration_ms: 0.642675
+  type: 'test'
+  ...
+# Subtest: CSV includes raw metrics and no credentials
+ok 46 - CSV includes raw metrics and no credentials
+  ---
+  duration_ms: 0.751438
+  type: 'test'
+  ...
+# Subtest: high and low direction percentiles reward the correct issue
+ok 47 - high and low direction percentiles reward the correct issue
+  ---
+  duration_ms: 2.109944
+  type: 'test'
+  ...
+# Subtest: raw threshold uses display units and missing exclude is respected
+ok 48 - raw threshold uses display units and missing exclude is respected
+  ---
+  duration_ms: 1.114589
+  type: 'test'
+  ...
+# Subtest: cash flow preset enables FCF metrics and formula explains weights
+ok 49 - cash flow preset enables FCF metrics and formula explains weights
+  ---
+  duration_ms: 0.622056
+  type: 'test'
+  ...
+# Subtest: contributions sum to custom score and CSV is secret-free
+ok 50 - contributions sum to custom score and CSV is secret-free
+  ---
+  duration_ms: 0.622576
+  type: 'test'
+  ...
+# Subtest: raw fundamental metrics are converted to percentages
+ok 51 - raw fundamental metrics are converted to percentages
+  ---
+  duration_ms: 1.1099
+  type: 'test'
+  ...
+# Subtest: quality preset filters weak company
+ok 52 - quality preset filters weak company
+  ---
+  duration_ms: 1.256014
+  type: 'test'
+  ...
+# Subtest: missing exclude rejects missing ROE when ROE threshold is active
+ok 53 - missing exclude rejects missing ROE when ROE threshold is active
+  ---
+  duration_ms: 1.29153
+  type: 'test'
+  ...
+# Subtest: composite respects user weights
+ok 54 - composite respects user weights
+  ---
+  duration_ms: 0.236893
+  type: 'test'
+  ...
+# Subtest: fetch coordinator is loaded before quote-consuming modules
+ok 55 - fetch coordinator is loaded before quote-consuming modules
+  ---
+  duration_ms: 5.72556
+  type: 'test'
+  ...
+# Subtest: coordinator contains immediate saved fallback and one background live request
+ok 56 - coordinator contains immediate saved fallback and one background live request
+  ---
+  duration_ms: 1.581013
+  type: 'test'
+  ...
+# Subtest: quote function has bounded concurrency stable cache and partial response
+ok 57 - quote function has bounded concurrency stable cache and partial response
+  ---
+  duration_ms: 1.244372
+  type: 'test'
+  ...
+# Subtest: mobile overflow guard constrains the page and parameter tabs
+ok 58 - mobile overflow guard constrains the page and parameter tabs
+  ---
+  duration_ms: 5.033152
+  type: 'test'
+  ...
+# Subtest: mobile overflow guard is loaded after readability
+ok 59 - mobile overflow guard is loaded after readability
+  ---
+  duration_ms: 1.444848
+  type: 'test'
+  ...
+# Subtest: phone route parses screen and performance panel
+ok 60 - phone route parses screen and performance panel
+  ---
+  duration_ms: 1.298613
+  type: 'test'
+  ...
+# Subtest: phone route preserves unrelated hash parameters
+ok 61 - phone route preserves unrelated hash parameters
+  ---
+  duration_ms: 0.474609
+  type: 'test'
+  ...
+# Subtest: invalid phone routes fall back safely
+ok 62 - invalid phone routes fall back safely
+  ---
+  duration_ms: 0.483767
+  type: 'test'
+  ...
+# Subtest: adaptive targets map to five primary screens
+ok 63 - adaptive targets map to five primary screens
+  ---
+  duration_ms: 0.248736
+  type: 'test'
+  ...
+# Subtest: every phone destination has bounded tasks
+ok 64 - every phone destination has bounded tasks
+  ---
+  duration_ms: 1.014181
+  type: 'test'
+  ...
+# Subtest: hash preserves unrelated screening and security params
+ok 65 - hash preserves unrelated screening and security params
+  ---
+  duration_ms: 0.41633
+  type: 'test'
+  ...
+# Subtest: back state parser and adjacent navigation are deterministic
+ok 66 - back state parser and adjacent navigation are deterministic
+  ---
+  duration_ms: 0.476894
+  type: 'test'
+  ...
+# Subtest: mobile flow security detail and adaptive assets are shipped
+ok 67 - mobile flow security detail and adaptive assets are shipped
+  ---
+  duration_ms: 5.610194
+  type: 'test'
+  ...
+# Subtest: security detail API never stores TDnet file URLs
+not ok 68 - security detail API never stores TDnet file URLs
+  ---
+  duration_ms: 3.165933
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/new-feature-build.test.mjs:1:698'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /\/v2\/fins\/summary/. Input:
+    
+    'const SOURCE_TIMEOUT_MS = 4500;\n' +
+      "const CACHE_CONTROL = 'public, max-age=120, s-maxage=300, stale-while-revalidate=900';\n" +
+      "const JQUANTS_BASE = 'https://api.jquants.com/v2';\n" +
+      '\n' +
+      'const finite = value => {\n' +
+      "  if (value === null || value === undefined || value === '') return null;\n" +
+      "  const parsed = Number(String(value).replaceAll(',', ''));\n" +
+      '  return Number.isFinite(parsed) ? parsed : null;\n' +
+      '};\n' +
+      'const code4 = value => {\n' +
+      "  const text = String(value ?? '').trim().toUpperCase().replace(/\\.T$/, '');\n" +
+      "  const normalized = text.length === 5 && text.endsWith('0') ? text.slice(0, -1) : text;\n" +
+      '  return /^[0-9A-Z]{4}$/.test(normalized) ? normalized : null;\n' +
+      '};\n' +
+      `const decodeXml = value => String(value ?? '').replace(/^<!\\[CDATA\\[|\\]\\]>$/g, '').replaceAll('&amp;', '&').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&#39;', "'").trim();\n` +
+      '\n' +
+      'async function timedFetch(url, init = {}, timeoutMs = SOURCE_TIMEOUT_MS) {\n' +
+      '  const controller = new AbortController();\n' +
+      "  const timer = setTimeout(() => controller.abort('timeout'), timeoutMs);\n" +
+      '  try { return await fetch(url, { ...init, signal:controller.signal }); }\n' +
+      '  finally { clearTimeout(timer); }\n' +
+      '}\n' +
+      '\n' +
+      'async function assetJson(context, path, fallback) {\n' +
+      '  const url = new URL(path, context.request.url);\n' +
+      '  try {\n' +
+      '    const response = context.env?.ASSETS?.fetch\n' +
+      '      ? await context.env.ASSETS.fetch(new Request(url))\n' +
+      '      : await fetch(url);\n' +
+      '    return response.ok ? await response.json() : fallback;\n' +
+      '  } catch {\n' +
+      '    return fallback;\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'function findByCode(rows, code) {\n' +
+      '  return (rows ?? []).find(row => code4(row.code ?? row.symbol) === code) ?? null;\n' +
+      '}\n' +
+      '\n' +
+      'async function jqAll(env, path, params = {}) {\n' +
+      '  const key = env?.JQUANTS_API_KEY;\n' +
+      "  if (!key) return { status:'not_configured', rows:[], error:null };\n" +
+      '  const rows = [];\n' +
+      '  let paginationKey = null;\n' +
+      '  try {\n' +
+      '    do {\n' +
+      '      const url = new URL(`${JQUANTS_BASE}${path}`);\n' +
+      "      Object.entries(params).forEach(([name, value]) => value !== null && value !== undefined && value !== '' && url.searchParams.set(name, value));\n" +
+      "      if (paginationKey) url.searchParams.set('pagination_key', paginationKey);\n" +
+      "      const response = await timedFetch(url, { headers:{ 'x-api-key':key, Accept:'application/json' } });\n" +
+      "      if (response.status === 401 || response.status === 403) return { status:'not_entitled', rows:[], error:`HTTP ${response.status}` };\n" +
+      "      if (!response.ok) return { status:'error', rows:[], error:`HTTP ${response.status}` };\n" +
+      '      const payload = await response.json();\n' +
+      '      const batch = payload.data ?? payload.info ?? payload.statements ?? payload.results ?? [];\n' +
+      '      if (Array.isArray(batch)) rows.push(...batch);\n' +
+      '      paginationKey = payload.pagination_key ?? null;\n' +
+      '    } while (paginationKey && rows.length < 5000);\n' +
+      "    return { status:'ok', rows, error:null };\n" +
+      '  } catch (error) {\n' +
+      "    return { status:error?.name === 'AbortError' ? 'timeout' : 'error', rows:[], error:String(error?.message ?? error) };\n" +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'async function yahooChart(code) {\n' +
+      '  const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(`${code}.T`)}?interval=1d&range=1y&includePrePost=false&events=div%2Csplits`;\n' +
+      "  const response = await timedFetch(url, { headers:{ Accept:'application/json', 'User-Agent':'Mozilla/5.0 (compatible; ValueScopeResearch/2.0)' } });\n" +
+      '  if (!response.ok) throw new Error(`Yahoo chart HTTP ${response.status}`);\n' +
+      '  const result = (await response.json())?.chart?.result?.[0];\n' +
+      "  if (!result) throw new Error('Yahoo chart result is empty');\n" +
+      '  const timestamps = result.timestamp ?? [];\n' +
+      '  const quote = result.indicators?.quote?.[0] ?? {};\n' +
+      '  const adjusted = result.indicators?.adjclose?.[0]?.adjclose ?? quote.close ?? [];\n' +
+      '  return timestamps.map((timestamp, index) => ({\n' +
+      '    date:new Date(Number(timestamp) * 1000).toISOString().slice(0, 10),\n' +
+      '    open:finite(quote.open?.[index]), high:finite(quote.high?.[index]), low:finite(quote.low?.[index]), close:finite(quote.close?.[index]),\n' +
+      '    adjusted_close:finite(adjusted?.[index]), volume:finite(quote.volume?.[index]),\n' +
+      '  })).filter(row => row.open !== null && row.high !== null && row.low !== null && row.close !== null);\n' +
+      '}\n' +
+      '\n' +
+      'function parseGeneralNewsRss(xml, limit = 8) {\n' +
+      "  const tag = (body, name) => decodeXml(body.match(new RegExp(`<${name}(?:\\\\s[^>]*)?>([\\\\s\\\\S]*?)<\\\\/${name}>`, 'i'))?.[1] ?? '');\n" +
+      '  return [...String(xml).matchAll(/<item>([\\s\\S]*?)<\\/item>/gi)].slice(0, limit).map(match => {\n' +
+      '    const body = match[1];\n' +
+      '    const source = body.match(/<source(?:\\s+url="([^"]*)")?[^>]*>([\\s\\S]*?)<\\/source>/i);\n' +
+      '    return {\n' +
+      "      title:tag(body, 'title'),\n" +
+      "      source:decodeXml(source?.[2] ?? '') || 'Google News',\n" +
+      "      published_at:tag(body, 'pubDate') || null,\n" +
+      "      link:tag(body, 'link'),\n" +
+      '    };\n' +
+      '  }).filter(item => item.title && /^https?:\\/\\//.test(item.link));\n' +
+      '}\n' +
+      '\n' +
+      'async function generalNews(name, code) {\n' +
+      '  const query = encodeURIComponent(`"${name}" ${code} 株 決算`);\n' +
+      "  const response = await timedFetch(`https://news.google.com/rss/search?q=${query}&hl=ja&gl=JP&ceid=JP:ja`, { headers:{ Accept:'application/rss+xml,application/xml,text/xml', 'User-Agent':'Mozilla/5.0 (compatible; ValueScopeResearch/2.0)' } });\n" +
+      '  if (!response.ok) throw new Error(`Google News RSS HTTP ${response.status}`);\n' +
+      '  return parseGeneralNewsRss(await response.text());\n' +
+      '}\n' +
+      '\n' +
+      'function periodType(row) {\n' +
+      "  const raw = String(row.TypeOfDocument ?? row.DocType ?? row.document_type ?? '').toLowerCase();\n" +
+      "  if (raw.includes('1q') || raw.includes('first quarter')) return 'Q1';\n" +
+      "  if (raw.includes('2q') || raw.includes('second quarter')) return 'Q2';\n" +
+      "  if (raw.includes('3q') || raw.includes('third quarter')) return 'Q3';\n" +
+      "  if (raw.includes('fy') || raw.includes('annual')) return 'FY';\n" +
+      "  return row.TypeOfDocument ?? row.DocType ?? row.document_type ?? '決算';\n" +
+      '}\n' +
+      '\n' +
+      'function normalizeFinancial(row) {\n' +
+      "  const get = (...keys) => keys.map(key => row[key]).find(value => value !== undefined && value !== null && value !== '');\n" +
+      '  return {\n' +
+      "    code:get('Code','code'),\n" +
+      "    disclosure_date:get('DisclosedDate','DiscDate','disclosed_date','disclosure_date'),\n" +
+      "    period_end:get('CurrentPeriodEndDate','CurPerEn','period_end'),\n" +
+      "    fiscal_year_end:get('CurrentFiscalYearEndDate','FYE','fiscal_year_end'),\n" +
+      "    document_type:get('TypeOfDocument','DocType','document_type'),\n" +
+      '    period_type:periodType(row),\n' +
+      "    sales:finite(get('NetSales','Sales','net_sales','sales')),\n" +
+      "    operating_profit:finite(get('OperatingProfit','OP','operating_profit')),\n" +
+      "    ordinary_profit:finite(get('OrdinaryProfit','OdP','ordinary_profit')),\n" +
+      "    net_profit:finite(get('Profit','net_profit','profit')),\n" +
+      "    eps:finite(get('EarningsPerShare','EPS','eps')),\n" +
+      "    total_assets:finite(get('TotalAssets','TA','total_assets')),\n" +
+      "    equity:finite(get('Equity','Eq','equity')),\n" +
+      "    operating_cash_flow:finite(get('CashFlowsFromOperatingActivities','CFO','operating_cash_flow')),\n" +
+      "    investing_cash_flow:finite(get('CashFlowsFromInvestingActivities','CFI','investing_cash_flow')),\n" +
+      "    financing_cash_flow:finite(get('CashFlowsFromFinancingActivities','CFF','financing_cash_flow')),\n" +
+      '  };\n' +
+      '}\n' +
+      '\n' +
+      'function changes(current, previous) {\n' +
+      '  const growth = field => current.period_type === previous?.period_type && current[field] !== null && previous?.[field] !== null && previous?.[field] !== 0\n' +
+      '    ? (current[field] / Math.abs(previous[field]) - Math.sign(previous[field])) * 100 : null;\n' +
+      "  return { sales_pct:growth('sales'), operating_profit_pct:growth('operating_profit'), ordinary_profit_pct:growth('ordinary_profit'), net_profit_pct:growth('net_profit'), eps_pct:growth('eps') };\n" +
+      '}\n' +
+      '\n' +
+      'function splitReasons(decision) {\n' +
+      '  const fundamental = decision?.fundamental ?? {};\n' +
+      '  const technical = decision?.technical ?? {};\n' +
+      '  return {\n' +
+      '    fundamental_reasons_positive:[...(fundamental.positive_reasons ?? [])],\n' +
+      '    fundamental_risks:[...(fundamental.risk_reasons ?? []), ...(fundamental.missing ?? []).map(name => `欠損: ${name}`)],\n' +
+      '    technical_reasons_positive:[...(technical.positive_reasons ?? [])],\n' +
+      '    technical_risks:[...(technical.risk_reasons ?? []), ...(technical.missing ?? []).map(name => `欠損: ${name}`)],\n' +
+      '  };\n' +
+      '}\n' +
+      '\n' +
+      'function localFinancialRows(local) {\n' +
+      '  return (local?.financial_summaries ?? []).map(normalizeFinancial);\n' +
+      '}\n' +
+      '\n' +
+      'export async function onRequestGet(context) {\n' +
+      '  const started = Date.now();\n' +
+      '  const requestUrl = new URL(context.request.url);\n' +
+      "  const code = code4(requestUrl.searchParams.get('code'));\n" +
+      "  if (!code) return Response.json({ error:'invalid_code' }, { status:400, headers:{ 'Cache-Control':'no-store' } });\n" +
+      "  const cacheKey = new Request(`${requestUrl.origin}${requestUrl.pathname}?code=${code}`, { method:'GET' });\n" +
+      '  const cached = await caches.default.match(cacheKey);\n' +
+      '  if (cached) return cached;\n' +
+      '\n' +
+      '  const [index, ranking, report, local] = await Promise.all([\n' +
+      "    assetJson(context, '/data/stock-details/index.json', {securities:[]}),\n" +
+      "    assetJson(context, '/jquants-ranking.json', {rows:[],metadata:{}}),\n" +
+      "    assetJson(context, '/data/paper-trading/latest-report.json', {decisions:[]}),\n" +
+      '    assetJson(context, `/data/stock-details/${code}.json`, {}),\n' +
+      '  ]);\n' +
+      '  const known = findByCode(index.securities, code) ?? findByCode(ranking.rows, code) ?? findByCode(report.decisions, code);\n' +
+      "  if (!known) return Response.json({ error:'unknown_code' }, { status:404, headers:{ 'Cache-Control':'no-store' } });\n" +
+      '  const rankingRow = findByCode(ranking.rows, code) ?? {};\n' +
+      '  const decision = findByCode(report.decisions, code) ?? {};\n' +
+      '  const name = known.company_name ?? rankingRow.company_name ?? decision.company_name ?? code;\n' +
+      '  const jqCode = `${code}0`;\n' +
+      '  const [chartSettled, newsSettled, summary, details, earnings, tdnet] = await Promise.all([\n' +
+      '    Promise.allSettled([yahooChart(code)]).then(([result]) => result),\n' +
+      '    Promise.allSettled([generalNews(name, code)]).then(([result]) => result),\n' +
+      "    jqAll(context.env, '/fins/summary', { code:jqCode }),\n" +
+      "    jqAll(context.env, '/fins/details', { code:jqCode }),\n" +
+      "    jqAll(context.env, '/fins/earnings-date', { code:jqCode }),\n" +
+      "    jqAll(context.env, '/td/list', { code:jqCode }),\n" +
+      '  ]);\n' +
+      '  const ch'... 5706 more characters
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    const SOURCE_TIMEOUT_MS = 4500;
+    const CACHE_CONTROL = 'public, max-age=120, s-maxage=300, stale-while-revalidate=900';
+    const JQUANTS_BASE = 'https://api.jquants.com/v2';
+    
+    const finite = value => {
+      if (value === null || value === undefined || value === '') return null;
+      const parsed = Number(String(value).replaceAll(',', ''));
+      return Number.isFinite(parsed) ? parsed : null;
+    };
+    const code4 = value => {
+      const text = String(value ?? '').trim().toUpperCase().replace(/\.T$/, '');
+      const normalized = text.length === 5 && text.endsWith('0') ? text.slice(0, -1) : text;
+      return /^[0-9A-Z]{4}$/.test(normalized) ? normalized : null;
+    };
+    const decodeXml = value => String(value ?? '').replace(/^<!\[CDATA\[|\]\]>$/g, '').replaceAll('&amp;', '&').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&#39;', "'").trim();
+    
+    async function timedFetch(url, init = {}, timeoutMs = SOURCE_TIMEOUT_MS) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort('timeout'), timeoutMs);
+      try { return await fetch(url, { ...init, signal:controller.signal }); }
+      finally { clearTimeout(timer); }
+    }
+    
+    async function assetJson(context, path, fallback) {
+      const url = new URL(path, context.request.url);
+      try {
+        const response = context.env?.ASSETS?.fetch
+          ? await context.env.ASSETS.fetch(new Request(url))
+          : await fetch(url);
+        return response.ok ? await response.json() : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+    
+    function findByCode(rows, code) {
+      return (rows ?? []).find(row => code4(row.code ?? row.symbol) === code) ?? null;
+    }
+    
+    async function jqAll(env, path, params = {}) {
+      const key = env?.JQUANTS_API_KEY;
+      if (!key) return { status:'not_configured', rows:[], error:null };
+      const rows = [];
+      let paginationKey = null;
+      try {
+        do {
+          const url = new URL(`${JQUANTS_BASE}${path}`);
+          Object.entries(params).forEach(([name, value]) => value !== null && value !== undefined && value !== '' && url.searchParams.set(name, value));
+          if (paginationKey) url.searchParams.set('pagination_key', paginationKey);
+          const response = await timedFetch(url, { headers:{ 'x-api-key':key, Accept:'application/json' } });
+          if (response.status === 401 || response.status === 403) return { status:'not_entitled', rows:[], error:`HTTP ${response.status}` };
+          if (!response.ok) return { status:'error', rows:[], error:`HTTP ${response.status}` };
+          const payload = await response.json();
+          const batch = payload.data ?? payload.info ?? payload.statements ?? payload.results ?? [];
+          if (Array.isArray(batch)) rows.push(...batch);
+          paginationKey = payload.pagination_key ?? null;
+        } while (paginationKey && rows.length < 5000);
+        return { status:'ok', rows, error:null };
+      } catch (error) {
+        return { status:error?.name === 'AbortError' ? 'timeout' : 'error', rows:[], error:String(error?.message ?? error) };
+      }
+    }
+    
+    async function yahooChart(code) {
+      const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(`${code}.T`)}?interval=1d&range=1y&includePrePost=false&events=div%2Csplits`;
+      const response = await timedFetch(url, { headers:{ Accept:'application/json', 'User-Agent':'Mozilla/5.0 (compatible; ValueScopeResearch/2.0)' } });
+      if (!response.ok) throw new Error(`Yahoo chart HTTP ${response.status}`);
+      const result = (await response.json())?.chart?.result?.[0];
+      if (!result) throw new Error('Yahoo chart result is empty');
+      const timestamps = result.timestamp ?? [];
+      const quote = result.indicators?.quote?.[0] ?? {};
+      const adjusted = result.indicators?.adjclose?.[0]?.adjclose ?? quote.close ?? [];
+      return timestamps.map((timestamp, index) => ({
+        date:new Date(Number(timestamp) * 1000).toISOString().slice(0, 10),
+        open:finite(quote.open?.[index]), high:finite(quote.high?.[index]), low:finite(quote.low?.[index]), close:finite(quote.close?.[index]),
+        adjusted_close:finite(adjusted?.[index]), volume:finite(quote.volume?.[index]),
+      })).filter(row => row.open !== null && row.high !== null && row.low !== null && row.close !== null);
+    }
+    
+    function parseGeneralNewsRss(xml, limit = 8) {
+      const tag = (body, name) => decodeXml(body.match(new RegExp(`<${name}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${name}>`, 'i'))?.[1] ?? '');
+      return [...String(xml).matchAll(/<item>([\s\S]*?)<\/item>/gi)].slice(0, limit).map(match => {
+        const body = match[1];
+        const source = body.match(/<source(?:\s+url="([^"]*)")?[^>]*>([\s\S]*?)<\/source>/i);
+        return {
+          title:tag(body, 'title'),
+          source:decodeXml(source?.[2] ?? '') || 'Google News',
+          published_at:tag(body, 'pubDate') || null,
+          link:tag(body, 'link'),
+        };
+      }).filter(item => item.title && /^https?:\/\//.test(item.link));
+    }
+    
+    async function generalNews(name, code) {
+      const query = encodeURIComponent(`"${name}" ${code} 株 決算`);
+      const response = await timedFetch(`https://news.google.com/rss/search?q=${query}&hl=ja&gl=JP&ceid=JP:ja`, { headers:{ Accept:'application/rss+xml,application/xml,text/xml', 'User-Agent':'Mozilla/5.0 (compatible; ValueScopeResearch/2.0)' } });
+      if (!response.ok) throw new Error(`Google News RSS HTTP ${response.status}`);
+      return parseGeneralNewsRss(await response.text());
+    }
+    
+    function periodType(row) {
+      const raw = String(row.TypeOfDocument ?? row.DocType ?? row.document_type ?? '').toLowerCase();
+      if (raw.includes('1q') || raw.includes('first quarter')) return 'Q1';
+      if (raw.includes('2q') || raw.includes('second quarter')) return 'Q2';
+      if (raw.includes('3q') || raw.includes('third quarter')) return 'Q3';
+      if (raw.includes('fy') || raw.includes('annual')) return 'FY';
+      return row.TypeOfDocument ?? row.DocType ?? row.document_type ?? '決算';
+    }
+    
+    function normalizeFinancial(row) {
+      const get = (...keys) => keys.map(key => row[key]).find(value => value !== undefined && value !== null && value !== '');
+      return {
+        code:get('Code','code'),
+        disclosure_date:get('DisclosedDate','DiscDate','disclosed_date','disclosure_date'),
+        period_end:get('CurrentPeriodEndDate','CurPerEn','period_end'),
+        fiscal_year_end:get('CurrentFiscalYearEndDate','FYE','fiscal_year_end'),
+        document_type:get('TypeOfDocument','DocType','document_type'),
+        period_type:periodType(row),
+        sales:finite(get('NetSales','Sales','net_sales','sales')),
+        operating_profit:finite(get('OperatingProfit','OP','operating_profit')),
+        ordinary_profit:finite(get('OrdinaryProfit','OdP','ordinary_profit')),
+        net_profit:finite(get('Profit','net_profit','profit')),
+        eps:finite(get('EarningsPerShare','EPS','eps')),
+        total_assets:finite(get('TotalAssets','TA','total_assets')),
+        equity:finite(get('Equity','Eq','equity')),
+        operating_cash_flow:finite(get('CashFlowsFromOperatingActivities','CFO','operating_cash_flow')),
+        investing_cash_flow:finite(get('CashFlowsFromInvestingActivities','CFI','investing_cash_flow')),
+        financing_cash_flow:finite(get('CashFlowsFromFinancingActivities','CFF','financing_cash_flow')),
+      };
+    }
+    
+    function changes(current, previous) {
+      const growth = field => current.period_type === previous?.period_type && current[field] !== null && previous?.[field] !== null && previous?.[field] !== 0
+        ? (current[field] / Math.abs(previous[field]) - Math.sign(previous[field])) * 100 : null;
+      return { sales_pct:growth('sales'), operating_profit_pct:growth('operating_profit'), ordinary_profit_pct:growth('ordinary_profit'), net_profit_pct:growth('net_profit'), eps_pct:growth('eps') };
+    }
+    
+    function splitReasons(decision) {
+      const fundamental = decision?.fundamental ?? {};
+      const technical = decision?.technical ?? {};
+      return {
+        fundamental_reasons_positive:[...(fundamental.positive_reasons ?? [])],
+        fundamental_risks:[...(fundamental.risk_reasons ?? []), ...(fundamental.missing ?? []).map(name => `欠損: ${name}`)],
+        technical_reasons_positive:[...(technical.positive_reasons ?? [])],
+        technical_risks:[...(technical.risk_reasons ?? []), ...(technical.missing ?? []).map(name => `欠損: ${name}`)],
+      };
+    }
+    
+    function localFinancialRows(local) {
+      return (local?.financial_summaries ?? []).map(normalizeFinancial);
+    }
+    
+    export async function onRequestGet(context) {
+      const started = Date.now();
+      const requestUrl = new URL(context.request.url);
+      const code = code4(requestUrl.searchParams.get('code'));
+      if (!code) return Response.json({ error:'invalid_code' }, { status:400, headers:{ 'Cache-Control':'no-store' } });
+      const cacheKey = new Request(`${requestUrl.origin}${requestUrl.pathname}?code=${code}`, { method:'GET' });
+      const cached = await caches.default.match(cacheKey);
+      if (cached) return cached;
+    
+      const [index, ranking, report, local] = await Promise.all([
+        assetJson(context, '/data/stock-details/index.json', {securities:[]}),
+        assetJson(context, '/jquants-ranking.json', {rows:[],metadata:{}}),
+        assetJson(context, '/data/paper-trading/latest-report.json', {decisions:[]}),
+        assetJson(context, `/data/stock-details/${code}.json`, {}),
+      ]);
+      const known = findByCode(index.securities, code) ?? findByCode(ranking.rows, code) ?? findByCode(report.decisions, code);
+      if (!known) return Response.json({ error:'unknown_code' }, { status:404, headers:{ 'Cache-Control':'no-store' } });
+      const rankingRow = findByCode(ranking.rows, code) ?? {};
+      const decision = findByCode(report.decisions, code) ?? {};
+      const name = known.company_name ?? rankingRow.company_name ?? decision.company_name ?? code;
+      const jqCode = `${code}0`;
+      const [chartSettled, newsSettled, summary, details, earnings, tdnet] = await Promise.all([
+        Promise.allSettled([yahooChart(code)]).then(([result]) => result),
+        Promise.allSettled([generalNews(name, code)]).then(([result]) => result),
+        jqAll(context.env, '/fins/summary', { code:jqCode }),
+        jqAll(context.env, '/fins/details', { code:jqCode }),
+        jqAll(context.env, '/fins/earnings-date', { code:jqCode }),
+        jqAll(context.env, '/td/list', { code:jqCode }),
+      ]);
+      const chartRows = chartSettled.status === 'fulfilled' ? chartSettled.value : [];
+      const newsItems = newsSettled.status === 'fulfilled' ? newsSettled.value : [];
+      const remotePeriods = summary.rows.map(normalizeFinancial).sort((a,b) => String(b.disclosure_date ?? '').localeCompare(String(a.disclosure_date ?? ''))).slice(0,8);
+      const periods = remotePeriods.length ? remotePeriods : localFinancialRows(local).slice(0,8);
+      periods.forEach((period,index) => { period.changes = changes(period, periods.slice(index+1).find(candidate => candidate.period_type === period.period_type)); });
+      const earningsHistory = earnings.rows.map(row => ({ scheduled_date:row.Date ?? row.EarningsDate ?? row.earnings_date ?? null, publication_date:row.PublicationDate ?? null, quarter:row.Quarter ?? row.TypeOfDocument ?? null })).filter(row => row.scheduled_date);
+      if (!earningsHistory.length && local?.next_earnings_date) earningsHistory.push({ scheduled_date:local.next_earnings_date, publication_date:null, quarter:null });
+      const localDisclosures = local?.official_disclosures ?? [];
+      const disclosures = tdnet.rows.length ? tdnet.rows : localDisclosures;
+      const technical = decision.technical ?? {};
+      const fundamental = decision.fundamental ?? {};
+      const recommendation = { summary:decision.decision?.action ?? 'WATCH', confidence:decision.decision?.confidence ?? null, evidence_dates:{ fundamental:fundamental.latest_disclosure_date ?? report.fundamental_source?.effective_data_cutoff ?? null, technical:technical.price_date ?? decision.quote?.quote_time ?? null }, ...splitReasons(decision) };
+      const warnings = [...(report.fundamental_source?.warnings ?? [])];
+      if (!periods.length) warnings.push('決算サマリーを取得できませんでした。欠損を0として扱いません。');
+      if (!chartRows.length) warnings.push('日足チャートを取得できませんでした。');
+      const payload = {
+        generated_at:new Date().toISOString(), code, name, security:{ code, symbol:`${code}.T`, company_name:name, market:rankingRow.market ?? known.market ?? null, sector:rankingRow.sector ?? known.sector ?? null },
+        fundamental:{ score:fundamental.score ?? rankingRow.fundamental_score ?? null, value_score:fundamental.value_score ?? rankingRow.value_score ?? null, quality_score:fundamental.quality_score ?? rankingRow.quality_score ?? null, growth_stability_score:fundamental.growth_stability_score ?? rankingRow.growth_stability_score ?? null, value_trap_risk:fundamental.value_trap_risk ?? rankingRow.value_trap_risk ?? null, data_completeness:fundamental.data_completeness ?? rankingRow.data_completeness ?? null, earnings_yield:fundamental.earnings_yield ?? null, book_to_market:fundamental.book_to_market ?? null, fcf_yield:fundamental.fcf_yield ?? null, roe:fundamental.roe ?? null, operating_margin:fundamental.operating_margin ?? null },
+        technical:{ score:technical.score ?? rankingRow.technical_score ?? null, price:technical.price ?? rankingRow.last_price ?? null, sma20:technical.sma20 ?? null, sma60:technical.sma60 ?? null, rsi14:technical.rsi14 ?? null, momentum20_pct:technical.momentum20_pct ?? null, momentum60_pct:technical.momentum60_pct ?? null, volatility20_pct:technical.volatility20_pct ?? null, drawdown20_pct:technical.drawdown20_pct ?? null },
+        recommendation,
+        holding:decision.holding ?? {quantity:0,avg_cost:null},
+        quote:decision.quote ?? {},
+        financials:{ status:remotePeriods.length ? summary.status : periods.length ? 'local_sanitized' : summary.status, periods, details_status:details.status, latest_details:details.rows[0] ?? null, full_statements_entitled:details.status !== 'not_entitled', full_statements_available:Boolean(details.rows.length) },
+        earnings:{ status:earnings.rows.length ? earnings.status : earningsHistory.length ? 'local_sanitized' : earnings.status, history:earningsHistory, next:earningsHistory[0] ?? null },
+        disclosures:{ status:disclosures.length ? (tdnet.rows.length ? tdnet.status : 'local_sanitized') : (local?.official_disclosure_status ?? tdnet.status), items:disclosures, search_url:`https://www.google.com/search?q=${encodeURIComponent(`${name} ${code} 適時開示 決算短信`)}` },
+        general_news:newsItems,
+        chart:{ status:chartRows.length ? 'ok' : (chartSettled.reason?.name === 'AbortError' ? 'timeout' : 'unavailable'), rows:chartRows },
+        data_dates:{ effective_fundamental_cutoff:report.fundamental_source?.effective_data_cutoff ?? ranking.metadata?.effective_data_cutoff ?? null, latest_disclosure_date:fundamental.latest_disclosure_date ?? periods[0]?.disclosure_date ?? null, latest_price_date:chartRows.at(-1)?.date ?? technical.price_date ?? null },
+        source_status:{ chart:{ok:Boolean(chartRows.length),error:chartSettled.status === 'rejected' ? String(chartSettled.reason?.message ?? chartSettled.reason) : null}, general_news:{ok:Boolean(newsItems.length),error:newsSettled.status === 'rejected' ? String(newsSettled.reason?.message ?? newsSettled.reason) : null}, financial_summary:{status:summary.status,local_fallback:!remotePeriods.length && periods.length>0}, financial_details:{status:details.status}, earnings:{status:earnings.status,local_fallback:!earnings.rows.length && earningsHistory.length>0}, tdnet:{status:tdnet.status,local_fallback:!tdnet.rows.length && localDisclosures.length>0} },
+        warnings, paper_only:true,
+      };
+      const duration = Date.now() - started;
+      const response = Response.json(payload, { headers:{ 'Cache-Control':CACHE_CONTROL, 'Content-Type':'application/json; charset=utf-8', 'X-Content-Type-Options':'nosniff', 'Server-Timing':`security-detail;dur=${duration}, chart;desc="${chartRows.length?'ok':'failed'}", news;desc="${newsItems.length?'ok':'failed'}"` } });
+      context.waitUntil(caches.default.put(cacheKey, response.clone()));
+      return response;
+    }
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/new-feature-build.test.mjs:1:856)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: recommendation UI has separate required headings and candlesticks
+ok 69 - recommendation UI has separate required headings and candlesticks
+  ---
+  duration_ms: 3.84732
+  type: 'test'
+  ...
+# Subtest: parameters are visibly separated into investment pillars
+ok 70 - parameters are visibly separated into investment pillars
+  ---
+  duration_ms: 1.114168
+  type: 'test'
+  ...
+# Subtest: category counts include every supported category
+ok 71 - category counts include every supported category
+  ---
+  duration_ms: 0.838131
+  type: 'test'
+  ...
+# Subtest: official parameter control and readability assets are in production build
+ok 72 - official parameter control and readability assets are in production build
+  ---
+  duration_ms: 5.897983
+  type: 'test'
+  ...
+# Subtest: readability CSS guarantees 16 18 and 20 pixel modes including iPhone
+ok 73 - readability CSS guarantees 16 18 and 20 pixel modes including iPhone
+  ---
+  duration_ms: 1.748788
+  type: 'test'
+  ...
+# Subtest: Playwright suite covers PC, two iPads and two iPhones
+ok 74 - Playwright suite covers PC, two iPads and two iPhones
+  ---
+  duration_ms: 1.411084
+  type: 'test'
+  ...
+# Subtest: normalization clamps ranges and keeps supported display sizes
+ok 75 - normalization clamps ranges and keeps supported display sizes
+  ---
+  duration_ms: 1.505351
+  type: 'test'
+  ...
+# Subtest: weights are normalized to exactly 100 percent
+ok 76 - weights are normalized to exactly 100 percent
+  ---
+  duration_ms: 1.107034
+  type: 'test'
+  ...
+# Subtest: RSI inversion is a blocking validation error
+ok 77 - RSI inversion is a blocking validation error
+  ---
+  duration_ms: 0.421099
+  type: 'test'
+  ...
+# Subtest: all named presets are available and change defaults
+ok 78 - all named presets are available and change defaults
+  ---
+  duration_ms: 3.734047
+  type: 'test'
+  ...
+# Subtest: legacy screening fundamental and risk settings migrate
+ok 79 - legacy screening fundamental and risk settings migrate
+  ---
+  duration_ms: 0.313938
+  type: 'test'
+  ...
+# Subtest: legacy stores preserve existing feature contracts
+ok 80 - legacy stores preserve existing feature contracts
+  ---
+  duration_ms: 0.353222
+  type: 'test'
+  ...
+# Subtest: font mapping has no option below 16 pixels
+ok 81 - font mapping has no option below 16 pixels
+  ---
+  duration_ms: 0.253345
+  type: 'test'
+  ...
+# Subtest: parameter control labels and no-order warning exist
+ok 82 - parameter control labels and no-order warning exist
+  ---
+  duration_ms: 5.889047
+  type: 'test'
+  ...
+# Subtest: readability layer enforces 16px font and touch minimums
+ok 83 - readability layer enforces 16px font and touch minimums
+  ---
+  duration_ms: 1.638219
+  type: 'test'
+  ...
+# Subtest: font boot reads central and existing preferences
+ok 84 - font boot reads central and existing preferences
+  ---
+  duration_ms: 1.372412
+  type: 'test'
+  ...
+# Subtest: default bundle starts with readable large font
+ok 85 - default bundle starts with readable large font
+  ---
+  duration_ms: 1.923916
+  type: 'test'
+  ...
+# Subtest: conservative preset tightens risk and quality controls
+ok 86 - conservative preset tightens risk and quality controls
+  ---
+  duration_ms: 1.153933
+  type: 'test'
+  ...
+# Subtest: normalization clamps invalid settings
+ok 87 - normalization clamps invalid settings
+  ---
+  duration_ms: 2.056544
+  type: 'test'
+  ...
+# Subtest: path helpers update nested parameter values
+ok 88 - path helpers update nested parameter values
+  ---
+  duration_ms: 0.415008
+  type: 'test'
+  ...
+# Subtest: export and import preserve user settings
+ok 89 - export and import preserve user settings
+  ---
+  duration_ms: 0.977842
+  type: 'test'
+  ...
+# Subtest: quality preset raises quality and ROE thresholds
+ok 90 - quality preset raises quality and ROE thresholds
+  ---
+  duration_ms: 2.698357
+  type: 'test'
+  ...
+# Subtest: loss-control preset tightens risk limits without enabling orders
+ok 91 - loss-control preset tightens risk limits without enabling orders
+  ---
+  duration_ms: 0.633817
+  type: 'test'
+  ...
+# Subtest: invalid import is rejected with accessible validation detail
+ok 92 - invalid import is rejected with accessible validation detail
+  ---
+  duration_ms: 0.497382
+  type: 'test'
+  ...
+# Subtest: wrong schema is rejected
+ok 93 - wrong schema is rejected
+  ---
+  duration_ms: 0.755095
+  type: 'test'
+  ...
+# Subtest: existing individual storage keys remain authoritative
+ok 94 - existing individual storage keys remain authoritative
+  ---
+  duration_ms: 0.835485
+  type: 'test'
+  ...
+# Subtest: storage payload writes legacy and central keys
+ok 95 - storage payload writes legacy and central keys
+  ---
+  duration_ms: 0.506459
+  type: 'test'
+  ...
+# Subtest: change summary includes fundamental weight edits
+ok 96 - change summary includes fundamental weight edits
+  ---
+  duration_ms: 2.590064
+  type: 'test'
+  ...
+# Subtest: impact preview returns honest counts from sanitized data
+ok 97 - impact preview returns honest counts from sanitized data
+  ---
+  duration_ms: 2.858247
+  type: 'test'
+  ...
+# Subtest: performance analytics module loads and preserves missing values
+ok 98 - performance analytics module loads and preserves missing values
+  ---
+  duration_ms: 1.658839
+  type: 'test'
+  ...
+# Subtest: one observation is not converted into fake returns
+ok 99 - one observation is not converted into fake returns
+  ---
+  duration_ms: 2.222605
+  type: 'test'
+  ...
+# Subtest: range filtering preserves observed points only
+ok 100 - range filtering preserves observed points only
+  ---
+  duration_ms: 12.991005
+  type: 'test'
+  ...
+# Subtest: adjustable settings recalculate risk reward and ratios
+ok 101 - adjustable settings recalculate risk reward and ratios
+  ---
+  duration_ms: 2.333654
+  type: 'test'
+  ...
+# Subtest: chart modes and CSV expose all series without secrets
+ok 102 - chart modes and CSV expose all series without secrets
+  ---
+  duration_ms: 0.486612
+  type: 'test'
+  ...
+# Subtest: period filter keeps recent points
+ok 103 - period filter keeps recent points
+  ---
+  duration_ms: 1.464705
+  type: 'test'
+  ...
+# Subtest: live equity is appended using entry basis
+ok 104 - live equity is appended using entry basis
+  ---
+  duration_ms: 0.553227
+  type: 'test'
+  ...
+# Subtest: metric state preserves insufficient history
+ok 105 - metric state preserves insufficient history
+  ---
+  duration_ms: 0.258374
+  type: 'test'
+  ...
+# Subtest: contribution view prefers live quote P&L
+ok 106 - contribution view prefers live quote P&L
+  ---
+  duration_ms: 0.394209
+  type: 'test'
+  ...
+# Subtest: chart bounds include zero when requested
+ok 107 - chart bounds include zero when requested
+  ---
+  duration_ms: 0.335609
+  type: 'test'
+  ...
+# Subtest: fetch coordinator is inserted before quote-consuming scripts
+ok 108 - fetch coordinator is inserted before quote-consuming scripts
+  ---
+  duration_ms: 6.788051
+  type: 'test'
+  ...
+# Subtest: coordinator provides one shared compact quote request and timeout
+ok 109 - coordinator provides one shared compact quote request and timeout
+  ---
+  duration_ms: 1.695047
+  type: 'test'
+  ...
+# Subtest: fast bootstrap displays static daily data before live quotes
+ok 110 - fast bootstrap displays static daily data before live quotes
+  ---
+  duration_ms: 1.714924
+  type: 'test'
+  ...
+# Subtest: all five phone destinations have bounded subpages
+ok 111 - all five phone destinations have bounded subpages
+  ---
+  duration_ms: 2.052196
+  type: 'test'
+  ...
+# Subtest: phone hash preserves other parameters and restores page
+ok 112 - phone hash preserves other parameters and restores page
+  ---
+  duration_ms: 0.716483
+  type: 'test'
+  ...
+# Subtest: adjacent navigation is clamped
+ok 113 - adjacent navigation is clamped
+  ---
+  duration_ms: 0.422802
+  type: 'test'
+  ...
+# Subtest: managed selectors include decision parameters analytics and risk
+ok 114 - managed selectors include decision parameters analytics and risk
+  ---
+  duration_ms: 1.305536
+  type: 'test'
+  ...
+# Subtest: quote API uses bounded concurrency, source timeouts and partial output
+ok 115 - quote API uses bounded concurrency, source timeouts and partial output
+  ---
+  duration_ms: 6.916903
+  type: 'test'
+  ...
+# Subtest: coordinator is injected before consumers and adaptive shell last
+ok 116 - coordinator is injected before consumers and adaptive shell last
+  ---
+  duration_ms: 1.76067
+  type: 'test'
+  ...
+# Subtest: supporting text floor is 13px and mobile body floor is 14px
+ok 117 - supporting text floor is 13px and mobile body floor is 14px
+  ---
+  duration_ms: 5.85875
+  type: 'test'
+  ...
+# Subtest: font modes remain 16 18 and 20 pixels
+ok 118 - font modes remain 16 18 and 20 pixels
+  ---
+  duration_ms: 1.600069
+  type: 'test'
+  ...
+# Subtest: responsive layer includes iPhone breakpoint and safe areas
+ok 119 - responsive layer includes iPhone breakpoint and safe areas
+  ---
+  duration_ms: 6.628102
+  type: 'test'
+  ...
+# Subtest: responsive script installs viewport indicator and five mobile destinations
+ok 120 - responsive script installs viewport indicator and five mobile destinations
+  ---
+  duration_ms: 2.046745
+  type: 'test'
+  ...
+# Subtest: risk diagnostics module loads with stable default limits
+ok 121 - risk diagnostics module loads with stable default limits
+  ---
+  duration_ms: 1.244322
+  type: 'test'
+  ...
+# Subtest: robust score ranks quality value above trap
+ok 122 - robust score ranks quality value above trap
+  ---
+  duration_ms: 4.619427
+  type: 'test'
+  ...
+# Subtest: missing metrics are not converted to zero
+ok 123 - missing metrics are not converted to zero
+  ---
+  duration_ms: 0.737092
+  type: 'test'
+  ...
+# Subtest: weights must sum to 100
+ok 124 - weights must sum to 100
+  ---
+  duration_ms: 0.463328
+  type: 'test'
+  ...
+# Subtest: csv parser and exporter preserve quoted values
+ok 125 - csv parser and exporter preserve quoted values
+  ---
+  duration_ms: 0.590457
+  type: 'test'
+  ...
+# Subtest: summary reports eligible and median
+ok 126 - summary reports eligible and median
+  ---
+  duration_ms: 1.753375
+  type: 'test'
+  ...
+# Subtest: merges ranking and daily technical data
+ok 127 - merges ranking and daily technical data
+  ---
+  duration_ms: 1.682223
+  type: 'test'
+  ...
+# Subtest: Free safe preset excludes weak record
+ok 128 - Free safe preset excludes weak record
+  ---
+  duration_ms: 3.726293
+  type: 'test'
+  ...
+# Subtest: missing policy neutral produces score while exclude rejects
+ok 129 - missing policy neutral produces score while exclude rejects
+  ---
+  duration_ms: 0.487543
+  type: 'test'
+  ...
+# Subtest: CSV contains separate pillars and no secrets
+ok 130 - CSV contains separate pillars and no secrets
+  ---
+  duration_ms: 0.808756
+  type: 'test'
+  ...
+# Subtest: security codes and hashes normalize without losing other state
+ok 131 - security codes and hashes normalize without losing other state
+  ---
+  duration_ms: 1.189149
+  type: 'test'
+  ...
+# Subtest: SMA and indicators use null for insufficient history
+ok 132 - SMA and indicators use null for insufficient history
+  ---
+  duration_ms: 10.194876
+  type: 'test'
+  ...
+# Subtest: candles are sorted filtered and enriched
+ok 133 - candles are sorted filtered and enriched
+  ---
+  duration_ms: 1.288855
+  type: 'test'
+  ...
+# Subtest: growth is calculated only for compatible periods and missing stays null
+not ok 134 - growth is calculated only for compatible periods and missing stays null
+  ---
+  duration_ms: 1.410543
+  type: 'test'
+  location: '/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/security-detail-core.test.mjs:1:1392'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 19.999999999999996
+    - 20
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 20
+  actual: 19.999999999999996
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/tests/security-detail-core.test.mjs:1:1483)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: recommendation reasons stay separated
+ok 135 - recommendation reasons stay separated
+  ---
+  duration_ms: 0.505839
+  type: 'test'
+  ...
+# Subtest: code extraction supports five-digit J-Quants codes and company names
+ok 136 - code extraction supports five-digit J-Quants codes and company names
+  ---
+  duration_ms: 1.525309
+  type: 'test'
+  ...
+# Subtest: chart geometry creates bounded candles and moving averages
+ok 137 - chart geometry creates bounded candles and moving averages
+  ---
+  duration_ms: 15.432511
+  type: 'test'
+  ...
+# Subtest: recommendation reasons stay separated
+ok 138 - recommendation reasons stay separated
+  ---
+  duration_ms: 1.239172
+  type: 'test'
+  ...
+# Subtest: generic TDnet fields are normalized
+ok 139 - generic TDnet fields are normalized
+  ---
+  duration_ms: 0.324107
+  type: 'test'
+  ...
+# Subtest: general news parser returns metadata only
+ok 140 - general news parser returns metadata only
+  ---
+  duration_ms: 3.693352
+  type: 'test'
+  ...
+# Subtest: flat API reason fields render into separate groups
+ok 141 - flat API reason fields render into separate groups
+  ---
+  duration_ms: 0.430447
+  type: 'test'
+  ...
+# Subtest: stock detail API validates code, times out upstreams and returns partial sources
+ok 142 - stock detail API validates code, times out upstreams and returns partial sources
+  ---
+  duration_ms: 5.352792
+  type: 'test'
+  ...
+# Subtest: stock detail is lazy and not requested by initial scripts
+ok 143 - stock detail is lazy and not requested by initial scripts
+  ---
+  duration_ms: 2.067172
+  type: 'test'
+  ...
+# Subtest: normalizes numeric and alphanumeric TSE codes
+ok 144 - normalizes numeric and alphanumeric TSE codes
+  ---
+  duration_ms: 1.033487
+  type: 'test'
+  ...
+# Subtest: calculates SMA and candle geometry
+ok 145 - calculates SMA and candle geometry
+  ---
+  duration_ms: 10.013596
+  type: 'test'
+  ...
+# Subtest: financial series calculates margins and year-on-year
+ok 146 - financial series calculates margins and year-on-year
+  ---
+  duration_ms: 0.539862
+  type: 'test'
+  ...
+# Subtest: recommendation reasons keep Fundamental and Technical separate
+ok 147 - recommendation reasons keep Fundamental and Technical separate
+  ---
+  duration_ms: 0.545322
+  type: 'test'
+  ...
+# Subtest: RSS parser returns title source date and link only
+ok 148 - RSS parser returns title source date and link only
+  ---
+  duration_ms: 1.717949
+  type: 'test'
+  ...
+# Subtest: insufficient history cannot be promoted
+ok 149 - insufficient history cannot be promoted
+  ---
+  duration_ms: 0.917509
+  type: 'test'
+  ...
+# Subtest: research CSV exposes baseline comparison and no secrets
+ok 150 - research CSV exposes baseline comparison and no secrets
+  ---
+  duration_ms: 0.443952
+  type: 'test'
+  ...
+1..150
+# tests 150
+# suites 0
+# pass 146
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1195.597333
+lint_exit_code=1
+test_exit_code=1
