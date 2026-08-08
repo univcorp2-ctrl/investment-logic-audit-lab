@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-08T01:02:18.751500+00:00",
+  "generated_at": "2026-08-08T02:30:18.364802+00:00",
   "snapshot_generated_at": "2026-08-03T14:07:31.566915+09:00",
   "operational_start": "2026-08-04T00:00:00+09:00",
   "data_errors": {},
@@ -86,13 +86,13 @@
         "observations": 4,
         "total_return_pct": 1.3811204697617763,
         "cagr_pct": null,
-        "volatility_pct": 37.15105496463604,
+        "volatility_pct": 37.15105496463603,
         "sharpe": null,
         "sortino": null,
         "max_drawdown_pct": -2.5643401203562233,
         "turnover": 1.053257532307022,
         "hit_rate_pct": 50.0,
-        "profit_factor": 1.5781144754281045
+        "profit_factor": 1.5781144754281042
       },
       "baseline_excess_pct": 1.210038910919331
     },

@@ -152,18 +152,9 @@
     "selected_strategy": null
   },
   "research_candidate": null,
-  "adoption_status": "not_eligible_operational_history",
+  "adoption_status": "not_eligible_insufficient_validation",
   "warnings": [
-    "Free-plan data with an effective cutoff of 2026-05-11 was not available to this app until the ranking was generated on 2026-08-03. Returns measured from 2026-05-12 are counterfactual diagnostics and were not executable with the Free plan at that time.",
     "Walk-forward validation has insufficient post-cutoff history; no strategy may be promoted."
   ],
-  "disclaimer": "Historical counterfactual research only. The delayed snapshot was not operationally available during most of the displayed comparison period. No paper or broker rule is changed automatically and no future return is guaranteed.",
-  "availability_model": {
-    "effective_data_cutoff": "2026-05-11",
-    "snapshot_generated_at": "2026-08-03T14:07:31.566915+09:00",
-    "operational_start": "2026-08-04T00:00:00+09:00",
-    "counterfactual_observations": 63,
-    "operational_observations": 4,
-    "counterfactual_only": true
-  }
+  "disclaimer": "Historical research only. No paper or broker rule is changed automatically and no future return is guaranteed."
 }
