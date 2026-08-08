@@ -1,0 +1,374 @@
+status=None
+duration=None
+---
+title=iPhone tasks hide unrelated large modules and browser history restores task
+file=security-detail-mobile-flow.spec.mjs line=11 column=1
+status=failed duration=21760
+Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator:  locator('#mobileTaskFlow')
+Expected: visible
+Received: hidden
+Timeout:  20000ms
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 20000ms[22m
+[2m  - waiting for locator('#mobileTaskFlow')[22m
+[2m    43 × locator resolved to <nav id="mobileTaskFlow" class="mobile-task-flow" aria-label="iPhone画面内ナビゲーション">…</nav>[22m
+[2m       - unexpected value "hidden"[22m
+
+Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator:  locator('#mobileTaskFlow')
+Expected: visible
+Received: hidden
+Timeout:  20000ms
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 20000ms[22m
+[2m  - waiting for locator('#mobileTaskFlow')[22m
+[2m    43 × locator resolved to <nav id="mobileTaskFlow" class="mobile-task-flow" aria-label="iPhone画面内ナビゲーション">…</nav>[22m
+[2m       - unexpected value "hidden"[22m
+
+    at gotoPhone (/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:7:211)
+    at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:11:100
+Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator:  locator('#mobileTaskFlow')
+Expected: visible
+Received: hidden
+Timeout:  20000ms
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 20000ms[22m
+[2m  - waiting for locator('#mobileTaskFlow')[22m
+[2m    43 × locator resolved to <nav id="mobileTaskFlow" class="mobile-task-flow" aria-label="iPhone画面内ナビゲーション">…</nav>[22m
+[2m       - unexpected value "hidden"[22m
+
+
+   5 | const adaptiveFixture={status:'collecting_data',observations:5,required_observations:63,walk_forward_windows:0,required_windows:3,fundamental_locked:true,fundamental_snapshots:1,reporting_periods:1,champion:{name:'balanced',objective:{value:0},metrics:{}},challenger:{name:'low_volatility',policy:{name:'low_volatility',fundamental:{buy_fundamental:58,buy_quality:62,buy_completeness:45,buy_max_trap:40},technical:{buy_technical:55},risk:{stop_loss_pct:-6,max_drawdown_pct:-9}},objective:{value:1.2},metrics:{}},promotion_guardrails:{checks:{enough_oos_sessions:false,enough_windows:false,objective_improvement:true,drawdown_not_worse:true,turnover_within_limit:true,parameter_stability:false,data_quality_ok:true}},parameter_classification:[{group:'fundamental',label:'Fundamental',ownership:'固定中',user_adjustable:true},{group:'technical',label:'Technical',ownership:'AI候補',user_adjustable:true},{group:'risk',label:'Risk',ownership:'AI候補',user_adjustable:true}],objective_formula:'OOS return + downside-adjusted return - drawdown - turnover',warnings:['OOS履歴が不足しています。自動修正は行っていません。']};
+   6 | async function mock(page){await page.route('**/api/quotes**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(quotePayload)}));await page.route('**/api/portfolio-status**',route=>route.fulfill({status:200,contentType:'text/plain',body:'generated_at\t2026-08-07T06:30:00Z\ntotal\t100\t105\t5\t5\t1\t0\t0\t1\t1\n'}));await page.route('**/api/security-detail**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(securityFixture)}));await page.route('**/data/adaptive-strategy/status.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(adaptiveFixture)}));await page.route('**/data/adaptive-strategy/candidates.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({candidates:[adaptiveFixture.challenger]})}));await page.route('**/data/adaptive-strategy/audit-log.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));}
+>  7 | async function gotoPhone(page,width=390,height=844){await page.setViewportSize({width,height});await mock(page);await page.goto('/',{waitUntil:'domcontentloaded'});await expect(page.locator('#mobileTaskFlow')).toBeVisible({timeout:20000})}
+     |                                                                                                                                                                                                                   ^
+   8 | async function primary(page,target){const button=page.locator(`#adaptiveMobileNav [data-adaptive-target="${target}"]`);await expect(button).toBeVisible();await button.click()}
+   9 | async function task(page,name){const button=page.locator('#mobileTaskFlow [data-mobile-task]').filter({hasText:name});await expect(button).toBeVisible();await button.click()}
+  10 | async function noOverflow(page){const values=await page.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,innerWidth:window.innerWidth}));expect(values.scrollWidth).toBeLessThanOrEqual(values.innerWidth+2)}
+    at gotoPhone (/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:7:211)
+    at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:11:100
+
+---
+title=conditions are navigated by buttons and show parameter classification
+file=security-detail-mobile-flow.spec.mjs line=12 column=1
+status=failed duration=21781
+Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator:  locator('#mobileTaskFlow')
+Expected: visible
+Received: hidden
+Timeout:  20000ms
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 20000ms[22m
+[2m  - waiting for locator('#mobileTaskFlow')[22m
+[2m    43 × locator resolved to <nav id="mobileTaskFlow" class="mobile-task-flow" aria-label="iPhone画面内ナビゲーション">…</nav>[22m
+[2m       - unexpected value "hidden"[22m
+
+Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator:  locator('#mobileTaskFlow')
+Expected: visible
+Received: hidden
+Timeout:  20000ms
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 20000ms[22m
+[2m  - waiting for locator('#mobileTaskFlow')[22m
+[2m    43 × locator resolved to <nav id="mobileTaskFlow" class="mobile-task-flow" aria-label="iPhone画面内ナビゲーション">…</nav>[22m
+[2m       - unexpected value "hidden"[22m
+
+    at gotoPhone (/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:7:211)
+    at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:12:94
+Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator:  locator('#mobileTaskFlow')
+Expected: visible
+Received: hidden
+Timeout:  20000ms
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 20000ms[22m
+[2m  - waiting for locator('#mobileTaskFlow')[22m
+[2m    43 × locator resolved to <nav id="mobileTaskFlow" class="mobile-task-flow" aria-label="iPhone画面内ナビゲーション">…</nav>[22m
+[2m       - unexpected value "hidden"[22m
+
+
+   5 | const adaptiveFixture={status:'collecting_data',observations:5,required_observations:63,walk_forward_windows:0,required_windows:3,fundamental_locked:true,fundamental_snapshots:1,reporting_periods:1,champion:{name:'balanced',objective:{value:0},metrics:{}},challenger:{name:'low_volatility',policy:{name:'low_volatility',fundamental:{buy_fundamental:58,buy_quality:62,buy_completeness:45,buy_max_trap:40},technical:{buy_technical:55},risk:{stop_loss_pct:-6,max_drawdown_pct:-9}},objective:{value:1.2},metrics:{}},promotion_guardrails:{checks:{enough_oos_sessions:false,enough_windows:false,objective_improvement:true,drawdown_not_worse:true,turnover_within_limit:true,parameter_stability:false,data_quality_ok:true}},parameter_classification:[{group:'fundamental',label:'Fundamental',ownership:'固定中',user_adjustable:true},{group:'technical',label:'Technical',ownership:'AI候補',user_adjustable:true},{group:'risk',label:'Risk',ownership:'AI候補',user_adjustable:true}],objective_formula:'OOS return + downside-adjusted return - drawdown - turnover',warnings:['OOS履歴が不足しています。自動修正は行っていません。']};
+   6 | async function mock(page){await page.route('**/api/quotes**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(quotePayload)}));await page.route('**/api/portfolio-status**',route=>route.fulfill({status:200,contentType:'text/plain',body:'generated_at\t2026-08-07T06:30:00Z\ntotal\t100\t105\t5\t5\t1\t0\t0\t1\t1\n'}));await page.route('**/api/security-detail**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(securityFixture)}));await page.route('**/data/adaptive-strategy/status.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(adaptiveFixture)}));await page.route('**/data/adaptive-strategy/candidates.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({candidates:[adaptiveFixture.challenger]})}));await page.route('**/data/adaptive-strategy/audit-log.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));}
+>  7 | async function gotoPhone(page,width=390,height=844){await page.setViewportSize({width,height});await mock(page);await page.goto('/',{waitUntil:'domcontentloaded'});await expect(page.locator('#mobileTaskFlow')).toBeVisible({timeout:20000})}
+     |                                                                                                                                                                                                                   ^
+   8 | async function primary(page,target){const button=page.locator(`#adaptiveMobileNav [data-adaptive-target="${target}"]`);await expect(button).toBeVisible();await button.click()}
+   9 | async function task(page,name){const button=page.locator('#mobileTaskFlow [data-mobile-task]').filter({hasText:name});await expect(button).toBeVisible();await button.click()}
+  10 | async function noOverflow(page){const values=await page.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,innerWidth:window.innerWidth}));expect(values.scrollWidth).toBeLessThanOrEqual(values.innerWidth+2)}
+    at gotoPhone (/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:7:211)
+    at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:12:94
+
+---
+title=PC double click opens security detail with five tabs and candlestick tools
+file=security-detail-mobile-flow.spec.mjs line=13 column=1
+status=timedOut duration=61511
+[31mTest timeout of 60000ms exceeded.[39m
+[31mTest timeout of 60000ms exceeded.[39m
+[31mTest timeout of 60000ms exceeded.[39m
+
+Error: locator.dblclick: Test timeout of 60000ms exceeded.
+Call log:
+[2m  - waiting for locator('#rankingBody tr').first()[22m
+[2m    - locator resolved to <tr tabindex="0" data-code="80350" data-security-code="3650">…</tr>[22m
+[2m  - attempting dblclick action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <div id="securityDetailContent" data-active-tab="overview" class="security-detail-content">…</div> from <section role="dialog" aria-modal="true" id="securityDetailDialog" class="security-detail-dialog" aria-labelledby="securityDetailTitle">…</section> subtree intercepts pointer events[22m
+[2m    - retrying dblclick action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <div id="securityDetailContent" data-active-tab="overview" class="security-detail-content">…</div> from <section role="dialog" aria-modal="true" id="securityDetailDialog" class="security-detail-dialog" aria-labelledby="securityDetailTitle">…</section> subtree intercepts pointer events[22m
+[2m    - retrying dblclick action[22m
+[2m      - waiting 100ms[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is not stable[22m
+[2m  27 × retrying dblclick action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <nav role="tablist" aria-label="銘柄詳細タブ" class="security-detail-tabs">…</nav> from <section role="dialog" aria-modal="true" id="securityDetailDialog" class="security-detail-dialog" aria-labelledby="securityDetailTitle">…</section> subtree intercepts pointer events[22m
+[2m     - retrying dblclick action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <div id="securityDetailContent" data-active-tab="overview" class="security-detail-content">…</div> from <section role="dialog" aria-modal="true" id="securityDetailDialog" class="security-detail-dialog" aria-labelledby="securityDetailTitle">…</section> subtree intercepts pointer events[22m
+[2m     - retrying dblclick action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <div id="securityDetailContent" data-active-tab="overview" class="security-detail-content">…</div> from <section role="dialog" aria-modal="true" id="securityDetailDialog" class="security-detail-dialog" aria-labelledby="securityDetailTitle">…</section> subtree intercepts pointer events[22m
+[2m     - retrying dblclick action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <nav role="tablist" aria-label="銘柄詳細タブ" class="security-detail-tabs">…</nav> from <section role="dialog" aria-modal="true" id="securityDetailDialog" class="security-detail-dialog" aria-labelledby="securityDetailTitle">…</section> subtree intercepts pointer events[22m
+[2m  - retrying dblclick action[22m
+[2m    - waiting 500ms[22m
+
+
+  11 | test('iPhone tasks hide unrelated large modules and browser history restores task',async({page})=>{await gotoPhone(page);await primary(page,'performance');await task(page,'資産推移');await expect(page.locator('#performanceAnalytics')).toBeVisible();await expect(page.locator('#demoTrade')).toBeHidden();await expect(page.locator('#riskDiagnostics')).toBeHidden();await task(page,'原因分析');await expect(page.locator('#riskDiagnostics')).toBeVisible();await expect(page.locator('#performanceAnalytics')).toBeHidden();await page.goBack();await expect(page.locator('#performanceAnalytics')).toBeVisible();await expect(page.locator('body')).toHaveAttribute('data-phone-task','curve');const height=await page.evaluate(()=>document.documentElement.scrollHeight/window.innerHeight);expect(height).toBeLessThan(8);await noOverflow(page)});
+  12 | test('conditions are navigated by buttons and show parameter classification',async({page})=>{await gotoPhone(page,375,812);await primary(page,'screening');await task(page,'Fundamental');await expect(page.locator('#parameterControl')).toBeVisible();await expect(page.locator('[data-parameter-tab="fundamental"]')).toHaveAttribute('aria-selected','true');await expect(page.locator('.parameter-classification-legend')).toContainText('Fundamental');await task(page,'Technical');await expect(page.locator('[data-parameter-tab="technical"]')).toHaveAttribute('aria-selected','true');await task(page,'Risk');await expect(page.locator('[data-parameter-tab="risk"]')).toHaveAttribute('aria-selected','true');await noOverflow(page)});
+> 13 | test('PC double click opens security detail with five tabs and candlestick tools',async({page})=>{await page.setViewportSize({width:1440,height:900});await mock(page);await page.goto('/',{waitUntil:'domcontentloaded'});const row=page.locator('#rankingBody tr').first();await expect(row).toBeVisible({timeout:20000});await row.dblclick();const dialog=page.locator('#securityDetailDialog');await expect(dialog).toBeVisible();await expect(dialog.locator('[role="tab"]')).toHaveCount(5);await dialog.getByRole('tab',{name:'チャート'}).click();await expect(dialog.locator('.candle').first()).toBeVisible();await expect(dialog.locator('.sma20')).toBeVisible();await expect(dialog.locator('.sma60')).toBeVisible();await dialog.getByRole('button',{name:'3M'}).click();await expect(dialog.locator('[data-chart-period="3m"]')).toHaveAttribute('aria-pressed','true');await dialog.getByRole('tab',{name:'推奨理由'}).click();await expect(dialog).toContainText('Fundamentalの推奨理由');await expect(dialog).toContainText('Technicalの推奨理由');await dialog.getByRole('tab',{name:'決算'}).click();await expect(dialog).toContainText('決算サマリー');await expect(dialog).toContainText('決算発表予定');await dialog.getByRole('tab',{name:'ニュース・開示'}).click();await expect(dialog).toContainText('適時開示データは未接続');await expect(dialog).toContainText('架空ニュースは表示しません');await expect(dialog).toContainText('一般ニュース（公式開示ではありません）')});
+     |                                                                                                                                                                                                                                                                                                                                       ^
+  14 | test('iPhone explicit detail button opens a full-screen sheet and switches all tabs',async({page})=>{await gotoPhone(page);await primary(page,'decision');await task(page,'ランキング');const button=page.locator('#rankingBody .security-detail-button').first();await expect(button).toBeVisible({timeout:20000});await button.click();const dialog=page.locator('#securityDetailDialog');await expect(dialog).toBeVisible();const box=await dialog.locator('.security-detail-sheet').boundingBox();expect(box.width).toBeGreaterThanOrEqual(388);expect(box.height).toBeGreaterThanOrEqual(840);for(const name of['概要','決算','ニュース・開示','チャート','推奨理由']){await dialog.getByRole('tab',{name}).click();await expect(dialog.getByRole('tab',{name})).toHaveAttribute('aria-selected','true')}await expect(dialog.getByRole('button',{name:'銘柄詳細を閉じる'})).toBeFocused();await page.keyboard.press('Escape');await expect(dialog).toBeHidden();await noOverflow(page)});
+  15 | test('AI learning task is honest about insufficient history and local-only application',async({page})=>{await gotoPhone(page);await primary(page,'data');await task(page,'AI学習');const section=page.locator('#adaptiveLearning');await expect(section).toBeVisible();await expect(section).toContainText('学習データ収集中');await expect(section).toContainText('Fundamentalは固定中');await expect(section).toContainText('5 / 63営業日');await expect(section).toContainText('自動修正は行っていません');await section.getByRole('button',{name:'AI提案をブラウザ条件へ反映'}).click();await expect(section).toContainText('日次デモ戦略は変更していません')});
+  16 | test('security dialog accessibility smoke',async({page})=>{await page.setViewportSize({width:1440,height:900});await mock(page);await page.goto('/',{waitUntil:'domcontentloaded'});await page.locator('#rankingBody tr').first().dblclick();const dialog=page.locator('#securityDetailDialog');await expect(dialog).toHaveAttribute('role','dialog');await expect(dialog).toHaveAttribute('aria-modal','true');await expect(dialog).toHaveAttribute('aria-labelledby','securityDetailTitle');await expect(dialog.locator('[role="tablist"]')).toHaveCount(1);const duplicates=await page.evaluate(()=>{const visible=element=>Boolean(element.offsetWidth||element.offsetHeight||element.getClientRects().length);const counts=new Map();document.querySelectorAll('[id]').forEach(element=>{if(visible(element))counts.set(element.id,(counts.get(element.id)??0)+1)});return[...counts.entries()].filter(([,count])=>count>1)});expect(duplicates).toEqual([]);const close=dialog.getByRole('button',{name:'銘柄詳細を閉じる'});const box=await close.boundingBox();expect(box.height).toBeGreaterThanOrEqual(44)});
+    at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:13:327
+
+---
+title=iPhone explicit detail button opens a full-screen sheet and switches all tabs
+file=security-detail-mobile-flow.spec.mjs line=14 column=1
+status=failed duration=21808
+Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator:  locator('#mobileTaskFlow')
+Expected: visible
+Received: hidden
+Timeout:  20000ms
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 20000ms[22m
+[2m  - waiting for locator('#mobileTaskFlow')[22m
+[2m    43 × locator resolved to <nav id="mobileTaskFlow" class="mobile-task-flow" aria-label="iPhone画面内ナビゲーション">…</nav>[22m
+[2m       - unexpected value "hidden"[22m
+
+Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator:  locator('#mobileTaskFlow')
+Expected: visible
+Received: hidden
+Timeout:  20000ms
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 20000ms[22m
+[2m  - waiting for locator('#mobileTaskFlow')[22m
+[2m    43 × locator resolved to <nav id="mobileTaskFlow" class="mobile-task-flow" aria-label="iPhone画面内ナビゲーション">…</nav>[22m
+[2m       - unexpected value "hidden"[22m
+
+    at gotoPhone (/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:7:211)
+    at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:14:102
+Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator:  locator('#mobileTaskFlow')
+Expected: visible
+Received: hidden
+Timeout:  20000ms
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 20000ms[22m
+[2m  - waiting for locator('#mobileTaskFlow')[22m
+[2m    43 × locator resolved to <nav id="mobileTaskFlow" class="mobile-task-flow" aria-label="iPhone画面内ナビゲーション">…</nav>[22m
+[2m       - unexpected value "hidden"[22m
+
+
+   5 | const adaptiveFixture={status:'collecting_data',observations:5,required_observations:63,walk_forward_windows:0,required_windows:3,fundamental_locked:true,fundamental_snapshots:1,reporting_periods:1,champion:{name:'balanced',objective:{value:0},metrics:{}},challenger:{name:'low_volatility',policy:{name:'low_volatility',fundamental:{buy_fundamental:58,buy_quality:62,buy_completeness:45,buy_max_trap:40},technical:{buy_technical:55},risk:{stop_loss_pct:-6,max_drawdown_pct:-9}},objective:{value:1.2},metrics:{}},promotion_guardrails:{checks:{enough_oos_sessions:false,enough_windows:false,objective_improvement:true,drawdown_not_worse:true,turnover_within_limit:true,parameter_stability:false,data_quality_ok:true}},parameter_classification:[{group:'fundamental',label:'Fundamental',ownership:'固定中',user_adjustable:true},{group:'technical',label:'Technical',ownership:'AI候補',user_adjustable:true},{group:'risk',label:'Risk',ownership:'AI候補',user_adjustable:true}],objective_formula:'OOS return + downside-adjusted return - drawdown - turnover',warnings:['OOS履歴が不足しています。自動修正は行っていません。']};
+   6 | async function mock(page){await page.route('**/api/quotes**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(quotePayload)}));await page.route('**/api/portfolio-status**',route=>route.fulfill({status:200,contentType:'text/plain',body:'generated_at\t2026-08-07T06:30:00Z\ntotal\t100\t105\t5\t5\t1\t0\t0\t1\t1\n'}));await page.route('**/api/security-detail**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(securityFixture)}));await page.route('**/data/adaptive-strategy/status.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(adaptiveFixture)}));await page.route('**/data/adaptive-strategy/candidates.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({candidates:[adaptiveFixture.challenger]})}));await page.route('**/data/adaptive-strategy/audit-log.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));}
+>  7 | async function gotoPhone(page,width=390,height=844){await page.setViewportSize({width,height});await mock(page);await page.goto('/',{waitUntil:'domcontentloaded'});await expect(page.locator('#mobileTaskFlow')).toBeVisible({timeout:20000})}
+     |                                                                                                                                                                                                                   ^
+   8 | async function primary(page,target){const button=page.locator(`#adaptiveMobileNav [data-adaptive-target="${target}"]`);await expect(button).toBeVisible();await button.click()}
+   9 | async function task(page,name){const button=page.locator('#mobileTaskFlow [data-mobile-task]').filter({hasText:name});await expect(button).toBeVisible();await button.click()}
+  10 | async function noOverflow(page){const values=await page.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,innerWidth:window.innerWidth}));expect(values.scrollWidth).toBeLessThanOrEqual(values.innerWidth+2)}
+    at gotoPhone (/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:7:211)
+    at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:14:102
+
+---
+title=AI learning task is honest about insufficient history and local-only application
+file=security-detail-mobile-flow.spec.mjs line=15 column=1
+status=failed duration=21841
+Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator:  locator('#mobileTaskFlow')
+Expected: visible
+Received: hidden
+Timeout:  20000ms
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 20000ms[22m
+[2m  - waiting for locator('#mobileTaskFlow')[22m
+[2m    43 × locator resolved to <nav id="mobileTaskFlow" class="mobile-task-flow" aria-label="iPhone画面内ナビゲーション">…</nav>[22m
+[2m       - unexpected value "hidden"[22m
+
+Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator:  locator('#mobileTaskFlow')
+Expected: visible
+Received: hidden
+Timeout:  20000ms
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 20000ms[22m
+[2m  - waiting for locator('#mobileTaskFlow')[22m
+[2m    43 × locator resolved to <nav id="mobileTaskFlow" class="mobile-task-flow" aria-label="iPhone画面内ナビゲーション">…</nav>[22m
+[2m       - unexpected value "hidden"[22m
+
+    at gotoPhone (/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:7:211)
+    at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:15:105
+Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator:  locator('#mobileTaskFlow')
+Expected: visible
+Received: hidden
+Timeout:  20000ms
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 20000ms[22m
+[2m  - waiting for locator('#mobileTaskFlow')[22m
+[2m    43 × locator resolved to <nav id="mobileTaskFlow" class="mobile-task-flow" aria-label="iPhone画面内ナビゲーション">…</nav>[22m
+[2m       - unexpected value "hidden"[22m
+
+
+   5 | const adaptiveFixture={status:'collecting_data',observations:5,required_observations:63,walk_forward_windows:0,required_windows:3,fundamental_locked:true,fundamental_snapshots:1,reporting_periods:1,champion:{name:'balanced',objective:{value:0},metrics:{}},challenger:{name:'low_volatility',policy:{name:'low_volatility',fundamental:{buy_fundamental:58,buy_quality:62,buy_completeness:45,buy_max_trap:40},technical:{buy_technical:55},risk:{stop_loss_pct:-6,max_drawdown_pct:-9}},objective:{value:1.2},metrics:{}},promotion_guardrails:{checks:{enough_oos_sessions:false,enough_windows:false,objective_improvement:true,drawdown_not_worse:true,turnover_within_limit:true,parameter_stability:false,data_quality_ok:true}},parameter_classification:[{group:'fundamental',label:'Fundamental',ownership:'固定中',user_adjustable:true},{group:'technical',label:'Technical',ownership:'AI候補',user_adjustable:true},{group:'risk',label:'Risk',ownership:'AI候補',user_adjustable:true}],objective_formula:'OOS return + downside-adjusted return - drawdown - turnover',warnings:['OOS履歴が不足しています。自動修正は行っていません。']};
+   6 | async function mock(page){await page.route('**/api/quotes**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(quotePayload)}));await page.route('**/api/portfolio-status**',route=>route.fulfill({status:200,contentType:'text/plain',body:'generated_at\t2026-08-07T06:30:00Z\ntotal\t100\t105\t5\t5\t1\t0\t0\t1\t1\n'}));await page.route('**/api/security-detail**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(securityFixture)}));await page.route('**/data/adaptive-strategy/status.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(adaptiveFixture)}));await page.route('**/data/adaptive-strategy/candidates.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({candidates:[adaptiveFixture.challenger]})}));await page.route('**/data/adaptive-strategy/audit-log.json**',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({events:[]})}));}
+>  7 | async function gotoPhone(page,width=390,height=844){await page.setViewportSize({width,height});await mock(page);await page.goto('/',{waitUntil:'domcontentloaded'});await expect(page.locator('#mobileTaskFlow')).toBeVisible({timeout:20000})}
+     |                                                                                                                                                                                                                   ^
+   8 | async function primary(page,target){const button=page.locator(`#adaptiveMobileNav [data-adaptive-target="${target}"]`);await expect(button).toBeVisible();await button.click()}
+   9 | async function task(page,name){const button=page.locator('#mobileTaskFlow [data-mobile-task]').filter({hasText:name});await expect(button).toBeVisible();await button.click()}
+  10 | async function noOverflow(page){const values=await page.evaluate(()=>({scrollWidth:document.documentElement.scrollWidth,innerWidth:window.innerWidth}));expect(values.scrollWidth).toBeLessThanOrEqual(values.innerWidth+2)}
+    at gotoPhone (/home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:7:211)
+    at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:15:105
+
+---
+title=security dialog accessibility smoke
+file=security-detail-mobile-flow.spec.mjs line=16 column=1
+status=timedOut duration=61438
+[31mTest timeout of 60000ms exceeded.[39m
+[31mTest timeout of 60000ms exceeded.[39m
+[31mTest timeout of 60000ms exceeded.[39m
+
+Error: locator.dblclick: Test timeout of 60000ms exceeded.
+Call log:
+[2m  - waiting for locator('#rankingBody tr').first()[22m
+[2m    - locator resolved to <tr tabindex="0" data-code="80350" data-security-code="3650">…</tr>[22m
+[2m  - attempting dblclick action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <div id="securityDetailContent" data-active-tab="overview" class="security-detail-content">…</div> from <section role="dialog" aria-modal="true" id="securityDetailDialog" class="security-detail-dialog" aria-labelledby="securityDetailTitle">…</section> subtree intercepts pointer events[22m
+[2m    - retrying dblclick action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not stable[22m
+[2m    - retrying dblclick action[22m
+[2m      - waiting 100ms[22m
+[2m    4 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <div id="securityDetailContent" data-active-tab="overview" class="security-detail-content">…</div> from <section role="dialog" aria-modal="true" id="securityDetailDialog" class="security-detail-dialog" aria-labelledby="securityDetailTitle">…</section> subtree intercepts pointer events[22m
+[2m    - retrying dblclick action[22m
+[2m      - waiting 500ms[22m
+[2m    26 × waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <nav role="tablist" aria-label="銘柄詳細タブ" class="security-detail-tabs">…</nav> from <section role="dialog" aria-modal="true" id="securityDetailDialog" class="security-detail-dialog" aria-labelledby="securityDetailTitle">…</section> subtree intercepts pointer events[22m
+[2m     - retrying dblclick action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <nav role="tablist" aria-label="銘柄詳細タブ" class="security-detail-tabs">…</nav> from <section role="dialog" aria-modal="true" id="securityDetailDialog" class="security-detail-dialog" aria-labelledby="securityDetailTitle">…</section> subtree intercepts pointer events[22m
+[2m     - retrying dblclick action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <div id="securityDetailContent" data-active-tab="overview" class="security-detail-content">…</div> from <section role="dialog" aria-modal="true" id="securityDetailDialog" class="security-detail-dialog" aria-labelledby="securityDetailTitle">…</section> subtree intercepts pointer events[22m
+[2m     - retrying dblclick action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <div id="securityDetailContent" data-active-tab="overview" class="security-detail-content">…</div> from <section role="dialog" aria-modal="true" id="securityDetailDialog" class="security-detail-dialog" aria-labelledby="securityDetailTitle">…</section> subtree intercepts pointer events[22m
+[2m     - retrying dblclick action[22m
+[2m       - waiting 500ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <nav role="tablist" aria-label="銘柄詳細タブ" class="security-detail-tabs">…</nav> from <section role="dialog" aria-modal="true" id="securityDetailDialog" class="security-detail-dialog" aria-labelledby="securityDetailTitle">…</section> subtree intercepts pointer events[22m
+[2m    - retrying dblclick action[22m
+[2m      - waiting 500ms[22m
+
+
+  14 | test('iPhone explicit detail button opens a full-screen sheet and switches all tabs',async({page})=>{await gotoPhone(page);await primary(page,'decision');await task(page,'ランキング');const button=page.locator('#rankingBody .security-detail-button').first();await expect(button).toBeVisible({timeout:20000});await button.click();const dialog=page.locator('#securityDetailDialog');await expect(dialog).toBeVisible();const box=await dialog.locator('.security-detail-sheet').boundingBox();expect(box.width).toBeGreaterThanOrEqual(388);expect(box.height).toBeGreaterThanOrEqual(840);for(const name of['概要','決算','ニュース・開示','チャート','推奨理由']){await dialog.getByRole('tab',{name}).click();await expect(dialog.getByRole('tab',{name})).toHaveAttribute('aria-selected','true')}await expect(dialog.getByRole('button',{name:'銘柄詳細を閉じる'})).toBeFocused();await page.keyboard.press('Escape');await expect(dialog).toBeHidden();await noOverflow(page)});
+  15 | test('AI learning task is honest about insufficient history and local-only application',async({page})=>{await gotoPhone(page);await primary(page,'data');await task(page,'AI学習');const section=page.locator('#adaptiveLearning');await expect(section).toBeVisible();await expect(section).toContainText('学習データ収集中');await expect(section).toContainText('Fundamentalは固定中');await expect(section).toContainText('5 / 63営業日');await expect(section).toContainText('自動修正は行っていません');await section.getByRole('button',{name:'AI提案をブラウザ条件へ反映'}).click();await expect(section).toContainText('日次デモ戦略は変更していません')});
+> 16 | test('security dialog accessibility smoke',async({page})=>{await page.setViewportSize({width:1440,height:900});await mock(page);await page.goto('/',{waitUntil:'domcontentloaded'});await page.locator('#rankingBody tr').first().dblclick();const dialog=page.locator('#securityDetailDialog');await expect(dialog).toHaveAttribute('role','dialog');await expect(dialog).toHaveAttribute('aria-modal','true');await expect(dialog).toHaveAttribute('aria-labelledby','securityDetailTitle');await expect(dialog.locator('[role="tablist"]')).toHaveCount(1);const duplicates=await page.evaluate(()=>{const visible=element=>Boolean(element.offsetWidth||element.offsetHeight||element.getClientRects().length);const counts=new Map();document.querySelectorAll('[id]').forEach(element=>{if(visible(element))counts.set(element.id,(counts.get(element.id)??0)+1)});return[...counts.entries()].filter(([,count])=>count>1)});expect(duplicates).toEqual([]);const close=dialog.getByRole('button',{name:'銘柄詳細を閉じる'});const box=await close.boundingBox();expect(box.height).toBeGreaterThanOrEqual(44)});
+     |                                                                                                                                                                                                                                   ^
+  17 |
+    at /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/web/e2e/security-detail-mobile-flow.spec.mjs:16:227
+
+--- stderr ---
+
+exit_code=1
