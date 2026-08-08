@@ -3,8 +3,9 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import json
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import pandas as pd
 
@@ -59,7 +60,9 @@ def _normalize_code(value: Any) -> str:
     return code
 
 
-def _inputs(root: Path) -> tuple[list[str], dict[str, dict[str, Any]], pd.Timestamp | None]:
+def _inputs(
+    root: Path,
+) -> tuple[list[str], dict[str, dict[str, Any]], pd.Timestamp | None]:
     web = root / "web"
     ranking = _load(web / "jquants-ranking.json", {"metadata": {}, "rows": []})
     demo = _load(web / "demo-portfolio.json", {"positions": []})
@@ -81,8 +84,9 @@ def evaluate_operational_slice(
     prices: pd.DataFrame,
     fundamentals: dict[str, dict[str, Any]],
     operational_start: pd.Timestamp,
-    config: LabConfig = LabConfig(),
+    config: LabConfig | None = None,
 ) -> dict[str, Any]:
+    config = config or LabConfig()
     evaluation = prices.loc[prices.index >= operational_start].dropna(how="all")
     if evaluation.empty:
         return {
@@ -107,8 +111,13 @@ def evaluate_operational_slice(
         turnover_by_strategy[name] = turnover
         strategy_rows.append({"name": name, "metrics": metrics(returns, turnover, config)})
 
-    baseline = returns_by_strategy.get("baseline_equal_weight", pd.Series(dtype=float))
-    baseline_total = float(((1 + baseline).prod() - 1) * 100) if not baseline.empty else None
+    baseline = returns_by_strategy.get(
+        "baseline_equal_weight",
+        pd.Series(dtype=float),
+    )
+    baseline_total = (
+        float(((1 + baseline).prod() - 1) * 100) if not baseline.empty else None
+    )
     for row in strategy_rows:
         total = row["metrics"].get("total_return_pct")
         row["baseline_excess_pct"] = (
@@ -124,13 +133,13 @@ def evaluate_operational_slice(
     )
     warnings: list[str] = []
     if len(evaluation) < config.train_days + config.purge_days + config.test_days:
-        warnings.append(
-            "学習126日・purge1日・テスト21日を満たしていません。"
-        )
+        warnings.append("学習126日・purge1日・テスト21日を満たしていません。")
     if walk_forward.get("status") != "ok":
         warnings.append("運用可能期間のwalk-forward検証は履歴不足です。")
     return {
-        "status": "ok" if walk_forward.get("status") == "ok" else "insufficient_history",
+        "status": (
+            "ok" if walk_forward.get("status") == "ok" else "insufficient_history"
+        ),
         "lookahead_safe": True,
         "evaluation_start": evaluation.index.min().isoformat(),
         "evaluation_end": evaluation.index.max().isoformat(),
@@ -144,13 +153,14 @@ def evaluate_operational_slice(
 def build_operational_evaluation(
     root: Path,
     loader: Callable[[str], pd.DataFrame] = fetch_daily_history,
-    config: LabConfig = LabConfig(),
+    config: LabConfig | None = None,
 ) -> dict[str, Any]:
+    config = config or LabConfig()
     symbols, fundamentals, generated_at = _inputs(root)
     if generated_at is None:
         payload = {
             "schema_version": 1,
-            "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+            "generated_at": dt.datetime.now(dt.UTC).isoformat(),
             "status": "unavailable",
             "lookahead_safe": False,
             "evaluation_start": None,
@@ -166,12 +176,17 @@ def build_operational_evaluation(
         operational_start = _next_business_day(generated_at)
         payload = {
             "schema_version": 1,
-            "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+            "generated_at": dt.datetime.now(dt.UTC).isoformat(),
             "snapshot_generated_at": generated_at.isoformat(),
             "operational_start": operational_start.isoformat(),
             "data_errors": errors,
             "paper_only": True,
-            **evaluate_operational_slice(prices, fundamentals, operational_start, config),
+            **evaluate_operational_slice(
+                prices,
+                fundamentals,
+                operational_start,
+                config,
+            ),
         }
     _write(root / "web" / "data" / "strategy-lab" / "operational.json", payload)
     return payload
