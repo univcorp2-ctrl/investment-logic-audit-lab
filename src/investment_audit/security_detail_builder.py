@@ -21,9 +21,7 @@ YAHOO_CHART = (
     "https://query2.finance.yahoo.com/v8/finance/chart/{symbol}"
     "?interval=1d&range=1y&includePrePost=false&events=div%2Csplits"
 )
-GOOGLE_NEWS = (
-    "https://news.google.com/rss/search?q={query}&hl=ja&gl=JP&ceid=JP:ja"
-)
+GOOGLE_NEWS = "https://news.google.com/rss/search?q={query}&hl=ja&gl=JP&ceid=JP:ja"
 USER_AGENT = "ValueScopeSecurityDetail/1.0"
 
 
@@ -84,7 +82,11 @@ def normalize_code(value: Any) -> str:
 
 
 class RateGate:
-    def __init__(self, interval_seconds: float, sleep_fn: Callable[[float], None] = time.sleep) -> None:
+    def __init__(
+        self,
+        interval_seconds: float,
+        sleep_fn: Callable[[float], None] = time.sleep,
+    ) -> None:
         self.interval = max(0.0, interval_seconds)
         self.sleep = sleep_fn
         self.last_call = 0.0
@@ -144,14 +146,20 @@ def statement_snapshot(record: dict[str, Any]) -> dict[str, Any]:
 
 def trend_status(records: list[dict[str, Any]]) -> dict[str, Any]:
     if not records:
-        return {"label": "決算データなし", "sales_change_pct": None, "profit_change_pct": None}
+        return {
+            "label": "決算データなし",
+            "sales_change_pct": None,
+            "profit_change_pct": None,
+        }
     latest = statement_snapshot(records[-1])
     previous = statement_snapshot(records[-2]) if len(records) >= 2 else {}
 
     def change(key: str) -> float | None:
         current = _number(latest.get(key))
         prior = _number(previous.get(key))
-        return None if current is None or prior in {None, 0} else (current / prior - 1) * 100
+        if current is None or prior in {None, 0}:
+            return None
+        return round((current / prior - 1) * 100, 8)
 
     sales_change = change("net_sales")
     profit_change = change("operating_profit")
@@ -236,13 +244,19 @@ def frame_bars(frame: pd.DataFrame, limit: int) -> list[dict[str, Any]]:
                 "high": _number(record.get("adjusted_high")) or _number(record.get("high")),
                 "low": _number(record.get("adjusted_low")) or _number(record.get("low")),
                 "close": close,
-                "volume": _number(record.get("adjusted_volume")) or _number(record.get("volume")),
+                "volume": _number(record.get("adjusted_volume"))
+                or _number(record.get("volume")),
             }
         )
     return add_moving_averages(rows)
 
 
-def fetch_news(company_name: str, code: str, limit: int, timeout: float) -> list[dict[str, Any]]:
+def fetch_news(
+    company_name: str,
+    code: str,
+    limit: int,
+    timeout: float,
+) -> list[dict[str, Any]]:
     query = quote_plus(f'"{company_name}" OR "{code}" 株 決算')
     response = requests.get(
         GOOGLE_NEWS.format(query=query),
@@ -259,19 +273,22 @@ def fetch_news(company_name: str, code: str, limit: int, timeout: float) -> list
         if not title or not link or title in seen:
             continue
         seen.add(title)
-        source = item.find("source")
         published = item.findtext("pubDate")
-        try:
-            published_iso = parsedate_to_datetime(published).isoformat() if published else None
-        except (TypeError, ValueError):
-            published_iso = published
+        source_node = item.find("source")
+        source = source_node.text.strip() if source_node is not None and source_node.text else None
+        published_at: str | None = None
+        if published:
+            try:
+                published_at = parsedate_to_datetime(published).isoformat()
+            except (TypeError, ValueError):
+                published_at = published
         items.append(
             {
                 "title": title,
-                "url": link,
-                "source": source.text.strip() if source is not None and source.text else "Google News",
-                "published_at": published_iso,
-                "kind": "third-party-headline",
+                "source": source,
+                "published_at": published_at,
+                "link": link,
+                "official_disclosure": False,
             }
         )
         if len(items) >= limit:
@@ -279,258 +296,106 @@ def fetch_news(company_name: str, code: str, limit: int, timeout: float) -> list
     return items
 
 
-def optional_client_frame(provider: JQuantsProvider, names: tuple[str, ...], code: str) -> pd.DataFrame:
-    client = getattr(provider, "_client", None)
-    for name in names:
-        method = getattr(client, name, None)
-        if not callable(method):
+def _security_codes(root: Path, limit: int) -> list[dict[str, Any]]:
+    demo = _load(root / "web" / "demo-portfolio.json", {"positions": []})
+    ranking = _load(root / "web" / "jquants-ranking.json", {"rows": []})
+    items: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for record in [*demo.get("positions", []), *ranking.get("rows", [])]:
+        code = normalize_code(record.get("code") or record.get("symbol"))
+        if not code or code in seen:
             continue
-        try:
-            payload = method(code=code)
-        except TypeError:
-            payload = method(code)
-        return provider._as_frame(payload)  # noqa: SLF001 - internal adapter compatibility
-    return pd.DataFrame()
+        seen.add(code)
+        items.append(
+            {
+                "code": code,
+                "symbol": record.get("symbol") or f"{code}.T",
+                "company_name": record.get("company_name") or record.get("name") or code,
+            }
+        )
+        if len(items) >= limit:
+            break
+    return items
 
 
-def recommendation_block(
-    code: str,
-    ranking_row: dict[str, Any],
-    decision: dict[str, Any],
-) -> dict[str, Any]:
-    fundamental = decision.get("fundamental", {})
-    technical = decision.get("technical", {})
-    action = decision.get("decision", {})
-    source_positive = str(ranking_row.get("positive_reasons") or "")
-    source_negative = str(ranking_row.get("negative_reasons") or "")
-    fundamental_positive = list(fundamental.get("positive_reasons", []))
-    fundamental_positive.extend(part.strip() for part in source_positive.split("/") if part.strip())
-    fundamental_risks = list(fundamental.get("risk_reasons", []))
-    fundamental_risks.extend(part.strip() for part in source_negative.split("/") if part.strip())
-    technical_positive = list(technical.get("positive_reasons", []))
-    technical_risks = list(technical.get("risk_reasons", []))
-    return {
-        "code": code,
-        "action": action.get("action", "WATCH"),
-        "confidence": action.get("confidence"),
-        "execution_note": action.get("execution_note"),
-        "fundamental": {
-            "score": fundamental.get("score") or ranking_row.get("overall_score"),
-            "positive_reasons": list(dict.fromkeys(fundamental_positive)),
-            "risk_reasons": list(dict.fromkeys(fundamental_risks)),
-            "missing": fundamental.get("missing", []),
-        },
-        "technical": {
-            "score": technical.get("score") or ranking_row.get("technical_score"),
-            "regime": technical.get("regime"),
-            "positive_reasons": list(dict.fromkeys(technical_positive)),
-            "risk_reasons": list(dict.fromkeys(technical_risks)),
-        },
-        "disclaimer": "機械的なデモ判断です。将来の利益を保証しません。",
-    }
-
-
-def build_security_details(
+def generate_security_details(
     root: Path,
     provider: JQuantsProvider | None = None,
     config: DetailBuildConfig = DetailBuildConfig(),
-    sleep_fn: Callable[[float], None] = time.sleep,
+    fetch_news_fn: Callable[[str, str, int, float], list[dict[str, Any]]] = fetch_news,
+    yahoo_bars_fn: Callable[[str, float], list[dict[str, Any]]] = yahoo_bars,
 ) -> dict[str, Any]:
-    web = root / "web"
-    ranking = _load(web / "jquants-ranking.json", {"metadata": {}, "rows": []})
-    report = _load(web / "data" / "paper-trading" / "latest-report.json", {"decisions": []})
-    existing_index = _load(web / "data" / "security-details" / "index.json", {"securities": []})
-    decisions = {normalize_code(item.get("code")): item for item in report.get("decisions", [])}
-    rows = ranking.get("rows", [])[: config.max_codes]
-    if provider is None and os.getenv("JQUANTS_API_KEY"):
+    output = root / "web" / "data" / "security-details"
+    output.mkdir(parents=True, exist_ok=True)
+    provider = provider or JQuantsProvider(
+        JQuantsConfig(
+            api_key=os.getenv("JQUANTS_API_KEY"),
+            cache_dir=root / ".cache" / "security-details",
+            cache_ttl_seconds=86_400,
+            allow_empty=True,
+        )
+    )
+    gate = RateGate(config.jquants_interval_seconds)
+    details: list[dict[str, Any]] = []
+    for security in _security_codes(root, config.max_codes):
+        code = security["code"]
+        symbol = security["symbol"]
+        financials = pd.DataFrame()
         try:
-            provider = JQuantsProvider(
-                JQuantsConfig(
-                    allow_empty=True,
-                    cache_dir=root / ".cache" / "security-details",
-                    cache_ttl_seconds=21_600,
-                )
-            )
+            gate.wait()
+            financials = provider.get_financial_summary(code=f"{code}0")
         except JQuantsProviderError:
-            provider = None
-    gate = RateGate(config.jquants_interval_seconds, sleep_fn)
-    output_dir = web / "data" / "security-details"
-    output_dir.mkdir(parents=True, exist_ok=True)
-    built: list[dict[str, Any]] = []
-    tdnet_enabled = provider is not None
-    for ranking_row in rows:
-        code = normalize_code(ranking_row.get("code"))
-        symbol = f"{code}.T"
-        company_name = ranking_row.get("company_name") or code
-        errors: list[str] = []
-        bars: list[dict[str, Any]] = []
-        summaries: list[dict[str, Any]] = []
-        statement_details: list[dict[str, Any]] = []
-        earnings_dates: list[dict[str, Any]] = []
-        disclosures: list[dict[str, Any]] = []
-        if provider is not None:
-            try:
-                gate.wait()
-                bars = frame_bars(provider.get_daily_bars(code=code), config.chart_days)
-            except JQuantsProviderError as exc:
-                errors.append(f"jquants_bars:{type(exc).__name__}")
-            try:
-                gate.wait()
-                summaries = _frame_records(provider.get_financial_summary(code=code), 10)
-            except JQuantsProviderError as exc:
-                errors.append(f"jquants_summary:{type(exc).__name__}")
-            try:
-                gate.wait()
-                statement_details = _frame_records(
-                    optional_client_frame(
-                        provider,
-                        ("get_fin_details", "get_financial_details"),
-                        code,
-                    ),
-                    4,
-                )
-            except Exception as exc:  # provider versions differ
-                errors.append(f"jquants_details:{type(exc).__name__}")
-            try:
-                gate.wait()
-                earnings_dates = _frame_records(
-                    optional_client_frame(
-                        provider,
-                        ("get_fin_earnings_date", "get_earnings_date"),
-                        code,
-                    ),
-                    6,
-                )
-            except Exception as exc:
-                errors.append(f"jquants_earnings:{type(exc).__name__}")
-            if tdnet_enabled:
-                try:
-                    gate.wait()
-                    disclosures = _frame_records(
-                        optional_client_frame(
-                            provider,
-                            ("get_td_list", "get_company_disclosure_list"),
-                            code,
-                        ),
-                        12,
-                    )
-                except Exception as exc:
-                    tdnet_enabled = False
-                    errors.append(f"tdnet_unavailable:{type(exc).__name__}")
-        if not bars:
-            try:
-                bars = yahoo_bars(symbol, config.request_timeout)[-config.chart_days :]
-            except (requests.RequestException, ValueError, KeyError, ET.ParseError) as exc:
-                errors.append(f"public_chart:{type(exc).__name__}")
+            pass
+        statements = _frame_records(financials, 12)
         try:
-            news = fetch_news(
-                str(company_name),
+            chart = yahoo_bars_fn(symbol, config.request_timeout)
+        except requests.RequestException:
+            chart = []
+        try:
+            news = fetch_news_fn(
+                security["company_name"],
                 code,
                 config.news_limit,
                 config.request_timeout,
             )
-        except (requests.RequestException, ET.ParseError, ValueError) as exc:
-            old = _load(output_dir / f"{code}.json", {})
-            news = old.get("news", [])
-            errors.append(f"news:{type(exc).__name__}")
-        if not summaries:
-            summaries = [
-                {
-                    "disclosed_date": ranking_row.get("latest_disclosure_date"),
-                    "operating_margin": ranking_row.get("operating_margin"),
-                    "roe": ranking_row.get("roe"),
-                    "earnings_yield": ranking_row.get("earnings_yield"),
-                    "fcf_yield": ranking_row.get("fcf_yield"),
-                    "source": "sanitized-ranking-fallback",
-                }
-            ]
-        detail = {
-            "schema_version": 1,
-            "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-            "code": code,
-            "symbol": symbol,
-            "company_name": company_name,
-            "market": ranking_row.get("market"),
-            "sector": ranking_row.get("sector"),
-            "rank": ranking_row.get("rank"),
-            "scores": {
-                key: ranking_row.get(key)
-                for key in (
-                    "overall_score",
-                    "value_score",
-                    "quality_score",
-                    "growth_stability_score",
-                    "technical_score",
-                    "liquidity_score",
-                    "value_trap_risk",
-                    "data_completeness",
-                )
-            },
-            "recommendation": recommendation_block(
-                code,
-                ranking_row,
-                decisions.get(code, {}),
-            ),
-            "financials": {
-                "source": "J-Quants / sanitized fallback",
-                "effective_data_cutoff": ranking.get("metadata", {}).get(
-                    "effective_data_cutoff"
-                ),
-                "summary_history": summaries,
-                "latest_snapshot": statement_snapshot(summaries[-1]),
-                "trend": trend_status(summaries),
-                "statement_details": statement_details,
-                "earnings_dates": earnings_dates,
-            },
-            "disclosures": disclosures,
-            "news": news,
-            "chart": {
-                "source": "J-Quants daily OHLC or Yahoo public fallback",
-                "interval": "1d",
-                "bars": bars,
-                "indicators": ["SMA20", "SMA60"],
-            },
-            "availability": {
-                "jquants": provider is not None,
-                "tdnet_addon": bool(disclosures),
-                "news_headlines": bool(news),
-                "chart": bool(bars),
-            },
-            "errors": errors,
+        except (requests.RequestException, ET.ParseError):
+            news = []
+        payload = {
+            **security,
+            "generated_at": dt.datetime.now(dt.UTC).isoformat(),
+            "financial_summaries": statements,
+            "financial_trend": trend_status(statements),
+            "chart": chart[-config.chart_days :],
+            "general_news": news,
+            "official_disclosure_status": "tdnet_addon_not_configured",
+            "official_disclosures": [],
             "paper_only": True,
         }
-        _write(output_dir / f"{code}.json", detail)
-        built.append(
+        _write(output / f"{code}.json", payload)
+        details.append(
             {
                 "code": code,
-                "company_name": company_name,
-                "path": f"./data/security-details/{code}.json",
-                "generated_at": detail["generated_at"],
-                "chart_points": len(bars),
-                "news_count": len(news),
-                "disclosure_count": len(disclosures),
+                "company_name": security["company_name"],
+                "financial_periods": len(statements),
+                "chart_rows": len(chart),
+                "news_items": len(news),
             }
         )
-    index_payload = {
+    index = {
         "schema_version": 1,
-        "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-        "securities": built,
-        "previous_count": len(existing_index.get("securities", [])),
+        "generated_at": dt.datetime.now(dt.UTC).isoformat(),
+        "securities": details,
         "paper_only": True,
     }
-    _write(output_dir / "index.json", index_payload)
-    return index_payload
+    _write(output / "index.json", index)
+    return index
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Build per-security analysis JSON")
+    parser = argparse.ArgumentParser(description="Generate rich stock research data")
     parser.add_argument("--root", type=Path, default=Path.cwd())
-    parser.add_argument("--max-codes", type=int, default=10)
     args = parser.parse_args(argv)
-    result = build_security_details(
-        args.root,
-        config=DetailBuildConfig(max_codes=args.max_codes),
-    )
+    result = generate_security_details(args.root)
     print(json.dumps(result, ensure_ascii=False))
     return 0
 
