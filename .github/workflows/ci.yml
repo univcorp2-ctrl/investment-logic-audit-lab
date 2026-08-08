@@ -1,12 +1,17 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
 
 permissions:
   contents: read
+
+concurrency:
+  group: python-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -37,6 +42,10 @@ jobs:
           src/investment_audit/risk_metrics.py
           src/investment_audit/allocation.py
           src/investment_audit/providers
+          src/investment_audit/operational_strategy_evaluation.py
+          src/investment_audit/adaptive_operational_guard.py
+          src/investment_audit/adaptive_daily_monitor.py
+          src/investment_audit/security_detail_builder.py
           tests/test_fundamentals.py
           tests/test_technical.py
           tests/test_screening.py
@@ -49,6 +58,9 @@ jobs:
           tests/test_risk_metrics.py
           tests/test_allocation.py
           tests/test_factor_cli.py
+          tests/test_operational_strategy_evaluation.py
+          tests/test_adaptive_operational_guard.py
+          tests/test_security_detail_builder.py
       - name: Type check enhanced analysis code
         shell: bash
         run: |
@@ -68,7 +80,11 @@ jobs:
             src/investment_audit/feature_library.py \
             src/investment_audit/risk_metrics.py \
             src/investment_audit/allocation.py \
-            src/investment_audit/providers | tee mypy-output.txt
+            src/investment_audit/providers \
+            src/investment_audit/operational_strategy_evaluation.py \
+            src/investment_audit/adaptive_operational_guard.py \
+            src/investment_audit/adaptive_daily_monitor.py \
+            src/investment_audit/security_detail_builder.py | tee mypy-output.txt
           status=${PIPESTATUS[0]}
           while IFS= read -r line; do
             if [[ "$line" =~ ^([^:]+):([0-9]+):([0-9]+):\ error:\ (.*)$ ]]; then
