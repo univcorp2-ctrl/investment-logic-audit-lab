@@ -1,50 +1,176 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-08T00:00:00+00:00",
+  "generated_at": "2026-08-08T03:04:27.873879+00:00",
   "model": "gated-walk-forward-rule-selection-v1",
   "mode": "learning_only",
   "paper_only": true,
   "real_order_allowed": false,
   "candidate": {
-    "strategy": null,
-    "objective_score": null,
-    "metrics": {},
-    "baseline_excess_pct": null,
-    "sharpe_improvement": null,
-    "drawdown_worsening_pct": null,
-    "proposed_overrides": {},
+    "strategy": "low_volatility",
+    "objective_score": 2.702756,
+    "metrics": {
+      "status": "ok",
+      "observations": 63,
+      "total_return_pct": 13.763805806062335,
+      "cagr_pct": 67.50063173255131,
+      "volatility_pct": 43.505605007806885,
+      "sharpe": 1.4039391796576828,
+      "sortino": 2.7598709613555674,
+      "max_drawdown_pct": -19.843772187700083,
+      "turnover": 7.800000000000001,
+      "hit_rate_pct": 55.55555555555556,
+      "profit_factor": 1.2379055815084905
+    },
+    "baseline_excess_pct": 16.642281410988947,
+    "sharpe_improvement": 1.2825867851167039,
+    "drawdown_worsening_pct": 0.0,
+    "proposed_overrides": {
+      "buy_quality": 60.0,
+      "buy_technical": 55.0,
+      "stop_loss_pct": -6.0,
+      "max_drawdown_pct": -8.0
+    },
     "parameter_categories": {
-      "Fundamental": {},
-      "Technical": {},
-      "Risk": {}
+      "Fundamental": {
+        "buy_quality": 60.0
+      },
+      "Technical": {
+        "buy_technical": 55.0
+      },
+      "Risk": {
+        "stop_loss_pct": -6.0,
+        "max_drawdown_pct": -8.0
+      }
     }
   },
   "active": {
+    "schema_version": 1,
     "approved": false,
     "mode": "baseline",
     "strategy": null,
     "overrides": {},
+    "effective_from": null,
+    "expires_at": null,
     "paper_only": true,
     "real_order_allowed": false,
-    "reason": "運用可能な履歴が不足しているため既定デモルールを使用"
+    "reason": "安全ゲート未通過のため既定デモルールを使用"
   },
-  "gates": [],
+  "gates": [
+    {
+      "name": "operational_data_only",
+      "passed": false,
+      "actual": true,
+      "required": false,
+      "explanation": "実際にその時点で利用できたデータだけで評価する"
+    },
+    {
+      "name": "operational_observations",
+      "passed": false,
+      "actual": 4,
+      "required": 169,
+      "explanation": "学習126日・purge1日・OOS42日以上を確保する"
+    },
+    {
+      "name": "walk_forward",
+      "passed": false,
+      "actual": "insufficient_history",
+      "required": "ok",
+      "explanation": "時系列walk-forward検証が完了している"
+    },
+    {
+      "name": "oos_observations",
+      "passed": false,
+      "actual": 0,
+      "required": 42,
+      "explanation": "未使用期間で十分な観測数を確保する"
+    },
+    {
+      "name": "parameter_stability",
+      "passed": false,
+      "actual": null,
+      "required": 0.6,
+      "explanation": "期間を変えても同じ候補が選ばれる"
+    },
+    {
+      "name": "candidate_selected_oos",
+      "passed": false,
+      "actual": {
+        "candidate": "low_volatility",
+        "selected": null
+      },
+      "required": "same strategy",
+      "explanation": "学習期間ではなくOOS選択と一致する"
+    },
+    {
+      "name": "candidate_metrics",
+      "passed": true,
+      "actual": "ok",
+      "required": "ok",
+      "explanation": "候補戦略の指標が算定可能である"
+    },
+    {
+      "name": "sharpe_improvement",
+      "passed": true,
+      "actual": 1.2825867851167039,
+      "required": 0.15,
+      "explanation": "ベースラインよりリスク調整後収益が改善する"
+    },
+    {
+      "name": "baseline_excess",
+      "passed": true,
+      "actual": 16.642281410988947,
+      "required": 1.0,
+      "explanation": "ベースラインに対して十分なOOS超過収益がある"
+    },
+    {
+      "name": "drawdown_protection",
+      "passed": true,
+      "actual": 0.0,
+      "required": 2.0,
+      "explanation": "収益改善の代わりに最大DDを大幅悪化させない"
+    }
+  ],
   "gate_summary": {
-    "passed": 0,
+    "passed": 4,
     "total": 10,
     "all_passed": false,
-    "failed": ["operational_observations"]
+    "failed": [
+      "operational_data_only",
+      "operational_observations",
+      "walk_forward",
+      "oos_observations",
+      "parameter_stability",
+      "candidate_selected_oos"
+    ]
   },
   "confirmation": {
     "current": 0,
     "required": 2
   },
   "observations": {
-    "operational": 0,
+    "operational": 4,
     "required_operational": 169,
     "oos": 0,
     "required_oos": 42
   },
+  "policy": {
+    "min_operational_observations": 169,
+    "min_oos_observations": 42,
+    "min_parameter_stability": 0.6,
+    "min_sharpe_improvement": 0.15,
+    "min_baseline_excess_pct": 1.0,
+    "max_drawdown_worsening_pct": 2.0,
+    "required_confirmations": 2,
+    "active_ttl_days": 35
+  },
+  "learning_principles": [
+    "実運用時点で利用可能だったデータだけを使う",
+    "学習期間と未使用OOS期間を分離する",
+    "収益だけでなく最大DDと安定性を同時評価する",
+    "同じ候補が2週連続で安全ゲートを通るまで反映しない",
+    "反映先はデモ取引だけで、実注文は送信しない",
+    "期限切れ後は既定ルールへ戻して再学習する"
+  ],
   "next_action": "履歴を蓄積し、既定ルールで監視を継続",
   "disclaimer": "自動学習は将来利益を保証しません。過学習を避けるため実注文へは接続しません。"
 }

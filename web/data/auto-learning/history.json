@@ -1,4 +1,17 @@
 {
   "schema_version": 1,
-  "history": []
+  "history": [
+    {
+      "run_id": "2026-08-08T02:30:14.560748+00:00",
+      "evaluated_at": "2026-08-08T03:04:27.873879+00:00",
+      "candidate": "low_volatility",
+      "objective_score": 2.702756,
+      "all_gates_passed": false,
+      "confirmation_count": 0,
+      "mode": "learning_only",
+      "operational_observations": 4,
+      "oos_observations": 0,
+      "parameter_stability": null
+    }
+  ]
 }
