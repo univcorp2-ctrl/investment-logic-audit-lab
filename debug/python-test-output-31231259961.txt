@@ -1,0 +1,237 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.15, pytest-9.1.1, pluggy-1.6.0 -- /opt/hostedtoolcache/Python/3.11.15/x64/bin/python
+cachedir: .pytest_cache
+rootdir: /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.1.0
+collecting ... collected 111 items
+
+tests/test_adaptive_guard.py::test_initializes_post_promotion_baseline PASSED [  0%]
+tests/test_adaptive_guard.py::test_does_not_rollback_before_ten_new_observations PASSED [  1%]
+tests/test_adaptive_guard.py::test_rolls_back_for_relative_return_underperformance FAILED [  2%]
+tests/test_adaptive_guard.py::test_rolls_back_for_relative_drawdown_worsening FAILED [  3%]
+tests/test_adaptive_guard.py::test_keeps_profile_when_relative_results_are_acceptable FAILED [  4%]
+tests/test_adaptive_learning.py::test_feature_maturation_uses_only_next_observed_date PASSED [  5%]
+tests/test_adaptive_learning.py::test_purged_split_has_no_adjacent_leakage PASSED [  6%]
+tests/test_adaptive_learning.py::test_bounded_parameter_change_never_exceeds_weekly_limit PASSED [  7%]
+tests/test_adaptive_learning.py::test_insufficient_history_stays_collecting_and_does_not_apply PASSED [  8%]
+tests/test_adaptive_learning.py::test_feature_collection_is_idempotent PASSED [  9%]
+tests/test_adaptive_learning.py::test_unapproved_config_cannot_change_daily_strategy PASSED [  9%]
+tests/test_adaptive_operational_guard.py::test_counterfactual_or_short_history_never_approves PASSED [ 10%]
+tests/test_adaptive_operational_guard.py::test_two_consecutive_verified_runs_approve_paper_only PASSED [ 11%]
+tests/test_adaptive_operational_guard.py::test_daily_monitor_ignores_old_unverified_policy PASSED [ 12%]
+tests/test_adaptive_operational_guard.py::test_daily_monitor_applies_verified_paper_policy PASSED [ 13%]
+tests/test_adaptive_parameter_learner.py::test_counterfactual_data_can_never_auto_apply PASSED [ 14%]
+tests/test_adaptive_parameter_learner.py::test_two_consecutive_safe_runs_approve_paper_only PASSED [ 15%]
+tests/test_adaptive_parameter_learner.py::test_drawdown_regression_blocks_candidate PASSED [ 16%]
+tests/test_adaptive_parameter_learner.py::test_active_config_requires_approval_and_expiry PASSED [ 17%]
+tests/test_adaptive_parameter_learner.py::test_inverse_volatility_needs_manual_position_sizing_review PASSED [ 18%]
+tests/test_adaptive_strategy.py::test_objective_penalizes_drawdown_and_turnover PASSED [ 18%]
+tests/test_adaptive_strategy.py::test_guardrails_require_history_windows_and_stability PASSED [ 19%]
+tests/test_adaptive_strategy.py::test_initial_run_collects_data_and_locks_fundamentals PASSED [ 20%]
+tests/test_adaptive_strategy.py::test_daily_monitor_ignores_unapproved_policy PASSED [ 21%]
+tests/test_adaptive_strategy.py::test_daily_monitor_applies_only_guarded_paper_policy FAILED [ 22%]
+tests/test_allocation.py::test_hrp_weights_sum_to_one_and_respect_cap PASSED [ 23%]
+tests/test_allocation.py::test_hrp_drops_constant_asset PASSED           [ 24%]
+tests/test_allocation.py::test_future_prices_do_not_change_past_hrp_weights PASSED [ 25%]
+tests/test_backtest.py::test_backtest_produces_metrics_and_equity_curve PASSED [ 26%]
+tests/test_backtest.py::test_fee_sensitivity_has_expected_grid PASSED    [ 27%]
+tests/test_cli.py::test_run_sample_writes_outputs PASSED                 [ 27%]
+tests/test_cli.py::test_value_screen_cli_writes_csv_and_json PASSED      [ 28%]
+tests/test_cli.py::test_value_screen_demo_is_offline_and_reproducible PASSED [ 29%]
+tests/test_daily_monitor.py::test_technical_snapshot_separates_trend_reasons PASSED [ 30%]
+tests/test_daily_monitor.py::test_buy_hold_sell_and_no_data_rules PASSED [ 31%]
+tests/test_daily_monitor.py::test_stale_or_discrepant_quote_is_not_executable PASSED [ 32%]
+tests/test_daily_monitor.py::test_portfolio_summary_calculates_pnl_and_drawdown PASSED [ 33%]
+tests/test_drawdown_diagnostics.py::test_large_drawdown_and_position_loss_generate_explanations PASSED [ 34%]
+tests/test_drawdown_diagnostics.py::test_enough_observations_allow_comparison_not_auto_apply PASSED [ 35%]
+tests/test_factor_cli.py::test_factor_audit_cli_writes_diagnostics PASSED [ 36%]
+tests/test_factor_diagnostics.py::test_positive_factor_has_positive_ic_and_spread PASSED [ 36%]
+tests/test_factor_diagnostics.py::test_constant_factor_returns_nan_ic_without_warning PASSED [ 37%]
+tests/test_factor_diagnostics.py::test_turnover_and_rank_autocorrelation_are_bounded PASSED [ 38%]
+tests/test_factor_diagnostics.py::test_group_neutralization_changes_sector_driven_ic PASSED [ 39%]
+tests/test_factor_diagnostics.py::test_forward_returns_use_future_price_only_for_evaluation PASSED [ 40%]
+tests/test_feature_library.py::test_feature_library_contains_multiscale_features PASSED [ 41%]
+tests/test_feature_library.py::test_lagged_snapshot_is_not_changed_by_latest_close PASSED [ 42%]
+tests/test_feature_library.py::test_short_constant_missing_volume_series_is_safe PASSED [ 43%]
+tests/test_fundamentals.py::test_derivation_preserves_missing_and_avoids_infinity PASSED [ 44%]
+tests/test_fundamentals.py::test_good_value_quality_beats_value_trap PASSED [ 45%]
+tests/test_fundamentals.py::test_sector_neutral_and_extreme_values_are_deterministic PASSED [ 45%]
+tests/test_fundamentals.py::test_piotroski_handles_partial_data PASSED   [ 46%]
+tests/test_jquants_free_screen.py::test_staged_free_screen_avoids_bulk_range_and_outputs_jquants_metadata PASSED [ 47%]
+tests/test_jquants_pipeline.py::test_free_plan_uses_twelve_week_cutoff PASSED [ 48%]
+tests/test_jquants_pipeline.py::test_universe_removes_funds_reits_and_preferred_stock PASSED [ 49%]
+tests/test_jquants_pipeline.py::test_point_in_time_excludes_future_disclosures PASSED [ 50%]
+tests/test_jquants_pipeline.py::test_pipeline_is_deterministic_and_never_writes_secret PASSED [ 51%]
+tests/test_jquants_pipeline.py::test_invalid_plan_is_rejected PASSED     [ 52%]
+tests/test_jquants_provider.py::test_master_and_bars_are_normalized_and_code_stays_string PASSED [ 53%]
+tests/test_jquants_provider.py::test_range_uses_timezone_aware_jst_datetimes_and_supports_pages PASSED [ 54%]
+tests/test_jquants_provider.py::test_financial_summary_uses_internal_schema PASSED [ 54%]
+tests/test_jquants_provider.py::test_missing_key_and_missing_optional_dependency PASSED [ 55%]
+tests/test_jquants_provider.py::test_rate_limit_retries_with_exponential_backoff PASSED [ 56%]
+tests/test_jquants_provider.py::test_rate_limit_and_server_error_have_typed_failures PASSED [ 57%]
+tests/test_jquants_provider.py::test_empty_response_and_invalid_date_range PASSED [ 58%]
+tests/test_jquants_provider.py::test_cache_prevents_duplicate_client_calls PASSED [ 59%]
+tests/test_live_ranking.py::test_build_fundamental_row_derives_value_and_quality_metrics PASSED [ 60%]
+tests/test_live_ranking.py::test_negative_results_create_trap_inputs PASSED [ 61%]
+tests/test_live_ranking.py::test_json_value_handles_nested_pandas_and_numpy_values PASSED [ 62%]
+tests/test_open_source_strategy_lab.py::test_strategy_weights_are_normalized_and_trend_uses_past_only PASSED [ 63%]
+tests/test_open_source_strategy_lab.py::test_execution_is_lagged_and_costed PASSED [ 63%]
+tests/test_open_source_strategy_lab.py::test_short_history_suppresses_annualized_claims PASSED [ 64%]
+tests/test_open_source_strategy_lab.py::test_walk_forward_has_purge_gap PASSED [ 65%]
+tests/test_open_source_strategy_lab.py::test_walk_forward_warns_when_not_enough_history PASSED [ 66%]
+tests/test_operational_strategy_evaluation.py::test_operational_start_is_after_snapshot_and_no_prior_rows PASSED [ 67%]
+tests/test_performance_analytics.py::test_short_history_suppresses_annualized_ratios PASSED [ 68%]
+tests/test_performance_analytics.py::test_drawdown_peak_trough_and_recovery_are_identified PASSED [ 69%]
+tests/test_performance_analytics.py::test_distribution_metrics_and_benchmark_are_calculated_with_enough_data PASSED [ 70%]
+tests/test_performance_analytics.py::test_contribution_series_uses_validated_mark PASSED [ 71%]
+tests/test_performance_report.py::test_report_builder_publishes_backward_compatible_analytics PASSED [ 72%]
+tests/test_portfolio.py::test_ranked_portfolio_selects_top_and_computes_metrics PASSED [ 72%]
+tests/test_portfolio.py::test_future_scores_do_not_change_past_weights PASSED [ 73%]
+tests/test_portfolio.py::test_publication_lag_and_next_day_execution PASSED [ 74%]
+tests/test_portfolio.py::test_robustness_summary_is_reproducible PASSED  [ 75%]
+tests/test_risk_metrics.py::test_risk_metrics_are_finite_for_mixed_returns PASSED [ 76%]
+tests/test_risk_metrics.py::test_undefined_denominators_return_nan PASSED [ 77%]
+tests/test_risk_metrics.py::test_empty_and_short_inputs_are_safe PASSED  [ 78%]
+tests/test_screening.py::test_screen_ranks_good_candidates_and_filters_traps PASSED [ 79%]
+tests/test_screening.py::test_thresholds_are_configurable PASSED         [ 80%]
+tests/test_screening.py::test_csv_and_json_outputs PASSED                [ 81%]
+tests/test_secret_hygiene.py::test_jquants_changes_do_not_contain_literal_credentials PASSED [ 81%]
+tests/test_security_detail_builder.py::test_normalize_code_and_moving_averages PASSED [ 82%]
+tests/test_security_detail_builder.py::test_trend_status_detects_growth FAILED [ 83%]
+tests/test_security_detail_builder.py::test_recommendation_separates_fundamental_and_technical PASSED [ 84%]
+tests/test_security_detail_builder.py::test_builder_writes_sanitized_detail_files PASSED [ 85%]
+tests/test_signals.py::test_time_series_momentum_shape PASSED            [ 86%]
+tests/test_signals.py::test_moving_average_trend_is_long_only_when_requested PASSED [ 87%]
+tests/test_signals.py::test_cross_sectional_momentum_generates_positions PASSED [ 88%]
+tests/test_signals.py::test_fundamental_quality_value_momentum_ranks_quality_first PASSED [ 89%]
+tests/test_stock_detail_pipeline.py::test_code_normalization_for_jquants PASSED [ 90%]
+tests/test_stock_detail_pipeline.py::test_financial_sanitation_keeps_only_display_fields PASSED [ 90%]
+tests/test_stock_detail_pipeline.py::test_plan_capability_flags_are_honest PASSED [ 91%]
+tests/test_stock_detail_pipeline.py::test_pipeline_generates_sanitized_files PASSED [ 92%]
+tests/test_stock_detail_pipeline.py::test_selected_securities_are_deduplicated PASSED [ 93%]
+tests/test_strategy_lab_availability.py::test_delayed_snapshot_cannot_promote_counterfactual_result PASSED [ 94%]
+tests/test_technical.py::test_indicators_and_scores_are_bounded PASSED   [ 95%]
+tests/test_technical.py::test_decision_score_is_strictly_lagged PASSED   [ 96%]
+tests/test_technical.py::test_short_constant_series_does_not_crash PASSED [ 97%]
+tests/test_technical.py::test_timezone_duplicates_and_sorting_are_normalized PASSED [ 98%]
+tests/test_walk_forward.py::test_iter_windows_creates_non_overlapping_test_windows PASSED [ 99%]
+tests/test_walk_forward.py::test_run_walk_forward_returns_oos_table PASSED [100%]
+
+=================================== FAILURES ===================================
+_____________ test_rolls_back_for_relative_return_underperformance _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_rolls_back_for_relative_r0')
+
+    def test_rolls_back_for_relative_return_underperformance(tmp_path: Path) -> None:
+        setup_root(tmp_path, 20)
+        evaluate_post_promotion_guard(tmp_path)
+        setup_root(tmp_path, 30, active_return=2, previous_return=5, active_dd=-5, previous_dd=-5)
+>       result = evaluate_post_promotion_guard(tmp_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_adaptive_guard.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/investment_audit/adaptive_guard.py:86: in evaluate_post_promotion_guard
+    metrics_by_name = {item["name"]: item for item in _strategy_metrics(strategy_lab)}
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <dict_keyiterator object at 0x7f3d90d00ae0>
+
+>   metrics_by_name = {item["name"]: item for item in _strategy_metrics(strategy_lab)}
+                       ^^^^^^^^^^^^
+E   TypeError: string indices must be integers, not 'str'
+
+src/investment_audit/adaptive_guard.py:86: TypeError
+_______________ test_rolls_back_for_relative_drawdown_worsening ________________
+
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_rolls_back_for_relative_d0')
+
+    def test_rolls_back_for_relative_drawdown_worsening(tmp_path: Path) -> None:
+        setup_root(tmp_path, 20)
+        evaluate_post_promotion_guard(tmp_path)
+        setup_root(tmp_path, 30, active_return=6, previous_return=5, active_dd=-9, previous_dd=-5)
+>       result = evaluate_post_promotion_guard(tmp_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_adaptive_guard.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/investment_audit/adaptive_guard.py:86: in evaluate_post_promotion_guard
+    metrics_by_name = {item["name"]: item for item in _strategy_metrics(strategy_lab)}
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <dict_keyiterator object at 0x7f3d90d030b0>
+
+>   metrics_by_name = {item["name"]: item for item in _strategy_metrics(strategy_lab)}
+                       ^^^^^^^^^^^^
+E   TypeError: string indices must be integers, not 'str'
+
+src/investment_audit/adaptive_guard.py:86: TypeError
+___________ test_keeps_profile_when_relative_results_are_acceptable ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_keeps_profile_when_relati0')
+
+    def test_keeps_profile_when_relative_results_are_acceptable(tmp_path: Path) -> None:
+        setup_root(tmp_path, 20)
+        evaluate_post_promotion_guard(tmp_path)
+        setup_root(tmp_path, 30, active_return=6, previous_return=5, active_dd=-5, previous_dd=-6)
+>       result = evaluate_post_promotion_guard(tmp_path, PostPromotionGuardConfig())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_adaptive_guard.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/investment_audit/adaptive_guard.py:86: in evaluate_post_promotion_guard
+    metrics_by_name = {item["name"]: item for item in _strategy_metrics(strategy_lab)}
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <dict_keyiterator object at 0x7f3d90d036a0>
+
+>   metrics_by_name = {item["name"]: item for item in _strategy_metrics(strategy_lab)}
+                       ^^^^^^^^^^^^
+E   TypeError: string indices must be integers, not 'str'
+
+src/investment_audit/adaptive_guard.py:86: TypeError
+_____________ test_daily_monitor_applies_only_guarded_paper_policy _____________
+
+tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_daily_monitor_applies_onl0')
+
+    def test_daily_monitor_applies_only_guarded_paper_policy(tmp_path: Path) -> None:
+        path = tmp_path / "web" / "data" / "adaptive-strategy"
+        path.mkdir(parents=True)
+        policy = {"name": "trend", "status": "active", "paper_only": True, "guardrails_passed": True, "fundamental": {}, "technical": {"buy_technical": 70, "sell_technical": 45}, "risk": {"stop_loss_pct": -6, "max_drawdown_pct": -9}}
+        (path / "active-policy.json").write_text(json.dumps(policy), encoding="utf-8")
+        config, metadata = strategy_config_from_policy(tmp_path)
+>       assert metadata["applied"] is True
+E       assert False is True
+
+tests/test_adaptive_strategy.py:53: AssertionError
+_______________________ test_trend_status_detects_growth _______________________
+
+    def test_trend_status_detects_growth() -> None:
+        result=trend_status([{"net_sales":100,"operating_profit":10},{"net_sales":120,"operating_profit":15}])
+        assert result["label"] == "増収増益"
+>       assert result["sales_change_pct"] == 20
+E       assert 19.999999999999996 == 20
+
+tests/test_security_detail_builder.py:41: AssertionError
+=============================== warnings summary ===============================
+tests/test_feature_library.py::test_feature_library_contains_multiscale_features
+tests/test_feature_library.py::test_lagged_snapshot_is_not_changed_by_latest_close
+tests/test_feature_library.py::test_lagged_snapshot_is_not_changed_by_latest_close
+tests/test_feature_library.py::test_short_constant_missing_volume_series_is_safe
+  /home/runner/work/investment-logic-audit-lab/investment-logic-audit-lab/src/investment_audit/feature_library.py:61: Pandas4Warning: Sorting by default when concatenating all DatetimeIndex is deprecated.  In the future, pandas will respect the default of `sort=False`. Specify `sort=True` or `sort=False` to silence this message. If you see this warnings when not directly calling concat, report a bug to pandas.
+    true_range = pd.concat(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_adaptive_guard.py::test_rolls_back_for_relative_return_underperformance - TypeError: string indices must be integers, not 'str'
+FAILED tests/test_adaptive_guard.py::test_rolls_back_for_relative_drawdown_worsening - TypeError: string indices must be integers, not 'str'
+FAILED tests/test_adaptive_guard.py::test_keeps_profile_when_relative_results_are_acceptable - TypeError: string indices must be integers, not 'str'
+FAILED tests/test_adaptive_strategy.py::test_daily_monitor_applies_only_guarded_paper_policy - assert False is True
+FAILED tests/test_security_detail_builder.py::test_trend_status_detects_growth - assert 19.999999999999996 == 20
+================== 5 failed, 106 passed, 4 warnings in 10.70s ==================
+pytest_exit_code=1
