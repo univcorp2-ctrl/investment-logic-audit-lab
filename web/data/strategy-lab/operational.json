@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-08T01:02:18.751500+00:00",
+  "snapshot_generated_at": "2026-08-03T14:07:31.566915+09:00",
+  "operational_start": "2026-08-04T00:00:00+09:00",
+  "data_errors": {},
+  "paper_only": true,
+  "status": "insufficient_history",
+  "lookahead_safe": true,
+  "evaluation_start": "2026-08-04T00:00:00+09:00",
+  "evaluation_end": "2026-08-07T00:00:00+09:00",
+  "observations": 4,
+  "strategies": [
+    {
+      "name": "baseline_equal_weight",
+      "metrics": {
+        "status": "insufficient_history",
+        "observations": 4,
+        "total_return_pct": 0.17108155884244525,
+        "cagr_pct": null,
+        "volatility_pct": 62.2224988403266,
+        "sharpe": null,
+        "sortino": null,
+        "max_drawdown_pct": -5.625104158550853,
+        "turnover": 1.0,
+        "hit_rate_pct": 25.0,
+        "profit_factor": 1.0838147245670429
+      },
+      "baseline_excess_pct": 0.0
+    },
+    {
+      "name": "trend_confirmed",
+      "metrics": {
+        "status": "insufficient_history",
+        "observations": 4,
+        "total_return_pct": 5.291640067426995,
+        "cagr_pct": null,
+        "volatility_pct": 21.682457773124664,
+        "sharpe": null,
+        "sortino": null,
+        "max_drawdown_pct": 0.0,
+        "turnover": 1.0,
+        "hit_rate_pct": 75.0,
+        "profit_factor": null
+      },
+      "baseline_excess_pct": 5.1205585085845495
+    },
+    {
+      "name": "quality_value",
+      "metrics": {
+        "status": "insufficient_history",
+        "observations": 4,
+        "total_return_pct": 0.7137328989224034,
+        "cagr_pct": null,
+        "volatility_pct": 52.807063266064425,
+        "sharpe": null,
+        "sortino": null,
+        "max_drawdown_pct": -4.3108218542531995,
+        "turnover": 1.0,
+        "hit_rate_pct": 50.0,
+        "profit_factor": 1.2162311468050229
+      },
+      "baseline_excess_pct": 0.5426513400799582
+    },
+    {
+      "name": "low_volatility",
+      "metrics": {
+        "status": "insufficient_history",
+        "observations": 4,
+        "total_return_pct": 2.865587633312683,
+        "cagr_pct": null,
+        "volatility_pct": 38.59833158642271,
+        "sharpe": null,
+        "sortino": null,
+        "max_drawdown_pct": -2.8377122062536397,
+        "turnover": 1.0,
+        "hit_rate_pct": 50.0,
+        "profit_factor": 2.040752373679296
+      },
+      "baseline_excess_pct": 2.6945060744702376
+    },
+    {
+      "name": "inverse_volatility",
+      "metrics": {
+        "status": "insufficient_history",
+        "observations": 4,
+        "total_return_pct": 1.3811204697617763,
+        "cagr_pct": null,
+        "volatility_pct": 37.15105496463604,
+        "sharpe": null,
+        "sortino": null,
+        "max_drawdown_pct": -2.5643401203562233,
+        "turnover": 1.053257532307022,
+        "hit_rate_pct": 50.0,
+        "profit_factor": 1.5781144754281045
+      },
+      "baseline_excess_pct": 1.210038910919331
+    },
+    {
+      "name": "momentum_confirmed",
+      "metrics": {
+        "status": "insufficient_history",
+        "observations": 4,
+        "total_return_pct": -2.435366837344388,
+        "cagr_pct": null,
+        "volatility_pct": 42.046031437867256,
+        "sharpe": null,
+        "sortino": null,
+        "max_drawdown_pct": -5.695548031351693,
+        "turnover": 1.6666666666666667,
+        "hit_rate_pct": 25.0,
+        "profit_factor": 0.5986248761278897
+      },
+      "baseline_excess_pct": -2.6064483961868334
+    }
+  ],
+  "walk_forward": {
+    "status": "insufficient_history",
+    "required_days": 148,
+    "available_days": 4,
+    "windows": [],
+    "selected_strategy": null
+  },
+  "warnings": [
+    "学習126日・purge1日・テスト21日を満たしていません。",
+    "運用可能期間のwalk-forward検証は履歴不足です。"
+  ]
+}
