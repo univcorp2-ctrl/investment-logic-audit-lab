@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-07T08:20:26.555332+00:00",
+  "generated_at": "2026-08-10T08:49:40.827628+00:00",
   "paper_only": true,
   "thresholds": {
     "portfolio_drawdown_alert_pct": -8.0,
@@ -17,30 +17,21 @@
     "preferred_rule_change_observations": 60
   },
   "snapshot": {
-    "equity": 31152000.0,
+    "equity": 31322200.0,
     "seed_cost_basis": 30722100.0,
-    "unrealized_pnl": 166500.0,
-    "unrealized_loss_pct_of_seed": 0.5419551397853662,
+    "unrealized_pnl": 367700.0,
+    "unrealized_loss_pct_of_seed": 1.1968582876821572,
     "max_drawdown_pct": -1.3787099327265517,
-    "current_drawdown_pct": -1.3787099327265517,
-    "observations": 3
+    "current_drawdown_pct": -0.8398891966759026,
+    "observations": 4
   },
   "causes": [
-    {
-      "code": "position_losses",
-      "severity": "high",
-      "title": "個別銘柄の損失が集中",
-      "evidence": [
-        "レーザーテック -8.77%"
-      ],
-      "explanation": "少数の銘柄が全体損益を大きく押し下げている可能性があります。"
-    },
     {
       "code": "concentration",
       "severity": "medium",
       "title": "ポジション集中度が高い",
       "evidence": [
-        "ファーストリテイリング 25.5%"
+        "ファーストリテイリング 25.1%"
       ],
       "explanation": "1銘柄の値動きがポートフォリオ全体を支配しやすい状態です。"
     },
@@ -49,11 +40,12 @@
       "severity": "medium",
       "title": "テクニカル悪化が複数銘柄で発生",
       "evidence": [
-        "キオクシアホールディングス Technical 0.0",
-        "三井金属 Technical 29.0",
-        "レーザーテック Technical 0.0",
+        "キオクシアホールディングス Technical 5.0",
+        "ＪＸ金属 Technical 29.0",
+        "三井金属 Technical 0.0",
+        "レーザーテック Technical 13.0",
         "東京エレクトロン Technical 0.0",
-        "ソフトバンクグループ Technical 0.0"
+        "ファーストリテイリング Technical 22.0"
       ],
       "explanation": "トレンド崩れ・負のモメンタム・高ボラ化が含み損を拡大させる典型要因です。"
     },
@@ -69,24 +61,26 @@
       "explanation": "割安に見えても品質悪化やFCF悪化を伴う場合、バリュートラップになり得ます。"
     },
     {
+      "code": "stale_fundamentals",
+      "severity": "medium",
+      "title": "ファンダメンタルが古い",
+      "evidence": [
+        "実効cutoff 2026-05-11",
+        "評価時点から約91日"
+      ],
+      "explanation": "Freeの遅延データでは、現在の決算・業績変化が投資判断へ反映されるまで時間差があります。"
+    },
+    {
       "code": "sector_cluster",
       "severity": "low",
       "title": "同一業種の損失集中を確認",
       "evidence": [
-        "3650 合計 -360,000円"
+        "6100 合計 -31,000円"
       ],
       "explanation": "複数銘柄を保有していても同じ業種なら実質的な分散が弱くなります。"
     }
   ],
   "improvement_candidates": [
-    {
-      "code": "position_stop",
-      "priority": "high",
-      "title": "1銘柄ごとの最大損失を明示",
-      "why": "個別損失の肥大化を防ぐ目的です。",
-      "setting_hint": "1銘柄最大含み損% / 円、最大ポジション比率を設定",
-      "auto_apply": false
-    },
     {
       "code": "position_cap",
       "priority": "medium",
@@ -112,6 +106,14 @@
       "auto_apply": false
     },
     {
+      "code": "freshness",
+      "priority": "medium",
+      "title": "Fundamental鮮度を改善",
+      "why": "古い企業情報による判断ズレを減らす目的です。",
+      "setting_hint": "Light以上の最新データ、または開示鮮度上限を短くする",
+      "auto_apply": false
+    },
+    {
       "code": "sector_cap",
       "priority": "low",
       "title": "業種上限を設定する候補",
@@ -124,7 +126,7 @@
     "goal": "勝率の最大化ではなく、期待値・ドローダウン・再現性のバランスを改善する",
     "rule_change_allowed": false,
     "preferred_evidence_reached": false,
-    "observations": 3,
+    "observations": 4,
     "minimum_observations": 42,
     "preferred_observations": 60,
     "principles": [
