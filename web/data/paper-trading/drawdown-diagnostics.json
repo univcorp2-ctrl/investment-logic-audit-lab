@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-10T08:49:40.827628+00:00",
+  "generated_at": "2026-08-11T08:14:48.580644+00:00",
   "paper_only": true,
   "thresholds": {
     "portfolio_drawdown_alert_pct": -8.0,
@@ -23,18 +23,9 @@
     "unrealized_loss_pct_of_seed": 1.1968582876821572,
     "max_drawdown_pct": -1.3787099327265517,
     "current_drawdown_pct": -0.8398891966759026,
-    "observations": 4
+    "observations": 5
   },
   "causes": [
-    {
-      "code": "concentration",
-      "severity": "medium",
-      "title": "ポジション集中度が高い",
-      "evidence": [
-        "ファーストリテイリング 25.1%"
-      ],
-      "explanation": "1銘柄の値動きがポートフォリオ全体を支配しやすい状態です。"
-    },
     {
       "code": "technical_breakdown",
       "severity": "medium",
@@ -66,29 +57,12 @@
       "title": "ファンダメンタルが古い",
       "evidence": [
         "実効cutoff 2026-05-11",
-        "評価時点から約91日"
+        "評価時点から約92日"
       ],
       "explanation": "Freeの遅延データでは、現在の決算・業績変化が投資判断へ反映されるまで時間差があります。"
-    },
-    {
-      "code": "sector_cluster",
-      "severity": "low",
-      "title": "同一業種の損失集中を確認",
-      "evidence": [
-        "6100 合計 -31,000円"
-      ],
-      "explanation": "複数銘柄を保有していても同じ業種なら実質的な分散が弱くなります。"
     }
   ],
   "improvement_candidates": [
-    {
-      "code": "position_cap",
-      "priority": "medium",
-      "title": "最大ポジション比率を下げる候補",
-      "why": "集中リスクを抑え、1銘柄の急落耐性を高めます。",
-      "setting_hint": "最大ポジション比率を15〜20%以下で比較",
-      "auto_apply": false
-    },
     {
       "code": "entry_confirmation",
       "priority": "medium",
@@ -112,21 +86,13 @@
       "why": "古い企業情報による判断ズレを減らす目的です。",
       "setting_hint": "Light以上の最新データ、または開示鮮度上限を短くする",
       "auto_apply": false
-    },
-    {
-      "code": "sector_cap",
-      "priority": "low",
-      "title": "業種上限を設定する候補",
-      "why": "同じテーマの同時下落を抑える目的です。",
-      "setting_hint": "最大業種比率を25〜35%で比較",
-      "auto_apply": false
     }
   ],
   "stability_plan": {
     "goal": "勝率の最大化ではなく、期待値・ドローダウン・再現性のバランスを改善する",
     "rule_change_allowed": false,
     "preferred_evidence_reached": false,
-    "observations": 4,
+    "observations": 5,
     "minimum_observations": 42,
     "preferred_observations": 60,
     "principles": [
