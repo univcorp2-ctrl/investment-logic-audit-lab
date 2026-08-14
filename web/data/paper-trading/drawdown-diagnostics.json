@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-13T08:41:31.556441+00:00",
+  "generated_at": "2026-08-14T08:35:57.376533+00:00",
   "paper_only": true,
   "thresholds": {
     "portfolio_drawdown_alert_pct": -8.0,
@@ -17,13 +17,13 @@
     "preferred_rule_change_observations": 60
   },
   "snapshot": {
-    "equity": 31496200.0,
+    "equity": 31646700.0,
     "seed_cost_basis": 30722100.0,
-    "unrealized_pnl": 541700.0,
-    "unrealized_loss_pct_of_seed": 1.763225821151549,
+    "unrealized_pnl": 692200.0,
+    "unrealized_loss_pct_of_seed": 2.2531011877443277,
     "max_drawdown_pct": -1.3787099327265517,
-    "current_drawdown_pct": -0.2890383854372791,
-    "observations": 7
+    "current_drawdown_pct": 0.0,
+    "observations": 8
   },
   "causes": [
     {
@@ -31,7 +31,7 @@
       "severity": "medium",
       "title": "テクニカル悪化が複数銘柄で発生",
       "evidence": [
-        "キオクシアホールディングス Technical 5.0",
+        "ＪＸ金属 Technical 13.0",
         "三井金属 Technical 0.0",
         "レーザーテック Technical 5.0",
         "東京エレクトロン Technical 5.0",
@@ -56,7 +56,7 @@
       "title": "ファンダメンタルが古い",
       "evidence": [
         "実効cutoff 2026-05-11",
-        "評価時点から約94日"
+        "評価時点から約95日"
       ],
       "explanation": "Freeの遅延データでは、現在の決算・業績変化が投資判断へ反映されるまで時間差があります。"
     }
@@ -91,7 +91,7 @@
     "goal": "勝率の最大化ではなく、期待値・ドローダウン・再現性のバランスを改善する",
     "rule_change_allowed": false,
     "preferred_evidence_reached": false,
-    "observations": 7,
+    "observations": 8,
     "minimum_observations": 42,
     "preferred_observations": 60,
     "principles": [

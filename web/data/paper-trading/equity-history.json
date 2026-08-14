@@ -6,7 +6,7 @@
       "realized_pnl": 0.0,
       "unrealized_pnl": 87500.0,
       "total_pnl": 87500.0,
-      "daily_return_pct": 0.2848,
+      "daily_return_pct": 0.28481126,
       "cumulative_return_pct": 0.2848
     },
     {
@@ -15,7 +15,7 @@
       "realized_pnl": 623400.0,
       "unrealized_pnl": 242000.0,
       "total_pnl": 865400.0,
-      "daily_return_pct": 2.5249,
+      "daily_return_pct": 2.52486238,
       "cumulative_return_pct": 2.8169
     },
     {
@@ -24,7 +24,7 @@
       "realized_pnl": 263400.0,
       "unrealized_pnl": 166500.0,
       "total_pnl": 429900.0,
-      "daily_return_pct": 0.2868,
+      "daily_return_pct": -1.37870993,
       "cumulative_return_pct": 1.3993
     },
     {
@@ -33,7 +33,7 @@
       "realized_pnl": 232400.0,
       "unrealized_pnl": 367700.0,
       "total_pnl": 600100.0,
-      "daily_return_pct": 0.5464,
+      "daily_return_pct": 0.54635336,
       "cumulative_return_pct": 1.9533
     },
     {
@@ -51,7 +51,7 @@
       "realized_pnl": 232400.0,
       "unrealized_pnl": 419000.0,
       "total_pnl": 651400.0,
-      "daily_return_pct": 0.1638,
+      "daily_return_pct": 0.1637816,
       "cumulative_return_pct": 2.1203
     },
     {
@@ -60,8 +60,17 @@
       "realized_pnl": 232400.0,
       "unrealized_pnl": 541700.0,
       "total_pnl": 774100.0,
-      "daily_return_pct": 0.3911,
+      "daily_return_pct": 0.39109439,
       "cumulative_return_pct": 2.5197
+    },
+    {
+      "date": "2026-08-14",
+      "equity": 31646700.0,
+      "realized_pnl": 232400.0,
+      "unrealized_pnl": 692200.0,
+      "total_pnl": 924600.0,
+      "daily_return_pct": 0.47783542,
+      "cumulative_return_pct": 3.0096
     }
   ]
 }
