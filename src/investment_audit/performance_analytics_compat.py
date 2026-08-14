@@ -83,43 +83,21 @@ def analyze_performance(
         symbol = str(position.get("symbol") or "")
         code = symbol.removesuffix(".T")
         current_price = _number(position.get("current_price"))
-        decisions.append(
-            {
-                "symbol": symbol,
-                "code": code,
-                "company_name": position.get("company_name") or code,
-                "holding": {
-                    "quantity": position.get("quantity", 0),
-                    "avg_cost": position.get("avg_cost"),
-                },
-                "technical": {"price": current_price},
-                "quote": {"valid": current_price is not None},
-            }
-        )
-    latest_report = {
-        "generated_at": generated_at,
-        "summary": summary,
-        "decisions": decisions,
-    }
-    portfolio_state = {
-        "seed_cost_basis": seed_cost,
-        "cash": summary.get("cash", 0.0),
-    }
+        decisions.append({
+            "symbol": symbol,
+            "code": code,
+            "company_name": position.get("company_name") or code,
+            "holding": {"quantity": position.get("quantity", 0), "avg_cost": position.get("avg_cost")},
+            "technical": {"price": current_price},
+            "quote": {"valid": current_price is not None},
+        })
+    latest_report = {"generated_at": generated_at, "summary": summary, "decisions": decisions}
+    portfolio_state = {"seed_cost_basis": seed_cost, "cash": summary.get("cash", 0.0), "seed_positions": seed_positions}
     benchmark_prices = pd.Series(dtype=float)
     if benchmark_history is not None and not benchmark_history.empty and "close" in benchmark_history:
         benchmark_prices = pd.to_numeric(benchmark_history["close"], errors="coerce").dropna()
-    history_for_engine = [
-        {
-            **row,
-            "daily_return_pct": row.get("daily_return_pct"),
-            "realized_pnl": row.get("realized_pnl"),
-            "unrealized_pnl": row.get("unrealized_pnl"),
-            "total_pnl": row.get("total_pnl"),
-        }
-        for row in history
-    ]
     analytics = calculate_performance_analytics(
-        history_for_engine,
+        history,
         latest_report,
         portfolio_state,
         trades,
@@ -140,16 +118,10 @@ def analyze_performance(
     benchmark_status = "unavailable" if benchmark_error else (
         "ok" if int(analytics.get("benchmark", {}).get("paired_observations") or 0) >= config.minimum_distribution_observations else "insufficient_history"
     )
-    benchmark = {
-        "status": benchmark_status,
-        "symbol": config.benchmark_symbol,
-        "name": config.benchmark_name,
-        "error": benchmark_error,
-        **analytics.get("benchmark", {}),
-    }
+    benchmark = {"status": benchmark_status, "symbol": config.benchmark_symbol, "name": config.benchmark_name, "error": benchmark_error, **analytics.get("benchmark", {})}
     benchmark["status"] = benchmark_status
     payload = {
-        "schema_version": 2,
+        "schema_version": 3,
         "generated_at": generated_at,
         "reliability": {
             "status": reliability_status,
