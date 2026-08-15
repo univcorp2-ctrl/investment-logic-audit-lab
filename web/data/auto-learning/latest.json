@@ -1,28 +1,28 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-08T03:04:27.873879+00:00",
+  "generated_at": "2026-08-15T02:29:50.500784+00:00",
   "model": "gated-walk-forward-rule-selection-v1",
   "mode": "learning_only",
   "paper_only": true,
   "real_order_allowed": false,
   "candidate": {
     "strategy": "low_volatility",
-    "objective_score": 2.702756,
+    "objective_score": 3.896584,
     "metrics": {
       "status": "ok",
-      "observations": 63,
-      "total_return_pct": 13.763805806062335,
-      "cagr_pct": 67.50063173255131,
-      "volatility_pct": 43.505605007806885,
-      "sharpe": 1.4039391796576828,
-      "sortino": 2.7598709613555674,
+      "observations": 67,
+      "total_return_pct": 19.33005469677149,
+      "cagr_pct": 94.3887105005486,
+      "volatility_pct": 42.47491591762022,
+      "sharpe": 1.779003112620409,
+      "sortino": 3.327118069405669,
       "max_drawdown_pct": -19.843772187700083,
-      "turnover": 7.800000000000001,
-      "hit_rate_pct": 55.55555555555556,
-      "profit_factor": 1.2379055815084905
+      "turnover": 8.6,
+      "hit_rate_pct": 56.71641791044776,
+      "profit_factor": 1.3123345491678031
     },
-    "baseline_excess_pct": 16.642281410988947,
-    "sharpe_improvement": 1.2825867851167039,
+    "baseline_excess_pct": 17.49821889927845,
+    "sharpe_improvement": 1.3641659256816614,
     "drawdown_worsening_pct": 0.0,
     "proposed_overrides": {
       "buy_quality": 60.0,
@@ -66,7 +66,7 @@
     {
       "name": "operational_observations",
       "passed": false,
-      "actual": 4,
+      "actual": 9,
       "required": 169,
       "explanation": "学習126日・purge1日・OOS42日以上を確保する"
     },
@@ -111,14 +111,14 @@
     {
       "name": "sharpe_improvement",
       "passed": true,
-      "actual": 1.2825867851167039,
+      "actual": 1.3641659256816614,
       "required": 0.15,
       "explanation": "ベースラインよりリスク調整後収益が改善する"
     },
     {
       "name": "baseline_excess",
       "passed": true,
-      "actual": 16.642281410988947,
+      "actual": 17.49821889927845,
       "required": 1.0,
       "explanation": "ベースラインに対して十分なOOS超過収益がある"
     },
@@ -148,7 +148,7 @@
     "required": 2
   },
   "observations": {
-    "operational": 4,
+    "operational": 9,
     "required_operational": 169,
     "oos": 0,
     "required_oos": 42
