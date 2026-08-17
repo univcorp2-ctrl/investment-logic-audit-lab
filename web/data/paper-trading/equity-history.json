@@ -71,6 +71,15 @@
       "total_pnl": 924600.0,
       "daily_return_pct": 0.47783542,
       "cumulative_return_pct": 3.0096
+    },
+    {
+      "date": "2026-08-17",
+      "equity": 31723800.0,
+      "realized_pnl": 232400.0,
+      "unrealized_pnl": 769300.0,
+      "total_pnl": 1001700.0,
+      "daily_return_pct": 0.2436273,
+      "cumulative_return_pct": 3.2605
     }
   ]
 }
