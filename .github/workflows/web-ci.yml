@@ -46,8 +46,9 @@ jobs:
         working-directory: web
         run: npm install --no-save --package-lock=false @playwright/test@1.55.0
       - name: Install Chromium
+        timeout-minutes: 5
         working-directory: web
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
       - name: Browser E2E — PC, iPad and iPhone
         working-directory: web
         run: npm run e2e
