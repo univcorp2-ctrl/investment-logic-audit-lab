@@ -1,5 +1,5 @@
 import { correctedEquitySeries, finite, liveLedgerMark } from './performance-cockpit-core.js';
-import { combinedRiskHero, extractChartPointLabels, graphSizePx, nextGraphSize, nextZoomPeriod } from './performance-cockpit-mobile-core.js';
+import { combinedRiskHero, extractChartPointLabels, graphSizePx, nextGraphSize } from './performance-cockpit-mobile-core.js';
 
 const SIZE_KEY='valuescope-performance-chart-size-v1';
 const ZOOM_KEY='valuescope-performance-chart-zoom-v1';
@@ -11,8 +11,13 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 let size=localStorage.getItem(SIZE_KEY)||'normal';
 let zoom=localStorage.getItem(ZOOM_KEY)||'all';
 let portfolio=null,history=[],series=[],live=null;
+let periodListenerInstalled=false;
 
 async function getJson(path,fallback){try{const response=await fetch(path);return response.ok?await response.json():fallback}catch{return fallback}}
+
+function activePeriod(){return document.querySelector('[data-pcock-period][aria-pressed="true"]')?.dataset?.pcockPeriod||zoom||'all'}
+function periodLabel(period){return({all:'全期間','1y':'1Y','6m':'6M','3m':'3M','1m':'1M','1w':'1W'})[period]||period}
+function sizeLabel(value){return({compact:'小',normal:'標準',large:'大'})[value]||'標準'}
 
 function installUi(){
   const cockpit=$('#performanceCockpit');
@@ -40,13 +45,26 @@ function installUi(){
     strip.className='pcock-date-strip';
     strip.setAttribute('aria-label','グラフの日付一覧');
     readout.after(strip);
-    $('#pcockShrink').addEventListener('click',()=>changeGraph(-1));
-    $('#pcockGrow').addEventListener('click',()=>changeGraph(1));
+    $('#pcockShrink').addEventListener('click',()=>changeGraphSize(-1));
+    $('#pcockGrow').addEventListener('click',()=>changeGraphSize(1));
     $('#pcockResetGraph').addEventListener('click',resetGraph);
   }
+  installPeriodListener();
   applyGraphSize();
   observeChart();
   return true;
+}
+
+function installPeriodListener(){
+  if(periodListenerInstalled)return;
+  periodListenerInstalled=true;
+  document.addEventListener('click',event=>{
+    const button=event.target.closest('[data-pcock-period]');
+    if(!button)return;
+    zoom=button.dataset.pcockPeriod||'all';
+    localStorage.setItem(ZOOM_KEY,zoom);
+    requestAnimationFrame(applyGraphSize);
+  });
 }
 
 function applyGraphSize(){
@@ -54,19 +72,27 @@ function applyGraphSize(){
   if(!cockpit)return;
   cockpit.dataset.graphSize=size;
   cockpit.style.setProperty('--pcock-user-chart-height',`${graphSizePx(size,matchMedia('(max-width:767px)').matches)}px`);
-  const label={compact:'小',normal:'標準',large:'大'}[size]||'標準';
-  const periodLabel={all:'全期間','1y':'1Y','6m':'6M','3m':'3M','1m':'1M','1w':'1W'}[zoom]||zoom;
-  const status=$('#pcockZoomStatus');if(status)status.textContent=`グラフ: ${label} / ${periodLabel}`;
+  const status=$('#pcockZoomStatus');
+  if(status)status.textContent=`グラフ: ${sizeLabel(size)} / ${periodLabel(activePeriod())}`;
 }
 
-function periodButton(period){return document.querySelector(`[data-pcock-period="${period}"]`)}
-function changeGraph(direction){
+function changeGraphSize(direction){
   size=nextGraphSize(size,direction);
-  zoom=nextZoomPeriod(zoom,direction);
-  localStorage.setItem(SIZE_KEY,size);localStorage.setItem(ZOOM_KEY,zoom);
-  applyGraphSize();periodButton(zoom)?.click();
+  localStorage.setItem(SIZE_KEY,size);
+  applyGraphSize();
 }
-function resetGraph(){size='normal';zoom='all';localStorage.setItem(SIZE_KEY,size);localStorage.setItem(ZOOM_KEY,zoom);applyGraphSize();periodButton('all')?.click()}
+
+function resetGraph(){
+  size='normal';
+  localStorage.setItem(SIZE_KEY,size);
+  applyGraphSize();
+  const all=document.querySelector('[data-pcock-period="all"]');
+  if(all&&all.getAttribute('aria-pressed')!=='true'){
+    zoom='all';
+    localStorage.setItem(ZOOM_KEY,zoom);
+    requestAnimationFrame(()=>all.click());
+  }
+}
 
 function observeChart(){
   const chart=$('#pcockChart');if(!chart||chart.dataset.mobileEnhanced)return;
@@ -127,7 +153,11 @@ async function start(){
 async function startData(){
   const [p,h]=await Promise.all([getJson('./data/paper-trading/portfolio.json',{}),getJson('./data/paper-trading/equity-history.json',{history:[]})]);
   portfolio=p;history=h.history??[];series=correctedEquitySeries(history,p.seed_cost_basis);renderHero();
-  if(zoom!=='all')periodButton(zoom)?.click();
+  const saved=localStorage.getItem(ZOOM_KEY);
+  if(saved&&saved!=='all'){
+    const button=document.querySelector(`[data-pcock-period="${saved}"]`);
+    if(button&&button.getAttribute('aria-pressed')!=='true')requestAnimationFrame(()=>button.click());
+  }
   refreshLive();
 }
 
