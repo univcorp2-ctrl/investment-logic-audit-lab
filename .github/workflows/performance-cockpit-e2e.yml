@@ -29,13 +29,27 @@ jobs:
           npm install --no-save --package-lock=false @playwright/test@1.55.0
           npx playwright install chromium
       - name: Run focused cockpit E2E
+        shell: bash
         working-directory: web
-        run: npx playwright test e2e/performance-cockpit-mobile.spec.mjs -c playwright.config.mjs --retries=0 --reporter=line
+        run: |
+          set +e
+          npx playwright test e2e/performance-cockpit-mobile.spec.mjs -c playwright.config.mjs --retries=0 --reporter=line 2>&1 | tee cockpit-e2e.log
+          code=${PIPESTATUS[0]}
+          set -e
+          {
+            echo '## Focused cockpit E2E output'
+            echo '```text'
+            tail -n 140 cockpit-e2e.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$code"
       - name: Upload failures
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: cockpit-e2e-${{ github.run_id }}
-          path: web/test-results
+          path: |
+            web/test-results
+            web/cockpit-e2e.log
           if-no-files-found: ignore
           retention-days: 7
