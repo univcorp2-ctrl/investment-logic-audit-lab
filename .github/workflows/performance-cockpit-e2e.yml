@@ -1,0 +1,41 @@
+name: Performance Cockpit E2E
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cockpit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install application
+        working-directory: web
+        run: npm ci
+      - name: Build
+        working-directory: web
+        run: npm run build
+      - name: Install Playwright
+        working-directory: web
+        run: |
+          npm install --no-save --package-lock=false @playwright/test@1.55.0
+          npx playwright install chromium
+      - name: Run focused cockpit E2E
+        working-directory: web
+        run: npx playwright test e2e/performance-cockpit-mobile.spec.mjs -c playwright.config.mjs --retries=0 --reporter=line
+      - name: Upload failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cockpit-e2e-${{ github.run_id }}
+          path: web/test-results
+          if-no-files-found: ignore
+          retention-days: 7
