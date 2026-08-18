@@ -29,18 +29,39 @@ jobs:
           npm install --no-save --package-lock=false @playwright/test@1.55.0
           npx playwright install chromium
       - name: Run focused cockpit E2E
+        id: e2e
         shell: bash
         working-directory: web
         run: |
           set +e
-          npx playwright test e2e/performance-cockpit-mobile.spec.mjs -c playwright.config.mjs --retries=0 --reporter=line 2>&1 | tee cockpit-e2e.log
-          code=${PIPESTATUS[0]}
+          npx playwright test e2e/performance-cockpit-mobile.spec.mjs -c playwright.config.mjs --retries=0 --reporter=json > cockpit-e2e.json 2> cockpit-e2e-stderr.txt
+          code=$?
           set -e
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('cockpit-e2e.json').read_text(encoding='utf-8'))
+          failures=[]
+          def walk(suite):
+              for child in suite.get('suites',[]): walk(child)
+              for spec in suite.get('specs',[]):
+                  for test in spec.get('tests',[]):
+                      for result in test.get('results',[]):
+                          if result.get('status') not in {'passed','skipped'}:
+                              error=result.get('error') or {}
+                              failures.append((spec.get('title','E2E failure'), error.get('message') or error.get('stack') or 'Unknown Playwright failure'))
+          for suite in data.get('suites',[]): walk(suite)
+          if failures:
+              for title,message in failures[:8]:
+                  clean=' '.join(str(message).splitlines())[:4000]
+                  print(f'::error title={title}::{clean}')
+          else:
+              print('::notice::No structured Playwright failure found; inspect artifact.')
+          PY
           {
-            echo '## Focused cockpit E2E output'
-            echo '```text'
-            tail -n 140 cockpit-e2e.log
-            echo '```'
+            echo '## Focused cockpit E2E'
+            echo "- Exit code: $code"
+            echo '- Structured failure annotations are emitted above.'
           } >> "$GITHUB_STEP_SUMMARY"
           exit "$code"
       - name: Upload failures
@@ -50,6 +71,7 @@ jobs:
           name: cockpit-e2e-${{ github.run_id }}
           path: |
             web/test-results
-            web/cockpit-e2e.log
+            web/cockpit-e2e.json
+            web/cockpit-e2e-stderr.txt
           if-no-files-found: ignore
           retention-days: 7
