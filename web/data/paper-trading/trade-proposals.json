@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-17T16:59:00.439232+09:00",
+  "generated_at": "2026-08-18T16:50:41.521027+09:00",
   "paper_only": true,
   "manual_review_required": true,
   "proposals": [
@@ -9,8 +9,12 @@
       "company_name": "ＪＸ金属",
       "rank": 4,
       "holding": {
-        "quantity": 0,
-        "avg_cost": null
+        "symbol": "5016.T",
+        "code": "5016",
+        "company_name": "ＪＸ金属",
+        "quantity": 100,
+        "avg_cost": 4000.0,
+        "opened_at": "2026-08-17T16:59:00.439108+09:00"
       },
       "fundamental": {
         "value_score": 39.3443,
@@ -39,62 +43,64 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 4000.0,
-        "price_date": "2026-08-17",
-        "sma20": 3799.0,
-        "sma60": 3980.75,
-        "price_vs_sma20_pct": 5.2909,
-        "price_vs_sma60_pct": 0.4836,
-        "rsi14": 54.4801,
-        "momentum20_pct": 3.8422,
-        "momentum60_pct": 1.833,
-        "volatility20_pct": 87.3012,
-        "drawdown20_pct": -8.046,
-        "average_volume20": 22015760.0,
-        "trading_value20": 83610821335.0,
-        "score": 69.0,
-        "regime": "UPTREND",
+        "price": 3814.0,
+        "price_date": "2026-08-18",
+        "sma20": 3811.8,
+        "sma60": 3977.75,
+        "price_vs_sma20_pct": 0.0577,
+        "price_vs_sma60_pct": -4.1166,
+        "rsi14": 58.7511,
+        "momentum20_pct": 7.1951,
+        "momentum60_pct": -4.5068,
+        "volatility20_pct": 84.4332,
+        "drawdown20_pct": -12.3218,
+        "average_volume20": 21671635.0,
+        "trading_value20": 82664231945.0,
+        "score": 39.0,
+        "regime": "NEUTRAL",
         "positive_reasons": [
           "株価が20日移動平均を上回る",
           "20日モメンタムがプラス",
-          "60日モメンタムがプラス",
           "RSIが過熱しすぎない強気圏"
         ],
         "risk_reasons": [
           "20日線が60日線を下回る下降基調",
+          "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい",
           "短期ボラティリティが高い"
         ],
         "missing": []
       },
       "quote": {
         "valid": true,
-        "current_price": 4000.0,
-        "quote_time": "2026-08-17T15:30:00+09:00",
+        "current_price": 3814.0,
+        "quote_time": "2026-08-18T15:30:00+09:00",
         "verification": "double-checked",
         "max_difference_pct": 0.0,
         "risks": []
       },
       "decision": {
-        "action": "SIM_BUY",
-        "confidence": 55.21,
+        "action": "SIM_SELL",
+        "confidence": 49.21,
         "reasons": [
           "企業品質スコアが高い",
           "成長・安定性が良好",
           "株価が20日移動平均を上回る",
           "20日モメンタムがプラス",
-          "60日モメンタムがプラス",
           "RSIが過熱しすぎない強気圏"
         ],
         "risks": [
           "データ充足率が低い",
           "20日線が60日線を下回る下降基調",
+          "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい",
           "短期ボラティリティが高い"
         ],
         "execution_allowed": true,
         "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
-        "side": "BUY",
+        "side": "SELL",
         "quantity": 100,
         "paper_only": true,
         "manual_review_required": true

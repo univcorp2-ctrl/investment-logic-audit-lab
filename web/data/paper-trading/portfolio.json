@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "portfolio_id": "valuescope-demo-20260803-afternoon",
-  "cash": 26669700.0,
-  "realized_pnl": 232400.0,
+  "cash": 27051100.0,
+  "realized_pnl": 213800.0,
   "positions": [
     {
       "symbol": "6857.T",
@@ -19,14 +19,6 @@
       "quantity": 100,
       "avg_cost": 7588.0,
       "opened_at": "2026-08-03T14:37:00+09:00"
-    },
-    {
-      "symbol": "5016.T",
-      "code": "5016",
-      "company_name": "ＪＸ金属",
-      "quantity": 100,
-      "avg_cost": 4000.0,
-      "opened_at": "2026-08-17T16:59:00.439108+09:00"
     }
   ],
   "seed_cost_basis": 30722100.0,
