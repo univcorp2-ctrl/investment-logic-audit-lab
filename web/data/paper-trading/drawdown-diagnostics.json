@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-27T18:16:16.291351+00:00",
+  "generated_at": "2026-08-28T19:25:05.634345+00:00",
   "paper_only": true,
   "thresholds": {
     "portfolio_drawdown_alert_pct": -8.0,
@@ -17,13 +17,13 @@
     "preferred_rule_change_observations": 60
   },
   "snapshot": {
-    "equity": 31379100.0,
+    "equity": 31494600.0,
     "seed_cost_basis": 30722100.0,
-    "unrealized_pnl": 449000.0,
-    "unrealized_loss_pct_of_seed": 1.4614886352169936,
+    "unrealized_pnl": 564500.0,
+    "unrealized_loss_pct_of_seed": 1.8374394979509865,
     "max_drawdown_pct": -1.3787099327265517,
-    "current_drawdown_pct": -1.0865659221152568,
-    "observations": 17
+    "current_drawdown_pct": -0.7224859569156306,
+    "observations": 18
   },
   "causes": [
     {
@@ -31,12 +31,12 @@
       "severity": "medium",
       "title": "テクニカル悪化が複数銘柄で発生",
       "evidence": [
-        "キオクシアホールディングス Technical 31.0",
-        "ＪＸ金属 Technical 5.0",
-        "三井金属 Technical 0.0",
+        "キオクシアホールディングス Technical 13.0",
+        "ＪＸ金属 Technical 25.0",
+        "三井金属 Technical 5.0",
         "レーザーテック Technical 0.0",
         "ファーストリテイリング Technical 0.0",
-        "ソフトバンクグループ Technical 0.0"
+        "ソフトバンクグループ Technical 5.0"
       ],
       "explanation": "トレンド崩れ・負のモメンタム・高ボラ化が含み損を拡大させる典型要因です。"
     },
@@ -57,18 +57,9 @@
       "title": "ファンダメンタルが古い",
       "evidence": [
         "実効cutoff 2026-05-11",
-        "評価時点から約108日"
+        "評価時点から約109日"
       ],
       "explanation": "Freeの遅延データでは、現在の決算・業績変化が投資判断へ反映されるまで時間差があります。"
-    },
-    {
-      "code": "sector_cluster",
-      "severity": "low",
-      "title": "同一業種の損失集中を確認",
-      "evidence": [
-        "3500 合計 -5,800円"
-      ],
-      "explanation": "複数銘柄を保有していても同じ業種なら実質的な分散が弱くなります。"
     }
   ],
   "improvement_candidates": [
@@ -95,21 +86,13 @@
       "why": "古い企業情報による判断ズレを減らす目的です。",
       "setting_hint": "Light以上の最新データ、または開示鮮度上限を短くする",
       "auto_apply": false
-    },
-    {
-      "code": "sector_cap",
-      "priority": "low",
-      "title": "業種上限を設定する候補",
-      "why": "同じテーマの同時下落を抑える目的です。",
-      "setting_hint": "最大業種比率を25〜35%で比較",
-      "auto_apply": false
     }
   ],
   "stability_plan": {
     "goal": "勝率の最大化ではなく、期待値・ドローダウン・再現性のバランスを改善する",
     "rule_change_allowed": false,
     "preferred_evidence_reached": false,
-    "observations": 17,
+    "observations": 18,
     "minimum_observations": 42,
     "preferred_observations": 60,
     "principles": [
