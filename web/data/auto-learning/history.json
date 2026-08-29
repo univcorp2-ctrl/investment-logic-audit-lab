@@ -36,6 +36,18 @@
       "operational_observations": 14,
       "oos_observations": 0,
       "parameter_stability": null
+    },
+    {
+      "run_id": "2026-08-29T07:18:33.282649+00:00",
+      "evaluated_at": "2026-08-29T07:58:31.625079+00:00",
+      "candidate": "low_volatility",
+      "objective_score": 2.466588,
+      "all_gates_passed": false,
+      "confirmation_count": 0,
+      "mode": "learning_only",
+      "operational_observations": 19,
+      "oos_observations": 0,
+      "parameter_stability": null
     }
   ]
 }
