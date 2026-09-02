@@ -1,17 +1,9 @@
 {
   "schema_version": 1,
   "portfolio_id": "valuescope-demo-20260803-afternoon",
-  "cash": 26943300.0,
-  "realized_pnl": 106000.0,
+  "cash": 30197300.0,
+  "realized_pnl": 234000.0,
   "positions": [
-    {
-      "symbol": "6857.T",
-      "code": "6857",
-      "company_name": "アドバンテスト",
-      "quantity": 100,
-      "avg_cost": 31260.0,
-      "opened_at": "2026-08-03T14:35:00+09:00"
-    },
     {
       "symbol": "7974.T",
       "code": "7974",

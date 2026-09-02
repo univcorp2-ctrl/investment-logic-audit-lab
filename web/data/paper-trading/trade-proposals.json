@@ -1,95 +1,93 @@
 {
-  "generated_at": "2026-09-01T21:32:41.539876+09:00",
+  "generated_at": "2026-09-02T21:05:38.492090+09:00",
   "paper_only": true,
   "manual_review_required": true,
   "proposals": [
     {
-      "symbol": "8035.T",
-      "code": "8035",
-      "company_name": "東京エレクトロン",
-      "rank": 1,
+      "symbol": "6857.T",
+      "code": "6857",
+      "company_name": "アドバンテスト",
+      "rank": 2,
       "holding": {
-        "symbol": "8035.T",
-        "code": "8035",
-        "company_name": "東京エレクトロン",
+        "symbol": "6857.T",
+        "code": "6857",
+        "company_name": "アドバンテスト",
         "quantity": 100,
-        "avg_cost": 56000.0,
-        "opened_at": "2026-08-28T03:16:15.341069+09:00"
+        "avg_cost": 31260.0,
+        "opened_at": "2026-08-03T14:35:00+09:00"
       },
       "fundamental": {
-        "value_score": 92.8962,
-        "quality_score": 76.4706,
-        "growth_stability_score": 91.6667,
-        "value_trap_risk": 17.2,
-        "data_completeness": 42.6667,
-        "earnings_yield": 0.0241,
-        "book_to_market": 0.0874,
-        "fcf_yield": 0.0187,
+        "value_score": 61.7486,
+        "quality_score": 68.6275,
+        "growth_stability_score": 82.1429,
+        "value_trap_risk": 15.2,
+        "data_completeness": 49.3333,
+        "earnings_yield": 0.0179,
+        "book_to_market": 0.0381,
+        "fcf_yield": 0.0144,
         "roe": null,
-        "operating_margin": 0.2558,
-        "latest_disclosure_date": "2026-04-30T00:00:00",
-        "score": 86.2082,
+        "operating_margin": 0.4422,
+        "latest_disclosure_date": "2026-04-27T00:00:00",
+        "score": 71.3488,
         "positive_reasons": [
-          "割安性スコアが高い",
           "企業品質スコアが高い",
           "成長・安定性が良好"
         ],
-        "risk_reasons": [
-          "データ充足率が低い"
-        ],
+        "risk_reasons": [],
         "missing": [
           "roe"
         ],
-        "source_positive_reasons": "利益利回りが相対的に良好 / FCF利回りが相対的に良好 / dividend_yieldが相対的に良好 / データ不足のため信頼度が低い",
+        "source_positive_reasons": "fcf_growthが相対的に良好 / 利益利回りが相対的に良好 / FCF利回りが相対的に良好 / データ不足のため信頼度が低い",
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 54980.0,
-        "price_date": "2026-09-01",
-        "sma20": 56390.5,
-        "sma60": 64129.6667,
-        "price_vs_sma20_pct": -2.5013,
-        "price_vs_sma60_pct": -14.2674,
-        "rsi14": 36.9896,
-        "momentum20_pct": -0.0182,
-        "momentum60_pct": -7.5189,
-        "volatility20_pct": 42.5581,
-        "drawdown20_pct": -8.5039,
-        "average_volume20": 2921460.0,
-        "trading_value20": 164909789950.0,
-        "score": 2.0,
-        "regime": "DOWNTREND",
-        "positive_reasons": [],
+        "price": 32540.0,
+        "price_date": "2026-09-02",
+        "sma20": 34726.0,
+        "sma60": 31353.3333,
+        "price_vs_sma20_pct": -6.295,
+        "price_vs_sma60_pct": 3.7848,
+        "rsi14": 36.5719,
+        "momentum20_pct": 4.9677,
+        "momentum60_pct": 28.9479,
+        "volatility20_pct": 57.2226,
+        "drawdown20_pct": -13.8698,
+        "average_volume20": 8117125.0,
+        "trading_value20": 281968934700.0,
+        "score": 62.0,
+        "regime": "NEUTRAL",
+        "positive_reasons": [
+          "20日線が60日線を上回る上昇基調",
+          "20日モメンタムがプラス",
+          "60日モメンタムがプラス"
+        ],
         "risk_reasons": [
           "株価が20日移動平均を下回る",
-          "20日線が60日線を下回る下降基調",
-          "20日モメンタムがマイナス",
-          "60日モメンタムがマイナス"
+          "20日高値からの下落が大きい"
         ],
         "missing": []
       },
       "quote": {
         "valid": true,
-        "current_price": 54980.0,
-        "quote_time": "2026-09-01T15:30:00+09:00",
+        "current_price": 32540.0,
+        "quote_time": "2026-09-02T15:30:00+09:00",
         "verification": "double-checked",
         "max_difference_pct": 0.0,
         "risks": []
       },
       "decision": {
         "action": "SIM_SELL",
-        "confidence": 45.42,
+        "confidence": 57.37,
         "reasons": [
-          "割安性スコアが高い",
           "企業品質スコアが高い",
-          "成長・安定性が良好"
+          "成長・安定性が良好",
+          "20日線が60日線を上回る上昇基調",
+          "20日モメンタムがプラス",
+          "60日モメンタムがプラス"
         ],
         "risks": [
-          "データ充足率が低い",
           "株価が20日移動平均を下回る",
-          "20日線が60日線を下回る下降基調",
-          "20日モメンタムがマイナス",
-          "60日モメンタムがマイナス"
+          "20日高値からの下落が大きい"
         ],
         "execution_allowed": true,
         "execution_note": "デモ台帳内でのみ実行可能"

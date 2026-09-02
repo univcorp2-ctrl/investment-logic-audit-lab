@@ -1,44 +1,44 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-09-01T12:32:42.074382+00:00",
+  "generated_at": "2026-09-02T12:05:39.007005+00:00",
   "paper_only": true,
   "sample": {
-    "observations": 19,
+    "observations": 20,
     "start_date": "2026-08-03T00:00:00",
-    "end_date": "2026-09-01T00:00:00",
+    "end_date": "2026-09-02T00:00:00",
     "seed_cost_basis": 30722100.0,
-    "current_equity": 30979600.0,
+    "current_equity": 31079400.0,
     "status": {
       "annualized": "insufficient_history",
-      "distribution": "insufficient_history",
+      "distribution": "ok",
       "basic": "ok"
     }
   },
   "performance": {
     "total_return_pct": {
-      "value": 0.8382,
+      "value": 1.163,
       "status": "ok",
       "note": null
     },
     "total_pnl": {
-      "value": 257500.0,
+      "value": 357300.0,
       "status": "ok",
       "note": null
     },
     "realized_pnl": {
-      "value": 106000.0,
+      "value": 234000.0,
       "status": "ok",
       "note": null
     },
     "unrealized_pnl": {
-      "value": 151500.0,
+      "value": 123300.0,
       "status": "ok",
       "note": null
     },
     "cagr_pct": {
       "value": null,
       "status": "insufficient_history",
-      "note": "60営業日以上を推奨。現在19日。"
+      "note": "60営業日以上を推奨。現在20日。"
     },
     "best_day_pct": {
       "value": 2.524862380556714,
@@ -51,21 +51,21 @@
       "note": null
     },
     "average_daily_return_pct": {
-      "value": 0.047337980422284216,
+      "value": 0.06107845528591949,
       "status": "ok",
       "note": null
     }
   },
   "risk": {
     "annualized_volatility_pct": {
-      "value": null,
-      "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在19日。"
+      "value": 12.817493082798748,
+      "status": "ok",
+      "note": null
     },
     "downside_deviation_pct": {
-      "value": null,
-      "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在19日。"
+      "value": 8.190164264996017,
+      "status": "ok",
+      "note": null
     },
     "max_drawdown_pct": {
       "value": -2.345872814732153,
@@ -73,74 +73,74 @@
       "note": null
     },
     "current_drawdown_pct": {
-      "value": -2.345872814732153,
+      "value": -2.0312825071397533,
       "status": "ok",
       "note": null
     },
     "ulcer_index": {
-      "value": null,
-      "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在19日。"
+      "value": 0.988957161160904,
+      "status": "ok",
+      "note": null
     },
     "pain_index_pct": {
-      "value": null,
-      "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在19日。"
+      "value": 0.7718834632619782,
+      "status": "ok",
+      "note": null
     },
     "historical_var_95_pct": {
-      "value": null,
-      "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在19日。"
+      "value": -1.391534483844442,
+      "status": "ok",
+      "note": null
     },
     "historical_cvar_95_pct": {
-      "value": null,
-      "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在19日。"
+      "value": -1.6352009550843594,
+      "status": "ok",
+      "note": null
     },
     "skewness": {
-      "value": null,
-      "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在19日。"
+      "value": 0.697962401223855,
+      "status": "ok",
+      "note": null
     },
     "excess_kurtosis": {
-      "value": null,
-      "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在19日。"
+      "value": 4.12190563289661,
+      "status": "ok",
+      "note": null
     }
   },
   "risk_adjusted": {
     "sharpe_ratio": {
       "value": null,
       "status": "insufficient_history",
-      "note": "60営業日以上を推奨。現在19日。"
+      "note": "60営業日以上を推奨。現在20日。"
     },
     "sortino_ratio": {
       "value": null,
       "status": "insufficient_history",
-      "note": "60営業日以上を推奨。現在19日。"
+      "note": "60営業日以上を推奨。現在20日。"
     },
     "calmar_ratio": {
       "value": null,
       "status": "insufficient_history",
-      "note": "60営業日以上を推奨。現在19日。"
+      "note": "60営業日以上を推奨。現在20日。"
     },
     "recovery_factor": {
-      "value": 0.35730837355549644,
+      "value": 0.495764302606827,
       "status": "ok",
       "note": null
     },
     "gain_to_pain_ratio": {
-      "value": 0.18725510561868333,
+      "value": 0.25432460681929075,
       "status": "ok",
       "note": null
     },
     "omega_ratio": {
-      "value": null,
-      "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在19日。"
+      "value": 1.2543246068192908,
+      "status": "ok",
+      "note": null
     },
     "risk_reward_ratio": {
-      "value": 1.3435538387252535,
+      "value": 1.3723529006001243,
       "status": "ok",
       "note": "平均利益 / 平均損失の絶対値。決済トレード優先。"
     }
@@ -148,12 +148,12 @@
   "trading_quality": {
     "basis": "closed_trades",
     "closed_trade_count": {
-      "value": 11.0,
+      "value": 12.0,
       "status": "ok",
       "note": null
     },
     "winning_trades": {
-      "value": 6.0,
+      "value": 7.0,
       "status": "ok",
       "note": null
     },
@@ -163,42 +163,42 @@
       "note": null
     },
     "win_rate_pct": {
-      "value": 54.54545454545454,
+      "value": 58.333333333333336,
       "status": "ok",
       "note": null
     },
     "loss_rate_pct": {
-      "value": 45.45454545454545,
+      "value": 41.66666666666667,
       "status": "ok",
       "note": null
     },
     "payoff_ratio": {
-      "value": 1.3435538387252535,
+      "value": 1.3723529006001243,
       "status": "ok",
       "note": null
     },
     "risk_reward_ratio": {
-      "value": 1.3435538387252535,
+      "value": 1.3723529006001243,
       "status": "ok",
       "note": null
     },
     "profit_factor": {
-      "value": 1.6122646064703041,
+      "value": 1.9212940608401738,
       "status": "ok",
       "note": null
     },
     "expectancy_yen": {
-      "value": 23054.545454545456,
+      "value": 31800.0,
       "status": "ok",
       "note": null
     },
     "expectancy_pct": {
-      "value": 1.0139264877431513,
+      "value": 1.2706567553725743,
       "status": "ok",
       "note": null
     },
     "average_win_yen": {
-      "value": 111300.0,
+      "value": 113685.71428571429,
       "status": "ok",
       "note": null
     },
@@ -208,7 +208,7 @@
       "note": null
     },
     "average_win_pct": {
-      "value": 4.1612004806311225,
+      "value": 4.151698940440423,
       "status": "ok",
       "note": null
     },
@@ -228,84 +228,84 @@
       "note": null
     },
     "trade_count": {
-      "value": 14.0,
+      "value": 15.0,
       "status": "ok",
       "note": null
     },
     "daily_win_rate_pct": {
-      "value": 63.1578947368421,
+      "value": 65.0,
       "status": "ok",
       "note": null
     },
     "daily_loss_rate_pct": {
-      "value": 31.57894736842105,
+      "value": 30.0,
       "status": "ok",
       "note": null
     },
     "turnover_today": {
-      "value": 5498000.0,
+      "value": 3254000.0,
       "status": "ok",
       "note": null
     }
   },
   "drawdown_details": {
     "max_drawdown_pct": -2.345872814732153,
-    "current_drawdown_pct": -2.345872814732153,
+    "current_drawdown_pct": -2.0312825071397533,
     "peak_date": "2026-08-17T00:00:00",
     "trough_date": "2026-09-01T00:00:00",
     "recovery_date": null,
     "drawdown_duration_periods": 10,
     "recovery_duration_periods": null,
-    "time_under_water_periods": 15
+    "time_under_water_periods": 16
   },
   "benchmark": {
     "name": "TOPIX連動型上場投資信託 (1306.T proxy)",
     "symbol": "1306.T",
-    "paired_observations": 17,
+    "paired_observations": 18,
     "total_return_pct": {
-      "value": 1.0142676876437662,
+      "value": -1.5823836768008803,
       "status": "ok",
       "note": null
     },
     "excess_return_pct": {
-      "value": -0.5459121484614915,
+      "value": 2.37439548923426,
       "status": "ok",
       "note": null
     },
     "beta": {
       "value": null,
       "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在17日。"
+      "note": "20営業日以上を推奨。現在18日。"
     },
     "alpha_annual_pct": {
       "value": null,
       "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在17日。"
+      "note": "20営業日以上を推奨。現在18日。"
     },
     "tracking_error_pct": {
       "value": null,
       "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在17日。"
+      "note": "20営業日以上を推奨。現在18日。"
     },
     "information_ratio": {
       "value": null,
       "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在17日。"
+      "note": "20営業日以上を推奨。現在18日。"
     },
     "correlation": {
       "value": null,
       "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在17日。"
+      "note": "20営業日以上を推奨。現在18日。"
     },
     "up_capture_pct": {
       "value": null,
       "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在17日。"
+      "note": "20営業日以上を推奨。現在18日。"
     },
     "down_capture_pct": {
       "value": null,
       "status": "insufficient_history",
-      "note": "20営業日以上を推奨。現在17日。"
+      "note": "20営業日以上を推奨。現在18日。"
     }
   },
   "series": {
@@ -423,6 +423,12 @@
         "equity": 30979600.0,
         "total_pnl": 257500.0,
         "cumulative_return_pct": 0.8382
+      },
+      {
+        "date": "2026-09-02",
+        "equity": 31079400.0,
+        "total_pnl": 357300.0,
+        "cumulative_return_pct": 1.163
       }
     ],
     "daily_pnl": [
@@ -520,6 +526,11 @@
         "date": "2026-09-01",
         "daily_pnl": -515000.0,
         "daily_return_pct": -1.6352009550843594
+      },
+      {
+        "date": "2026-09-02",
+        "daily_pnl": 99800.0,
+        "daily_return_pct": 0.3221474776949895
       }
     ],
     "drawdown": [
@@ -598,47 +609,39 @@
       {
         "date": "2026-09-01",
         "drawdown_pct": -2.345872814732153
+      },
+      {
+        "date": "2026-09-02",
+        "drawdown_pct": -2.0312825071397533
       }
     ],
     "contributions": [
-      {
-        "code": "7974",
-        "company_name": "任天堂",
-        "quantity": 100,
-        "entry_value": 758800.0,
-        "current_value": 910300.0,
-        "pnl": 151500.0,
-        "return_pct": 19.965735371639433,
-        "weight_pct": 2.9383852599775335,
-        "quote_valid": true
-      },
-      {
-        "code": "8035",
-        "company_name": "東京エレクトロン",
-        "quantity": 100,
-        "entry_value": 5600000.0,
-        "current_value": 5498000.0,
-        "pnl": -102000.0,
-        "return_pct": -1.8214285714285714,
-        "weight_pct": 17.747162648969,
-        "quote_valid": true
-      },
       {
         "code": "6857",
         "company_name": "アドバンテスト",
         "quantity": 100,
         "entry_value": 3126000.0,
-        "current_value": 3126000.0,
-        "pnl": 0.0,
-        "return_pct": 0.0,
-        "weight_pct": 10.09051117509587,
+        "current_value": 3254000.0,
+        "pnl": 128000.0,
+        "return_pct": 4.094689699296225,
+        "weight_pct": 10.469957592488916,
+        "quote_valid": true
+      },
+      {
+        "code": "7974",
+        "company_name": "任天堂",
+        "quantity": 100,
+        "entry_value": 758800.0,
+        "current_value": 882100.0,
+        "pnl": 123300.0,
+        "return_pct": 16.24934106483922,
+        "weight_pct": 2.838214379942985,
         "quote_valid": true
       }
     ]
   },
   "warnings": [
-    "Sharpe・Sortino・CAGR・Calmarは60営業日以上で表示。現在19日。",
-    "Volatility・VaR・CVaR等は20営業日以上で表示。現在19日。"
+    "Sharpe・Sortino・CAGR・Calmarは60営業日以上で表示。現在20日。"
   ],
   "definitions": {
     "risk_reward_ratio": "決済トレードの平均利益 / 平均損失の絶対値。決済が無い場合のみ日次リターンを代理使用。",
