@@ -1,6 +1,185 @@
 {
-  "generated_at": "2026-09-04T21:06:22.437152+09:00",
+  "generated_at": "2026-10-13T23:59:15.263097+09:00",
   "paper_only": true,
   "manual_review_required": true,
-  "proposals": []
+  "proposals": [
+    {
+      "symbol": "6857.T",
+      "code": "6857",
+      "company_name": "アドバンテスト",
+      "rank": 2,
+      "holding": {
+        "quantity": 0,
+        "avg_cost": null
+      },
+      "fundamental": {
+        "value_score": 61.7486,
+        "quality_score": 68.6275,
+        "growth_stability_score": 82.1429,
+        "value_trap_risk": 15.2,
+        "data_completeness": 49.3333,
+        "earnings_yield": 0.0179,
+        "book_to_market": 0.0381,
+        "fcf_yield": 0.0144,
+        "roe": null,
+        "operating_margin": 0.4422,
+        "latest_disclosure_date": "2026-04-27T00:00:00",
+        "score": 71.3488,
+        "positive_reasons": [
+          "企業品質スコアが高い",
+          "成長・安定性が良好"
+        ],
+        "risk_reasons": [],
+        "missing": [
+          "roe"
+        ],
+        "source_positive_reasons": "fcf_growthが相対的に良好 / 利益利回りが相対的に良好 / FCF利回りが相対的に良好 / データ不足のため信頼度が低い",
+        "source_negative_reasons": ""
+      },
+      "technical": {
+        "price": 40400.0,
+        "price_date": "2026-10-13",
+        "sma20": 35572.5,
+        "sma60": 33530.0833,
+        "price_vs_sma20_pct": 13.5709,
+        "price_vs_sma60_pct": 20.4888,
+        "rsi14": 83.9572,
+        "momentum20_pct": 23.0207,
+        "momentum60_pct": 40.1804,
+        "volatility20_pct": 56.4434,
+        "drawdown20_pct": -3.4648,
+        "average_volume20": 12167335.0,
+        "trading_value20": 444092611900.0,
+        "score": 90.0,
+        "regime": "UPTREND",
+        "positive_reasons": [
+          "株価が20日移動平均を上回る",
+          "20日線が60日線を上回る上昇基調",
+          "20日モメンタムがプラス",
+          "60日モメンタムがプラス"
+        ],
+        "risk_reasons": [
+          "RSIが過熱圏"
+        ],
+        "missing": []
+      },
+      "quote": {
+        "valid": true,
+        "current_price": 40400.0,
+        "quote_time": "2026-10-13T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
+      },
+      "decision": {
+        "action": "SIM_BUY",
+        "confidence": 62.97,
+        "reasons": [
+          "企業品質スコアが高い",
+          "成長・安定性が良好",
+          "株価が20日移動平均を上回る",
+          "20日線が60日線を上回る上昇基調",
+          "20日モメンタムがプラス",
+          "60日モメンタムがプラス"
+        ],
+        "risks": [
+          "RSIが過熱圏"
+        ],
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
+      },
+      "proposal": {
+        "side": "BUY",
+        "quantity": 100,
+        "paper_only": true,
+        "manual_review_required": true
+      }
+    },
+    {
+      "symbol": "6920.T",
+      "code": "6920",
+      "company_name": "レーザーテック",
+      "rank": 5,
+      "holding": {
+        "quantity": 0,
+        "avg_cost": null
+      },
+      "fundamental": {
+        "value_score": 50.0,
+        "quality_score": 90.1961,
+        "growth_stability_score": 29.5238,
+        "value_trap_risk": 26.1,
+        "data_completeness": 46.3333,
+        "earnings_yield": 0.0143,
+        "book_to_market": 0.057,
+        "fcf_yield": 0.009,
+        "roe": null,
+        "operating_margin": 0.4612,
+        "latest_disclosure_date": "2026-04-30T00:00:00",
+        "score": 61.5486,
+        "positive_reasons": [
+          "企業品質スコアが高い"
+        ],
+        "risk_reasons": [],
+        "missing": [
+          "roe"
+        ],
+        "source_positive_reasons": "operating_marginが相対的に良好 / データ不足のため信頼度が低い",
+        "source_negative_reasons": ""
+      },
+      "technical": {
+        "price": 46090.0,
+        "price_date": "2026-10-13",
+        "sma20": 41356.0,
+        "sma60": 39470.6667,
+        "price_vs_sma20_pct": 11.4469,
+        "price_vs_sma60_pct": 16.7703,
+        "rsi14": 79.6719,
+        "momentum20_pct": 30.6406,
+        "momentum60_pct": 2.9484,
+        "volatility20_pct": 58.3588,
+        "drawdown20_pct": -5.0865,
+        "average_volume20": 4154730.0,
+        "trading_value20": 175171623050.0,
+        "score": 98.0,
+        "regime": "UPTREND",
+        "positive_reasons": [
+          "株価が20日移動平均を上回る",
+          "20日線が60日線を上回る上昇基調",
+          "20日モメンタムがプラス",
+          "60日モメンタムがプラス"
+        ],
+        "risk_reasons": [],
+        "missing": []
+      },
+      "quote": {
+        "valid": true,
+        "current_price": 46090.0,
+        "quote_time": "2026-10-13T15:30:00+09:00",
+        "verification": "double-checked",
+        "max_difference_pct": 0.0,
+        "risks": []
+      },
+      "decision": {
+        "action": "SIM_BUY",
+        "confidence": 60.47,
+        "reasons": [
+          "企業品質スコアが高い",
+          "株価が20日移動平均を上回る",
+          "20日線が60日線を上回る上昇基調",
+          "20日モメンタムがプラス",
+          "60日モメンタムがプラス"
+        ],
+        "risks": [],
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
+      },
+      "proposal": {
+        "side": "BUY",
+        "quantity": 100,
+        "paper_only": true,
+        "manual_review_required": true
+      }
+    }
+  ]
 }

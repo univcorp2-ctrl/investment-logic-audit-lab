@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-04T21:06:22.437152+09:00",
-  "trading_date": "2026-09-04",
+  "generated_at": "2026-10-13T23:59:15.263097+09:00",
+  "trading_date": "2026-10-13",
   "mode": "simulation-execute",
   "paper_only": true,
   "disclaimer": "この処理は外部注文を送信しないデモ・シミュレーションです。表示された判断や損益は将来の利益を保証しません。",
@@ -21,7 +21,7 @@
   },
   "quote_source": {
     "endpoint": "https://valuescope-japan.pages.dev/api/quotes?compact=1",
-    "generated_at": "2026-09-04T12:06:21.345Z",
+    "generated_at": "2026-10-13T14:59:13.085Z",
     "errors": []
   },
   "config": {
@@ -40,19 +40,19 @@
     "max_quote_age_days": 4
   },
   "summary": {
-    "cash": 30197300.0,
-    "market_value": 883900.0,
-    "equity": 31081200.0,
+    "cash": 21548300.0,
+    "market_value": 9466200.0,
+    "equity": 31014500.0,
     "realized_pnl": 234000.0,
-    "unrealized_pnl": 125100.0,
-    "total_pnl": 359100.0,
-    "cumulative_return_pct": 1.1689,
-    "daily_return_pct": -0.0051,
+    "unrealized_pnl": 58400.0,
+    "total_pnl": 292400.0,
+    "cumulative_return_pct": 0.9518,
+    "daily_return_pct": -0.2146,
     "max_drawdown_pct": -2.3459,
-    "position_count": 1,
-    "turnover_today": 0.0,
-    "trade_count_total": 15,
-    "executed_today": 0
+    "position_count": 3,
+    "turnover_today": 8649000.0,
+    "trade_count_total": 17,
+    "executed_today": 2
   },
   "decisions": [
     {
@@ -86,50 +86,52 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 54460.0,
-        "price_date": "2026-09-04",
-        "sma20": 51903.5,
-        "sma60": 66206.8333,
-        "price_vs_sma20_pct": 4.9255,
-        "price_vs_sma60_pct": -17.7426,
-        "rsi14": 39.4269,
-        "momentum20_pct": 11.7357,
-        "momentum60_pct": -22.7518,
-        "volatility20_pct": 95.5846,
-        "drawdown20_pct": -11.934,
-        "average_volume20": 37650830.0,
-        "trading_value20": 1964453598500.0,
-        "score": 41.0,
-        "regime": "NEUTRAL",
+        "price": 15180.0,
+        "price_date": "2026-10-13",
+        "sma20": 17925.5834,
+        "sma60": 17860.8612,
+        "price_vs_sma20_pct": -15.3166,
+        "price_vs_sma60_pct": -15.0097,
+        "rsi14": 41.4093,
+        "momentum20_pct": -20.1053,
+        "momentum60_pct": -32.1311,
+        "volatility20_pct": 74.1993,
+        "drawdown20_pct": -21.6044,
+        "average_volume20": 61317945.0,
+        "trading_value20": 1093629130642.9688,
+        "score": 15.0,
+        "regime": "DOWNTREND",
         "positive_reasons": [
-          "株価が20日移動平均を上回る",
-          "20日モメンタムがプラス"
+          "20日線が60日線を上回る上昇基調"
         ],
         "risk_reasons": [
-          "20日線が60日線を下回る下降基調",
+          "株価が20日移動平均を下回る",
+          "20日モメンタムがマイナス",
           "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい",
           "短期ボラティリティが高い"
         ],
         "missing": []
       },
       "quote": {
         "valid": true,
-        "current_price": 54460.0,
-        "quote_time": "2026-09-04T15:30:00+09:00",
+        "current_price": 15180.0,
+        "quote_time": "2026-10-13T15:30:00+09:00",
         "verification": "double-checked",
         "max_difference_pct": 0.0,
         "risks": []
       },
       "decision": {
         "action": "WATCH",
-        "confidence": 45.24,
+        "confidence": 40.04,
         "reasons": [
-          "株価が20日移動平均を上回る",
-          "20日モメンタムがプラス"
+          "20日線が60日線を上回る上昇基調"
         ],
         "risks": [
-          "20日線が60日線を下回る下降基調",
+          "株価が20日移動平均を下回る",
+          "20日モメンタムがマイナス",
           "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい",
           "短期ボラティリティが高い"
         ],
         "execution_allowed": false,
@@ -178,52 +180,54 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 3619.0,
-        "price_date": "2026-09-04",
-        "sma20": 3767.6,
-        "sma60": 3952.3,
-        "price_vs_sma20_pct": -3.9442,
-        "price_vs_sma60_pct": -8.4331,
-        "rsi14": 36.105,
-        "momentum20_pct": -12.6268,
-        "momentum60_pct": 6.6922,
-        "volatility20_pct": 52.4551,
-        "drawdown20_pct": -9.525,
-        "average_volume20": 17460185.0,
-        "trading_value20": 65919221650.0,
-        "score": 22.0,
+        "price": 3527.0,
+        "price_date": "2026-10-13",
+        "sma20": 3622.9057,
+        "sma60": 3721.5027,
+        "price_vs_sma20_pct": -2.6472,
+        "price_vs_sma60_pct": -5.2265,
+        "rsi14": 52.3072,
+        "momentum20_pct": -9.5175,
+        "momentum60_pct": -7.7956,
+        "volatility20_pct": 34.6028,
+        "drawdown20_pct": -7.815,
+        "average_volume20": 17627180.0,
+        "trading_value20": 63913637592.6233,
+        "score": 10.0,
         "regime": "DOWNTREND",
         "positive_reasons": [
-          "60日モメンタムがプラス"
+          "RSIが過熱しすぎない強気圏"
         ],
         "risk_reasons": [
           "株価が20日移動平均を下回る",
           "20日線が60日線を下回る下降基調",
-          "20日モメンタムがマイナス"
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス"
         ],
         "missing": []
       },
       "quote": {
         "valid": true,
-        "current_price": 3619.0,
-        "quote_time": "2026-09-04T15:30:00+09:00",
+        "current_price": 3527.0,
+        "quote_time": "2026-10-13T15:30:00+09:00",
         "verification": "double-checked",
         "max_difference_pct": 0.0,
         "risks": []
       },
       "decision": {
         "action": "WATCH",
-        "confidence": 45.81,
+        "confidence": 43.41,
         "reasons": [
           "企業品質スコアが高い",
           "成長・安定性が良好",
-          "60日モメンタムがプラス"
+          "RSIが過熱しすぎない強気圏"
         ],
         "risks": [
           "データ充足率が低い",
           "株価が20日移動平均を下回る",
           "20日線が60日線を下回る下降基調",
-          "20日モメンタムがマイナス"
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス"
         ],
         "execution_allowed": false,
         "execution_note": "監視のみ"
@@ -269,54 +273,50 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 25635.0,
-        "price_date": "2026-09-04",
-        "sma20": 28660.25,
-        "sma60": 34670.25,
-        "price_vs_sma20_pct": -10.5556,
-        "price_vs_sma60_pct": -26.0605,
-        "rsi14": 23.498,
-        "momentum20_pct": -19.8155,
-        "momentum60_pct": -30.6787,
-        "volatility20_pct": 75.3822,
-        "drawdown20_pct": -20.4376,
-        "average_volume20": 1849805.0,
-        "trading_value20": 52920587225.0,
-        "score": 0.0,
-        "regime": "DOWNTREND",
-        "positive_reasons": [],
+        "price": 2544.0,
+        "price_date": "2026-10-13",
+        "sma20": 2361.386,
+        "sma60": 2643.1577,
+        "price_vs_sma20_pct": 7.7333,
+        "price_vs_sma60_pct": -3.7515,
+        "rsi14": 76.7772,
+        "momentum20_pct": 3.3695,
+        "momentum60_pct": -23.2347,
+        "volatility20_pct": 63.6316,
+        "drawdown20_pct": -8.4068,
+        "average_volume20": 16336840.0,
+        "trading_value20": 39071570604.9512,
+        "score": 48.0,
+        "regime": "NEUTRAL",
+        "positive_reasons": [
+          "株価が20日移動平均を上回る",
+          "20日モメンタムがプラス"
+        ],
         "risk_reasons": [
-          "株価が20日移動平均を下回る",
           "20日線が60日線を下回る下降基調",
-          "20日モメンタムがマイナス",
-          "60日モメンタムがマイナス",
-          "RSIが弱気圏",
-          "20日高値からの下落が大きい",
-          "短期ボラティリティが高い"
+          "60日モメンタムがマイナス"
         ],
         "missing": []
       },
       "quote": {
         "valid": true,
-        "current_price": 25635.0,
-        "quote_time": "2026-09-04T15:30:00+09:00",
+        "current_price": 2544.0,
+        "quote_time": "2026-10-13T15:30:00+09:00",
         "verification": "double-checked",
         "max_difference_pct": 0.0,
         "risks": []
       },
       "decision": {
         "action": "WATCH",
-        "confidence": 27.88,
-        "reasons": [],
+        "confidence": 37.48,
+        "reasons": [
+          "株価が20日移動平均を上回る",
+          "20日モメンタムがプラス"
+        ],
         "risks": [
           "データ充足率が低い",
-          "株価が20日移動平均を下回る",
           "20日線が60日線を下回る下降基調",
-          "20日モメンタムがマイナス",
-          "60日モメンタムがマイナス",
-          "RSIが弱気圏",
-          "20日高値からの下落が大きい",
-          "短期ボラティリティが高い"
+          "60日モメンタムがマイナス"
         ],
         "execution_allowed": false,
         "execution_note": "監視のみ"
@@ -366,59 +366,57 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 5053.0,
-        "price_date": "2026-09-04",
-        "sma20": 5413.4,
-        "sma60": 5120.1167,
-        "price_vs_sma20_pct": -6.6576,
-        "price_vs_sma60_pct": -1.3108,
-        "rsi14": 29.9098,
-        "momentum20_pct": 9.9434,
-        "momentum60_pct": 20.4816,
-        "volatility20_pct": 80.8742,
-        "drawdown20_pct": -16.8641,
-        "average_volume20": 62485520.0,
-        "trading_value20": 340361509190.0,
-        "score": 47.0,
+        "price": 5070.0,
+        "price_date": "2026-10-13",
+        "sma20": 5166.4555,
+        "sma60": 5053.3843,
+        "price_vs_sma20_pct": -1.867,
+        "price_vs_sma60_pct": 0.3288,
+        "rsi14": 55.5162,
+        "momentum20_pct": -7.3456,
+        "momentum60_pct": 1.6478,
+        "volatility20_pct": 52.2253,
+        "drawdown20_pct": -13.4073,
+        "average_volume20": 34593915.0,
+        "trading_value20": 180013030829.7095,
+        "score": 50.0,
         "regime": "NEUTRAL",
         "positive_reasons": [
           "20日線が60日線を上回る上昇基調",
-          "20日モメンタムがプラス",
-          "60日モメンタムがプラス"
+          "60日モメンタムがプラス",
+          "RSIが過熱しすぎない強気圏"
         ],
         "risk_reasons": [
           "株価が20日移動平均を下回る",
-          "RSIが弱気圏",
-          "20日高値からの下落が大きい",
-          "短期ボラティリティが高い"
+          "20日モメンタムがマイナス",
+          "20日高値からの下落が大きい"
         ],
         "missing": []
       },
       "quote": {
         "valid": true,
-        "current_price": 5053.0,
-        "quote_time": "2026-09-04T15:30:00+09:00",
+        "current_price": 5070.0,
+        "quote_time": "2026-10-13T15:30:00+09:00",
         "verification": "double-checked",
         "max_difference_pct": 0.0,
         "risks": []
       },
       "decision": {
         "action": "WATCH",
-        "confidence": 45.48,
+        "confidence": 46.08,
         "reasons": [
           "割安性スコアが高い",
           "企業品質スコアが高い",
           "成長・安定性が良好",
           "20日線が60日線を上回る上昇基調",
-          "20日モメンタムがプラス",
-          "60日モメンタムがプラス"
+          "60日モメンタムがプラス",
+          "RSIが過熱しすぎない強気圏"
         ],
         "risks": [
           "データ充足率が低い",
           "株価が20日移動平均を下回る",
-          "RSIが弱気圏",
-          "20日高値からの下落が大きい",
-          "短期ボラティリティが高い"
+          "20日モメンタムがマイナス",
+          "20日高値からの下落が大きい"
         ],
         "execution_allowed": false,
         "execution_note": "監視のみ"
@@ -464,62 +462,60 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 33090.0,
-        "price_date": "2026-09-04",
-        "sma20": 34662.0,
-        "sma60": 31583.4167,
-        "price_vs_sma20_pct": -4.5352,
-        "price_vs_sma60_pct": 4.7702,
-        "rsi14": 30.2775,
-        "momentum20_pct": 0.4859,
-        "momentum60_pct": 31.1274,
-        "volatility20_pct": 48.4259,
-        "drawdown20_pct": -12.414,
-        "average_volume20": 8048605.0,
-        "trading_value20": 279124157300.0,
-        "score": 54.0,
-        "regime": "NEUTRAL",
+        "price": 40400.0,
+        "price_date": "2026-10-13",
+        "sma20": 35572.5,
+        "sma60": 33530.0833,
+        "price_vs_sma20_pct": 13.5709,
+        "price_vs_sma60_pct": 20.4888,
+        "rsi14": 83.9572,
+        "momentum20_pct": 23.0207,
+        "momentum60_pct": 40.1804,
+        "volatility20_pct": 56.4434,
+        "drawdown20_pct": -3.4648,
+        "average_volume20": 12167335.0,
+        "trading_value20": 444092611900.0,
+        "score": 90.0,
+        "regime": "UPTREND",
         "positive_reasons": [
+          "株価が20日移動平均を上回る",
           "20日線が60日線を上回る上昇基調",
           "20日モメンタムがプラス",
           "60日モメンタムがプラス"
         ],
         "risk_reasons": [
-          "株価が20日移動平均を下回る",
-          "RSIが弱気圏",
-          "20日高値からの下落が大きい"
+          "RSIが過熱圏"
         ],
         "missing": []
       },
       "quote": {
         "valid": true,
-        "current_price": 33090.0,
-        "quote_time": "2026-09-04T15:30:00+09:00",
+        "current_price": 40400.0,
+        "quote_time": "2026-10-13T15:30:00+09:00",
         "verification": "double-checked",
         "max_difference_pct": 0.0,
         "risks": []
       },
       "decision": {
-        "action": "WATCH",
-        "confidence": 55.77,
+        "action": "SIM_BUY",
+        "confidence": 62.97,
         "reasons": [
           "企業品質スコアが高い",
           "成長・安定性が良好",
+          "株価が20日移動平均を上回る",
           "20日線が60日線を上回る上昇基調",
           "20日モメンタムがプラス",
           "60日モメンタムがプラス"
         ],
         "risks": [
-          "株価が20日移動平均を下回る",
-          "RSIが弱気圏",
-          "20日高値からの下落が大きい"
+          "RSIが過熱圏"
         ],
-        "execution_allowed": false,
-        "execution_note": "監視のみ"
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
-        "side": null,
-        "quantity": 0,
+        "side": "BUY",
+        "quantity": 100,
         "paper_only": true,
         "manual_review_required": true
       }
@@ -557,60 +553,55 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 33180.0,
-        "price_date": "2026-09-04",
-        "sma20": 35822.5,
-        "sma60": 42498.1667,
-        "price_vs_sma20_pct": -7.3766,
-        "price_vs_sma60_pct": -21.926,
-        "rsi14": 17.9325,
-        "momentum20_pct": -23.4249,
-        "momentum60_pct": -18.0535,
-        "volatility20_pct": 63.0279,
-        "drawdown20_pct": -18.0538,
-        "average_volume20": 2797110.0,
-        "trading_value20": 100956907300.0,
-        "score": 0.0,
-        "regime": "DOWNTREND",
-        "positive_reasons": [],
-        "risk_reasons": [
-          "株価が20日移動平均を下回る",
-          "20日線が60日線を下回る下降基調",
-          "20日モメンタムがマイナス",
-          "60日モメンタムがマイナス",
-          "RSIが弱気圏",
-          "20日高値からの下落が大きい"
+        "price": 46090.0,
+        "price_date": "2026-10-13",
+        "sma20": 41356.0,
+        "sma60": 39470.6667,
+        "price_vs_sma20_pct": 11.4469,
+        "price_vs_sma60_pct": 16.7703,
+        "rsi14": 79.6719,
+        "momentum20_pct": 30.6406,
+        "momentum60_pct": 2.9484,
+        "volatility20_pct": 58.3588,
+        "drawdown20_pct": -5.0865,
+        "average_volume20": 4154730.0,
+        "trading_value20": 175171623050.0,
+        "score": 98.0,
+        "regime": "UPTREND",
+        "positive_reasons": [
+          "株価が20日移動平均を上回る",
+          "20日線が60日線を上回る上昇基調",
+          "20日モメンタムがプラス",
+          "60日モメンタムがプラス"
         ],
+        "risk_reasons": [],
         "missing": []
       },
       "quote": {
         "valid": true,
-        "current_price": 33180.0,
-        "quote_time": "2026-09-04T15:30:00+09:00",
+        "current_price": 46090.0,
+        "quote_time": "2026-10-13T15:30:00+09:00",
         "verification": "double-checked",
         "max_difference_pct": 0.0,
         "risks": []
       },
       "decision": {
-        "action": "WATCH",
-        "confidence": 40.87,
+        "action": "SIM_BUY",
+        "confidence": 60.47,
         "reasons": [
-          "企業品質スコアが高い"
+          "企業品質スコアが高い",
+          "株価が20日移動平均を上回る",
+          "20日線が60日線を上回る上昇基調",
+          "20日モメンタムがプラス",
+          "60日モメンタムがプラス"
         ],
-        "risks": [
-          "株価が20日移動平均を下回る",
-          "20日線が60日線を下回る下降基調",
-          "20日モメンタムがマイナス",
-          "60日モメンタムがマイナス",
-          "RSIが弱気圏",
-          "20日高値からの下落が大きい"
-        ],
-        "execution_allowed": false,
-        "execution_note": "監視のみ"
+        "risks": [],
+        "execution_allowed": true,
+        "execution_note": "デモ台帳内でのみ実行可能"
       },
       "proposal": {
-        "side": null,
-        "quantity": 0,
+        "side": "BUY",
+        "quantity": 100,
         "paper_only": true,
         "manual_review_required": true
       }
@@ -655,53 +646,52 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 8839.0,
-        "price_date": "2026-09-04",
-        "sma20": 8721.75,
-        "sma60": 7697.7,
-        "price_vs_sma20_pct": 1.3443,
-        "price_vs_sma60_pct": 14.8265,
-        "rsi14": 52.2388,
-        "momentum20_pct": 15.6786,
-        "momentum60_pct": 22.5087,
-        "volatility20_pct": 40.2042,
-        "drawdown20_pct": -2.9001,
-        "average_volume20": 9942665.0,
-        "trading_value20": 86156444690.0,
-        "score": 100.0,
-        "regime": "UPTREND",
+        "price": 8172.0,
+        "price_date": "2026-10-13",
+        "sma20": 8041.65,
+        "sma60": 8111.4833,
+        "price_vs_sma20_pct": 1.6209,
+        "price_vs_sma60_pct": 0.7461,
+        "rsi14": 38.6856,
+        "momentum20_pct": -2.7259,
+        "momentum60_pct": 15.0014,
+        "volatility20_pct": 32.1166,
+        "drawdown20_pct": -3.5752,
+        "average_volume20": 7590370.0,
+        "trading_value20": 61082675145.0,
+        "score": 48.0,
+        "regime": "NEUTRAL",
         "positive_reasons": [
           "株価が20日移動平均を上回る",
-          "20日線が60日線を上回る上昇基調",
-          "20日モメンタムがプラス",
-          "60日モメンタムがプラス",
-          "RSIが過熱しすぎない強気圏"
+          "60日モメンタムがプラス"
         ],
-        "risk_reasons": [],
+        "risk_reasons": [
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス"
+        ],
         "missing": []
       },
       "quote": {
         "valid": true,
-        "current_price": 8839.0,
-        "quote_time": "2026-09-04T15:30:00+09:00",
+        "current_price": 8172.0,
+        "quote_time": "2026-10-13T15:30:00+09:00",
         "verification": "double-checked",
         "max_difference_pct": 0.0,
         "risks": []
       },
       "decision": {
         "action": "SIM_HOLD",
-        "confidence": 60.08,
+        "confidence": 49.68,
         "reasons": [
           "割安性スコアが高い",
           "成長・安定性が良好",
           "株価が20日移動平均を上回る",
-          "20日線が60日線を上回る上昇基調",
-          "20日モメンタムがプラス",
-          "60日モメンタムがプラス",
-          "RSIが過熱しすぎない強気圏"
+          "60日モメンタムがプラス"
         ],
         "risks": [
-          "データ充足率が低い"
+          "データ充足率が低い",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス"
         ],
         "execution_allowed": false,
         "execution_note": "監視のみ"
@@ -750,54 +740,55 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 53320.0,
-        "price_date": "2026-09-04",
-        "sma20": 55848.0,
-        "sma60": 63845.6667,
-        "price_vs_sma20_pct": -4.5266,
-        "price_vs_sma60_pct": -16.4861,
-        "rsi14": 21.862,
-        "momentum20_pct": -3.6327,
-        "momentum60_pct": -13.7635,
-        "volatility20_pct": 36.2699,
-        "drawdown20_pct": -11.2664,
-        "average_volume20": 2809260.0,
-        "trading_value20": 157017624550.0,
-        "score": 0.0,
-        "regime": "DOWNTREND",
-        "positive_reasons": [],
+        "price": 11555.0,
+        "price_date": "2026-10-13",
+        "sma20": 11216.6703,
+        "sma60": 11224.782,
+        "price_vs_sma20_pct": 3.0163,
+        "price_vs_sma60_pct": 2.9419,
+        "rsi14": 64.8418,
+        "momentum20_pct": 11.3857,
+        "momentum60_pct": -16.1092,
+        "volatility20_pct": 55.817,
+        "drawdown20_pct": -9.7618,
+        "average_volume20": 15260195.0,
+        "trading_value20": 170034822078.3203,
+        "score": 56.0,
+        "regime": "NEUTRAL",
+        "positive_reasons": [
+          "株価が20日移動平均を上回る",
+          "20日モメンタムがプラス",
+          "RSIが過熱しすぎない強気圏"
+        ],
         "risk_reasons": [
-          "株価が20日移動平均を下回る",
           "20日線が60日線を下回る下降基調",
-          "20日モメンタムがマイナス",
-          "60日モメンタムがマイナス",
-          "RSIが弱気圏"
+          "60日モメンタムがマイナス"
         ],
         "missing": []
       },
       "quote": {
         "valid": true,
-        "current_price": 53320.0,
-        "quote_time": "2026-09-04T15:30:00+09:00",
+        "current_price": 11555.0,
+        "quote_time": "2026-10-13T15:30:00+09:00",
         "verification": "double-checked",
         "max_difference_pct": 0.0,
         "risks": []
       },
       "decision": {
         "action": "WATCH",
-        "confidence": 45.02,
+        "confidence": 56.22,
         "reasons": [
           "割安性スコアが高い",
           "企業品質スコアが高い",
-          "成長・安定性が良好"
+          "成長・安定性が良好",
+          "株価が20日移動平均を上回る",
+          "20日モメンタムがプラス",
+          "RSIが過熱しすぎない強気圏"
         ],
         "risks": [
           "データ充足率が低い",
-          "株価が20日移動平均を下回る",
           "20日線が60日線を下回る下降基調",
-          "20日モメンタムがマイナス",
-          "60日モメンタムがマイナス",
-          "RSIが弱気圏"
+          "60日モメンタムがマイナス"
         ],
         "execution_allowed": false,
         "execution_note": "監視のみ"
@@ -840,51 +831,51 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 69100.0,
-        "price_date": "2026-09-04",
-        "sma20": 73694.2926,
-        "sma60": 78495.944,
-        "price_vs_sma20_pct": -6.2343,
-        "price_vs_sma60_pct": -11.97,
-        "rsi14": 24.9178,
-        "momentum20_pct": -12.0161,
-        "momentum60_pct": -12.283,
-        "volatility20_pct": 22.4008,
-        "drawdown20_pct": -12.4821,
-        "average_volume20": 938030.0,
-        "trading_value20": 68987716180.0781,
-        "score": 0.0,
-        "regime": "DOWNTREND",
-        "positive_reasons": [],
+        "price": 73790.0,
+        "price_date": "2026-10-13",
+        "sma20": 70149.5,
+        "sma60": 73435.2811,
+        "price_vs_sma20_pct": 5.1896,
+        "price_vs_sma60_pct": 0.483,
+        "rsi14": 67.6113,
+        "momentum20_pct": 10.3649,
+        "momentum60_pct": -8.4812,
+        "volatility20_pct": 28.1113,
+        "drawdown20_pct": -2.3813,
+        "average_volume20": 1199455.0,
+        "trading_value20": 84442442250.0,
+        "score": 56.0,
+        "regime": "NEUTRAL",
+        "positive_reasons": [
+          "株価が20日移動平均を上回る",
+          "20日モメンタムがプラス",
+          "RSIが過熱しすぎない強気圏"
+        ],
         "risk_reasons": [
-          "株価が20日移動平均を下回る",
           "20日線が60日線を下回る下降基調",
-          "20日モメンタムがマイナス",
-          "60日モメンタムがマイナス",
-          "RSIが弱気圏",
-          "20日高値からの下落が大きい"
+          "60日モメンタムがマイナス"
         ],
         "missing": []
       },
       "quote": {
         "valid": true,
-        "current_price": 69100.0,
-        "quote_time": "2026-09-04T15:30:00+09:00",
+        "current_price": 73790.0,
+        "quote_time": "2026-10-13T15:30:00+09:00",
         "verification": "double-checked",
         "max_difference_pct": 0.0,
         "risks": []
       },
       "decision": {
         "action": "WATCH",
-        "confidence": 37.99,
-        "reasons": [],
+        "confidence": 49.19,
+        "reasons": [
+          "株価が20日移動平均を上回る",
+          "20日モメンタムがプラス",
+          "RSIが過熱しすぎない強気圏"
+        ],
         "risks": [
-          "株価が20日移動平均を下回る",
           "20日線が60日線を下回る下降基調",
-          "20日モメンタムがマイナス",
-          "60日モメンタムがマイナス",
-          "RSIが弱気圏",
-          "20日高値からの下落が大きい"
+          "60日モメンタムがマイナス"
         ],
         "execution_allowed": false,
         "execution_note": "監視のみ"
@@ -931,51 +922,57 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 5590.0,
-        "price_date": "2026-09-04",
-        "sma20": 5350.9,
-        "sma60": 5828.7,
-        "price_vs_sma20_pct": 4.4684,
-        "price_vs_sma60_pct": -4.0953,
-        "rsi14": 44.3077,
-        "momentum20_pct": -1.8437,
-        "momentum60_pct": -13.4809,
-        "volatility20_pct": 68.1753,
-        "drawdown20_pct": -5.0289,
-        "average_volume20": 36095480.0,
-        "trading_value20": 194039567910.0,
-        "score": 28.0,
+        "price": 5310.0,
+        "price_date": "2026-10-13",
+        "sma20": 6231.7272,
+        "sma60": 5759.2462,
+        "price_vs_sma20_pct": -14.7909,
+        "price_vs_sma60_pct": -7.8004,
+        "rsi14": 34.805,
+        "momentum20_pct": -21.9577,
+        "momentum60_pct": -16.4884,
+        "volatility20_pct": 71.7876,
+        "drawdown20_pct": -21.9577,
+        "average_volume20": 63344885.0,
+        "trading_value20": 395985212034.0747,
+        "score": 7.0,
         "regime": "DOWNTREND",
         "positive_reasons": [
-          "株価が20日移動平均を上回る"
+          "20日線が60日線を上回る上昇基調"
         ],
         "risk_reasons": [
-          "20日線が60日線を下回る下降基調",
+          "株価が20日移動平均を下回る",
           "20日モメンタムがマイナス",
-          "60日モメンタムがマイナス"
+          "60日モメンタムがマイナス",
+          "RSIが弱気圏",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い"
         ],
         "missing": []
       },
       "quote": {
         "valid": true,
-        "current_price": 5590.0,
-        "quote_time": "2026-09-04T15:30:00+09:00",
+        "current_price": 5310.0,
+        "quote_time": "2026-10-13T15:30:00+09:00",
         "verification": "double-checked",
         "max_difference_pct": 0.0,
         "risks": []
       },
       "decision": {
         "action": "WATCH",
-        "confidence": 39.86,
+        "confidence": 35.66,
         "reasons": [
-          "株価が20日移動平均を上回る"
+          "20日線が60日線を上回る上昇基調"
         ],
         "risks": [
           "バリュートラップリスクが高い",
           "データ充足率が低い",
-          "20日線が60日線を下回る下降基調",
+          "株価が20日移動平均を下回る",
           "20日モメンタムがマイナス",
-          "60日モメンタムがマイナス"
+          "60日モメンタムがマイナス",
+          "RSIが弱気圏",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い"
         ],
         "execution_allowed": false,
         "execution_note": "監視のみ"
@@ -988,7 +985,41 @@
       }
     }
   ],
-  "executed_simulation_events": [],
+  "executed_simulation_events": [
+    {
+      "date": "2026-10-13",
+      "side": "SIM_BUY",
+      "symbol": "6857.T",
+      "quantity": 100,
+      "price": 40400.0,
+      "value": 4040000.0,
+      "paper_only": true,
+      "reasons": [
+        "企業品質スコアが高い",
+        "成長・安定性が良好",
+        "株価が20日移動平均を上回る",
+        "20日線が60日線を上回る上昇基調",
+        "20日モメンタムがプラス",
+        "60日モメンタムがプラス"
+      ]
+    },
+    {
+      "date": "2026-10-13",
+      "side": "SIM_BUY",
+      "symbol": "6920.T",
+      "quantity": 100,
+      "price": 46090.0,
+      "value": 4609000.0,
+      "paper_only": true,
+      "reasons": [
+        "企業品質スコアが高い",
+        "株価が20日移動平均を上回る",
+        "20日線が60日線を上回る上昇基調",
+        "20日モメンタムがプラス",
+        "60日モメンタムがプラス"
+      ]
+    }
+  ],
   "skipped": [],
   "disclosures": {
     "availability": "unavailable",

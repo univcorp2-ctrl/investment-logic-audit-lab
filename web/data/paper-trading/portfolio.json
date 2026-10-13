@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "portfolio_id": "valuescope-demo-20260803-afternoon",
-  "cash": 30197300.0,
+  "cash": 21548300.0,
   "realized_pnl": 234000.0,
   "positions": [
     {
@@ -11,6 +11,22 @@
       "quantity": 100,
       "avg_cost": 7588.0,
       "opened_at": "2026-08-03T14:37:00+09:00"
+    },
+    {
+      "symbol": "6857.T",
+      "code": "6857",
+      "company_name": "アドバンテスト",
+      "quantity": 100,
+      "avg_cost": 40400.0,
+      "opened_at": "2026-10-13T23:59:15.262965+09:00"
+    },
+    {
+      "symbol": "6920.T",
+      "code": "6920",
+      "company_name": "レーザーテック",
+      "quantity": 100,
+      "avg_cost": 46090.0,
+      "opened_at": "2026-10-13T23:59:15.262990+09:00"
     }
   ],
   "seed_cost_basis": 30722100.0,
