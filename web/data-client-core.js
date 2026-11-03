@@ -51,7 +51,7 @@ export function summaryFromStatic(report = {}, metrics = {}) {
   };
 }
 export function deriveCompactQuotePayload(fullPayload = {}) {
-  const quotes = Array.isArray(fullPayload.quotes) ? fullPayload.quotes : Array.isArray(fullPayload.positions) ? fullPayload.positions : [];
+  const quotes = Array.isArray(fullPayload.positions) ? fullPayload.positions : Array.isArray(fullPayload.quotes) ? fullPayload.quotes : [];
   return {
     generated_at: fullPayload.generated_at ?? null,
     timezone: fullPayload.timezone ?? 'Asia/Tokyo',
@@ -65,6 +65,7 @@ export function deriveCompactQuotePayload(fullPayload = {}) {
       code: quote.code,
       name: quote.name ?? quote.company_name,
       entry_price: quote.entry_price,
+      quantity: quote.quantity,
       current_price: quote.current_price,
       quote_time: quote.quote_time,
       unrealized_pnl: quote.unrealized_pnl,
@@ -93,11 +94,11 @@ export function buildSavedQuotePayload(report = {}, demo = {}, compact = false) 
     const quantity = numberOrNull(position.quantity) ?? 100;
     const entryPrice = numberOrNull(position.entry_price) ?? numberOrNull(decision?.holding?.avg_cost) ?? 0;
     const markedPrice = numberOrNull(decision?.technical?.price);
-    const quoteValid = decision?.quote?.valid !== false && markedPrice !== null;
-    const currentPrice = quoteValid ? markedPrice : entryPrice;
+    const quoteValid = false; // Historical snapshots are not independently validated current quotes.
+    const currentPrice = null;
     const entryValue = entryPrice * quantity;
-    const currentValue = currentPrice * quantity;
-    const pnl = currentValue - entryValue;
+    const currentValue = null;
+    const pnl = null;
     return {
       symbol, code,
       name: position.company_name ?? decision.company_name ?? code,
@@ -108,21 +109,21 @@ export function buildSavedQuotePayload(report = {}, demo = {}, compact = false) 
       secondary_source: null,
       secondary_price: null,
       max_difference_pct: numberOrNull(decision?.quote?.max_difference_pct),
-      verification: decision?.quote?.verification ?? 'saved-daily-snapshot',
+      verification: 'saved-daily-snapshot',
       usable: quoteValid,
       entry_price: entryPrice,
       quantity,
       position_value: currentValue,
       unrealized_pnl: pnl,
-      return_pct: entryValue ? pnl / entryValue * 100 : 0,
+      return_pct: null,
       errors: quoteValid ? [] : ['live_quote_pending'],
     };
   });
   const totalEntryValue = quotes.reduce((sum, quote) => sum + quote.entry_price * quote.quantity, 0);
-  const totalCurrentValue = quotes.reduce((sum, quote) => sum + quote.position_value, 0);
-  const totalPnl = totalCurrentValue - totalEntryValue;
+  const totalCurrentValue = null;
+  const totalPnl = null;
   const full = {
-    generated_at: report?.generated_at ?? new Date().toISOString(),
+    generated_at: report?.generated_at ?? null,
     timezone: 'Asia/Tokyo', refresh_seconds: 60,
     source_policy: { primary: '保存済み日次レポート', live_enhancement: '現在値はバックグラウンドで更新', warning: 'ライブ取得完了までは最新の日次保存値を表示します。' },
     source_status: { mode:'saved-fallback', live_pending:true, usable:quotes.filter(quote => quote.usable).length, total:quotes.length },
@@ -131,10 +132,12 @@ export function buildSavedQuotePayload(report = {}, demo = {}, compact = false) 
       total_entry_value: totalEntryValue,
       total_current_value: totalCurrentValue,
       total_unrealized_pnl: totalPnl,
-      total_return_pct: totalEntryValue ? totalPnl / totalEntryValue * 100 : 0,
-      winners: quotes.filter(quote => quote.unrealized_pnl > 0).length,
-      losers: quotes.filter(quote => quote.unrealized_pnl < 0).length,
-      unchanged: quotes.filter(quote => quote.unrealized_pnl === 0).length,
+      total_return_pct: null,
+      valuation_complete: false,
+      basis: 'legacy-historical-demo',
+      winners: null,
+      losers: null,
+      unchanged: null,
       usable_quotes: quotes.filter(quote => quote.usable).length,
       double_checked: quotes.filter(quote => quote.verification === 'double-checked').length,
     },
