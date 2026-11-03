@@ -9,8 +9,37 @@ export function closedTradeRows(trades=[],demo={}){const entries=seedEntryMap(de
 function maxConsecutive(values,predicate){let best=0,current=0;for(const value of values){if(predicate(value)){current+=1;best=Math.max(best,current)}else current=0}return best}
 export function closedTradeMetrics(trades=[],demo={}){const rows=closedTradeRows(trades,demo),pnls=rows.map(row=>row.pnl),wins=rows.filter(row=>row.pnl>0),losses=rows.filter(row=>row.pnl<0),avg=list=>list.length?list.reduce((sum,row)=>sum+row.pnl,0)/list.length:null,avgPct=list=>list.length?list.reduce((sum,row)=>sum+row.return_pct,0)/list.length:null,averageWinYen=avg(wins),averageLossYen=avg(losses),grossWins=wins.reduce((sum,row)=>sum+row.pnl,0),grossLosses=losses.reduce((sum,row)=>sum+row.pnl,0);return{basis:'closed_trades',closed_trade_count:rows.length,winning_trades:wins.length,losing_trades:losses.length,win_rate_pct:rows.length?wins.length/rows.length*100:null,loss_rate_pct:rows.length?losses.length/rows.length*100:null,average_win_yen:averageWinYen,average_loss_yen:averageLossYen,average_win_pct:avgPct(wins),average_loss_pct:avgPct(losses),risk_reward_ratio:averageWinYen!==null&&averageLossYen!==null&&averageLossYen!==0?averageWinYen/Math.abs(averageLossYen):null,profit_factor:grossWins>0&&grossLosses<0?grossWins/Math.abs(grossLosses):null,expectancy_yen:rows.length?pnls.reduce((sum,value)=>sum+value,0)/rows.length:null,expectancy_pct:rows.length?rows.reduce((sum,row)=>sum+row.return_pct,0)/rows.length:null,realized_pnl:pnls.reduce((sum,value)=>sum+value,0),max_consecutive_wins:maxConsecutive(pnls,value=>value>0),max_consecutive_losses:maxConsecutive(pnls,value=>value<0),rows}}
 export function tokyoDateKey(value=new Date()){const date=value instanceof Date?value:new Date(value);if(Number.isNaN(date.getTime()))return'';return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(date)}
-export function acceptQuote(quote={},now=new Date()){const price=finite(quote.current_price),diff=finite(quote.max_difference_pct);if(price===null)return{accepted:false,reason:'price-missing',price:null};if(diff!==null&&diff>3)return{accepted:false,reason:'source-discrepancy',price:null};if(quote.usable===true)return{accepted:true,reason:'validated',price};const doubleChecked=String(quote.verification??'').startsWith('double-checked'),sameTokyoDay=tokyoDateKey(quote.quote_time)===tokyoDateKey(now);if(doubleChecked&&(diff===null||diff<=1)&&sameTokyoDay)return{accepted:true,reason:'double-checked-range-lag',price};return{accepted:false,reason:'unusable',price:null}}
-export function liveLedgerMark(portfolio={},quotesPayload={},now=new Date()){const quotes=new Map((quotesPayload.positions??quotesPayload.quotes??[]).map(quote=>[String(quote.code),quote])),seed=finite(portfolio.seed_cost_basis)??0;let currentValue=finite(portfolio.cash)??0,accepted=0,fallback=0;const positions=(portfolio.positions??[]).map(position=>{const quote=quotes.get(String(position.code)),decision=acceptQuote(quote??{},now),cost=finite(position.avg_cost)??0,qty=finite(position.quantity)??0,price=decision.accepted?decision.price:cost;if(decision.accepted)accepted+=1;else fallback+=1;const value=(price??cost)*qty;currentValue+=value;return{...position,current_price:price,value,accepted:decision.accepted,verification_reason:decision.reason,quote_time:quote?.quote_time??null,max_difference_pct:finite(quote?.max_difference_pct)}});const pnl=currentValue-seed;return{seed_cost_basis:seed,current_equity:currentValue,total_pnl:pnl,total_return_pct:seed?pnl/seed*100:null,accepted_quotes:accepted,fallback_quotes:fallback,positions}}
+export function acceptQuote(quote={},now=new Date()){
+  const price=finite(quote.current_price),diff=finite(quote.max_difference_pct);
+  if(price===null||price<=0)return{accepted:false,reason:'price-missing',price:null};
+  if(quote.adjustment_review_required===true)return{accepted:false,reason:'corporate-action-review',price:null};
+  if(diff===null||diff>3)return{accepted:false,reason:'source-discrepancy-or-unverified',price:null};
+  if(!['double-checked','checked-with-time-skew'].includes(String(quote.verification??''))||quote.usable!==true)
+    return{accepted:false,reason:'independent-verification-required',price:null};
+  const quoteTime=Date.parse(quote.quote_time??''),clock=now.getTime();
+  if(!Number.isFinite(quoteTime)||quoteTime>clock+10*60*1000||clock-quoteTime>4*86400000)
+    return{accepted:false,reason:'quote-stale-or-undated',price:null};
+  return{accepted:true,reason:'verified-current-market-date',price};
+}
+export function liveLedgerMark(portfolio={},quotesPayload={},now=new Date()){
+  const quotes=new Map((quotesPayload.positions??quotesPayload.quotes??[]).map(quote=>[String(quote.code),quote]));
+  const seed=finite(portfolio.seed_cost_basis),cash=finite(portfolio.cash);
+  let verifiedValue=cash??0,accepted=0;
+  const positions=(portfolio.positions??[]).map(position=>{
+    const quote=quotes.get(String(position.code)),decision=acceptQuote(quote??{},now);
+    const qty=finite(position.quantity),cost=finite(position.avg_cost);
+    const acceptedPrice=decision.accepted&&qty!==null&&qty>0&&cost!==null?decision.price:null;
+    if(acceptedPrice!==null){accepted+=1;verifiedValue+=acceptedPrice*qty}
+    return{...position,current_price:acceptedPrice,value:acceptedPrice===null?null:acceptedPrice*qty,
+      accepted:acceptedPrice!==null,verification_reason:decision.reason,quote_time:quote?.quote_time??null,
+      max_difference_pct:finite(quote?.max_difference_pct)};
+  });
+  const complete=seed!==null&&seed>0&&cash!==null&&positions.length>0&&accepted===positions.length;
+  const equity=complete?verifiedValue:null;
+  return{seed_cost_basis:seed,current_equity:equity,total_pnl:complete?equity-seed:null,
+    total_return_pct:complete?(equity/seed-1)*100:null,accepted_quotes:accepted,
+    fallback_quotes:positions.length-accepted,complete,positions};
+}
 export function liveDrawdown(historyRows=[],seedCostBasis=null,liveEquity=null){const clean=correctedEquitySeries(historyRows,seedCostBasis),seed=finite(seedCostBasis)??0,peak=Math.max(seed,...clean.map(row=>row.equity)),equity=finite(liveEquity),current=equity!==null&&peak>0?(equity/peak-1)*100:null;return{peak_equity:peak,current_drawdown_pct:current,max_drawdown_pct:Math.min(maxDrawdownPct(historyRows,seedCostBasis)??0,current??0)}}
 export function reliabilityMetric(metric,required,observations){const value=metric?.value??metric;if(observations<required)return{value:null,status:'insufficient_history',note:`算定待ち ${observations}/${required}営業日`};return{value:finite(value),status:metric?.status??'ok',note:metric?.note??null}}
 export function prioritizedMetrics({series=[],metrics={},tradeMetrics={},seedCostBasis=null}={}){const observations=series.length,confirmedReturn=series.at(-1)?.cumulative_return_pct??null,values={total_return:{value:confirmedReturn,status:'ok'},max_drawdown:{value:maxDrawdownPct(series,seedCostBasis),status:'ok'},sharpe:reliabilityMetric(metrics.risk_adjusted?.sharpe_ratio,60,observations),sortino:reliabilityMetric(metrics.risk_adjusted?.sortino_ratio,60,observations),calmar:reliabilityMetric(metrics.risk_adjusted?.calmar_ratio,60,observations),risk_reward:{value:tradeMetrics.risk_reward_ratio,status:tradeMetrics.risk_reward_ratio===null?'insufficient_wins_losses':'ok'},profit_factor:{value:tradeMetrics.profit_factor,status:tradeMetrics.profit_factor===null?'insufficient_wins_losses':'ok'},expectancy:{value:tradeMetrics.expectancy_yen,status:tradeMetrics.expectancy_yen===null?'insufficient_trades':'ok'}};return PERFORMANCE_METRIC_ORDER.map(key=>({key,...PERFORMANCE_METRIC_META[key],...values[key]}))}
