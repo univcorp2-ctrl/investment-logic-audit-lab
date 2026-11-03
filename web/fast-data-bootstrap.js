@@ -81,9 +81,12 @@ async function loadDaily() {
 window.addEventListener('valuescope:quotes', event => {
   const payload = event.detail ?? {};
   const status = ensureStatus();
-  const live = Number(payload.portfolio?.total_unrealized_pnl);
+  // Legacy ten-stock watchlist is not the current paper ledger.
+  const currentPortfolio = payload.portfolio ?? {};
+  const verified = currentPortfolio.basis === 'paper-ledger' && currentPortfolio.valuation_complete === true;
+  const live = verified ? currentPortfolio.unrealized_pnl : null;
   const node = $('#uxUnrealizedPnl') ?? overviewMetric('含み損益');
-  if (node && Number.isFinite(live)) {
+  if (verified && node && typeof live === 'number' && Number.isFinite(live)) {
     node.textContent = `${live >= 0 ? '+' : ''}${money(live)}`;
     signed(node, live);
   }
