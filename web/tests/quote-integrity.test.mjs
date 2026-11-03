@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { onRequestGet } from '../functions/api/quotes.js';
+import { onRequestGet, parseYahooJapan, parseGoogleFinance } from '../functions/api/quotes.js';
 
 const prices = { '7974':8000, '6857':40000, '6920':46000 };
 const paper = {
@@ -61,4 +61,13 @@ test('independently matched fresh quotes mark only the three active holdings', a
   assert.equal(result.portfolio.total_pnl,226200);
   assert.equal(result.portfolio.total_unrealized_pnl,-7800);
   assert.equal(result.portfolio.realized_pnl,234000);
+});
+
+test('November 2026 Yahoo JP and Google Finance markup parses the same dated close',()=>{
+  const yahoo=parseYahooJapan('<div>8,149 前日比-140(-1.69%) リアルタイム株価 11/2</div>');
+  const google=parseGoogleFinance('<span jsname="Pdsbrc" class=""><span>¥8,149.00</span></span><div class="jZZ2de">11月2日, 15:30:00 UTC+9</div>');
+  assert.equal(yahoo.price,8149);
+  assert.equal(google.price,8149);
+  assert.match(yahoo.quote_time,/2026-11-02/);
+  assert.match(google.quote_time,/2026-11-02/);
 });
