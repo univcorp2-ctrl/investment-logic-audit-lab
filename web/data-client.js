@@ -13,7 +13,7 @@ const inFlight = new Map();
 const subscribers = new Set();
 const STATIC_TTL_MS = 60_000;
 const QUOTE_TTL_MS = 55_000;
-const NETWORK_TIMEOUT_MS = 8_000;
+const NETWORK_TIMEOUT_MS = 14_000;
 let fallbackBundlePromise = null;
 let liveQuotePromise = null;
 let liveFull = null;
@@ -130,19 +130,19 @@ function backgroundLiveRefresh() {
 
 async function quoteResponse(url, force) {
   const compact = url.searchParams.get('compact') === '1';
-  if (force) {
-    try {
-      const full = await fetchLiveQuotes(true);
-      return Response.json(compact ? deriveCompactQuotePayload(full) : full, { headers: { 'X-ValueScope-Data': 'live' } });
-    } catch { /* saved fallback below */ }
+  try {
+    // Await actual Cloudflare quote API rather than immediately serving a stale demo as "live".
+    const full = await fetchLiveQuotes(force);
+    return Response.json(compact ? deriveCompactQuotePayload(full) : full, {
+      headers: { 'X-ValueScope-Data': 'verified-api', 'Cache-Control':'no-store' },
+    });
+  } catch {
+    const { report, demo } = await fallbackBundle();
+    const fallback = buildSavedQuotePayload(report, demo, compact);
+    return Response.json(fallback, {
+      headers: { 'X-ValueScope-Data': 'saved-unverified', 'Cache-Control': 'no-store' },
+    });
   }
-  if (liveFull && liveExpiresAt > Date.now()) {
-    return Response.json(compact ? liveCompact : liveFull, { headers: { 'X-ValueScope-Data': 'live-cache' } });
-  }
-  const { report, demo } = await fallbackBundle();
-  const fallback = buildSavedQuotePayload(report, demo, compact);
-  backgroundLiveRefresh();
-  return Response.json(fallback, { headers: { 'X-ValueScope-Data': 'saved-fallback', 'Cache-Control': 'no-store' } });
 }
 
 async function portfolioStatusResponse(url) {
