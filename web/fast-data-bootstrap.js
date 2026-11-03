@@ -97,8 +97,8 @@ window.addEventListener('valuescope:quotes', event => {
     status.textContent = '現在値取得失敗・保存値を表示';
     status.className = 'ux-load-status stale';
   } else {
-    status.textContent = '現在値反映済み';
-    status.className = 'ux-load-status ready';
+    status.textContent = verified ? '保有銘柄の検証済み現在値' : '現在値未検証・前回確定の仮想損益を表示';
+    status.className = verified ? 'ux-load-status ready' : 'ux-load-status stale';
   }
 });
 
