@@ -28,7 +28,7 @@ async function requestWithSources({ independent }) {
       independent ? '<div>' + price.toLocaleString('en-US') + ' 前日比 0 リアルタイム株価 15:30</div>' : 'unavailable',
       {status:independent?200:503});
     if (url.includes('google.com/finance')) return new Response(
-      independent ? '<div data-last-price="' + price + '"></div>' : 'unavailable',
+      independent ? '<span jsname="Pdsbrc"><span>¥' + price.toLocaleString('en-US') + '</span></span><div class="jZZ2de">11月2日, 15:30:00 UTC+9</div>' : 'unavailable',
       {status:independent?200:503});
     throw new Error('unexpected network request ' + url);
   };
