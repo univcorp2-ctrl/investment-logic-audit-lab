@@ -65,7 +65,7 @@ test('independently matched fresh quotes mark only the three active holdings', a
 
 test('November 2026 Yahoo JP and Google Finance markup parses the same dated close',()=>{
   const yahoo=parseYahooJapan('<div>8,149 前日比-140(-1.69%) リアルタイム株価 11/2</div>');
-  const google=parseGoogleFinance('<span jsname="Pdsbrc" class=""><span>¥8,149.00</span></span><div class="jZZ2de">11月2日, 15:30:00 UTC+9</div>');
+  const google=parseGoogleFinance('<div data-last-price="1140.36"></div><span jsname="Pdsbrc" class=""><span>¥8,149.00</span></span><div class="jZZ2de">11月2日, 15:30:00 UTC+9</div>');
   assert.equal(yahoo.price,8149);
   assert.equal(google.price,8149);
   assert.match(yahoo.quote_time,/2026-11-02/);
