@@ -139,7 +139,8 @@ async function refreshLive(){
   if(!portfolio)return;
   try{
     const quotes=window.ValueScopeData?.refreshQuotes?await window.ValueScopeData.refreshQuotes(true):await (await fetch('/api/quotes?compact=1&force=1')).json();
-    live=liveLedgerMark(portfolio,quotes,new Date());
+    const verifiedMark=liveLedgerMark(portfolio,quotes,new Date());
+    live=verifiedMark.complete?verifiedMark:null;
     renderHero();
   }catch{renderHero()}
 }
