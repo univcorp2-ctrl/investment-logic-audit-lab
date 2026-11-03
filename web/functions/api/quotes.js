@@ -68,7 +68,6 @@ export function parseYahooJapan(html) {
 }
 export function parseGoogleFinance(html) {
   const patterns = [
-    /data-last-price=["']?([0-9.]+)/i,
     /jsname=["']Pdsbrc["'][^>]*>\s*<span[^>]*>\s*[¥￥]?\s*([0-9,.]+)/i,
     /<[^>]*class=["'][^"']*YMlKec[^"']*["'][^>]*>\s*[¥￥]?\s*([0-9,.]+)/i,
   ];
