@@ -85,7 +85,7 @@ function finalizeQuote(security, yahooResult, googleResult, chartResult) {
   const sourceErrors = [errorName(yahooResult), errorName(googleResult), errorName(chartResult)].filter(Boolean);
   const primary = yahoo ?? chart ?? google;
   const entryPrice = ENTRY_PRICES[security.symbol];
-  if (!primary?.price) return { ...security, current_price:null, usable:false, verification:'unavailable', entry_price:entryPrice, quantity:QUANTITY, position_value:entryPrice * QUANTITY, unrealized_pnl:0, return_pct:0, errors:sourceErrors };
+  if (!primary?.price) return { ...security, current_price:null, usable:false, verification:'unavailable', entry_price:entryPrice, quantity:QUANTITY, position_value:null, unrealized_pnl:null, return_pct:null, errors:sourceErrors };
   const checks = [yahoo, google, chart].filter(item => item && item !== primary && cleanNumber(item.price) !== null);
   const differences = checks.map(check => Math.abs(primary.price - check.price) / primary.price * 100);
   const maxDifference = differences.length ? Math.max(...differences) : null;
@@ -93,15 +93,20 @@ function finalizeQuote(security, yahooResult, googleResult, chartResult) {
   const dayHigh = yahoo?.day_high ?? chart?.day_high ?? null;
   const dayLow = yahoo?.day_low ?? chart?.day_low ?? null;
   const inRange = (dayHigh === null || primary.price <= dayHigh) && (dayLow === null || primary.price >= dayLow);
-  const usable = inRange && !discrepancy;
+  const recordedAt = chart?.quote_time ?? google?.quote_time ?? null;
+  const timestamp = Date.parse(recordedAt ?? '');
+  const quoteFresh = Number.isFinite(timestamp) && timestamp <= Date.now() + 600000 && Date.now() - timestamp <= 4 * 86400000;
+  const independent = Boolean(google && (yahoo || chart));
+  const adjustment_review_required = entryPrice > 0 && (primary.price / entryPrice < .4 || primary.price / entryPrice > 2.5);
+  const usable = independent && quoteFresh && inRange && !discrepancy && !adjustment_review_required;
   let verification = 'single-source';
-  if (checks.length && maxDifference !== null && maxDifference <= 1) verification = 'double-checked';
-  else if (checks.length && maxDifference !== null && maxDifference <= 3) verification = 'checked-with-time-skew';
+  if (independent && checks.length && maxDifference !== null && maxDifference <= 1) verification = 'double-checked';
+  else if (independent && checks.length && maxDifference !== null && maxDifference <= 3) verification = 'checked-with-time-skew';
   else if (discrepancy) verification = 'price-discrepancy';
   const secondary = google && google !== primary ? google : chart && chart !== primary ? chart : yahoo && yahoo !== primary ? yahoo : null;
-  const valuationPrice = usable ? primary.price : entryPrice;
-  const pnl = (valuationPrice - entryPrice) * QUANTITY;
-  return { ...security, current_price:primary.price, quote_time:primary.quote_time, primary_source:primary.source, primary_source_mode:primary.source_mode, day_high:dayHigh, day_low:dayLow, secondary_price:secondary?.price ?? null, secondary_time:secondary?.quote_time ?? null, secondary_source:secondary?.source ?? null, max_difference_pct:maxDifference, verification, usable, entry_price:entryPrice, quantity:QUANTITY, position_value:valuationPrice * QUANTITY, unrealized_pnl:pnl, return_pct:entryPrice ? pnl / (entryPrice * QUANTITY) * 100 : 0, errors:sourceErrors };
+  const valuationPrice = usable ? primary.price : null;
+  const pnl = usable ? (valuationPrice - entryPrice) * QUANTITY : null;
+  return { ...security, current_price:primary.price, quote_time:recordedAt, primary_source:primary.source, primary_source_mode:primary.source_mode, day_high:dayHigh, day_low:dayLow, secondary_price:secondary?.price ?? null, secondary_time:secondary?.quote_time ?? null, secondary_source:secondary?.source ?? null, max_difference_pct:maxDifference, verification, usable, quote_fresh:quoteFresh, independent_source_check:independent, adjustment_review_required, entry_price:entryPrice, quantity:QUANTITY, position_value:usable ? valuationPrice * QUANTITY : null, unrealized_pnl:pnl, return_pct:usable && entryPrice ? pnl / (entryPrice * QUANTITY) * 100 : null, errors:sourceErrors };
 }
 
 async function buildQuote(security) {
@@ -116,7 +121,7 @@ async function mapWithConcurrency(items, limit, mapper) {
     while (nextIndex < items.length) {
       const index = nextIndex++;
       try { results[index] = await mapper(items[index], index); }
-      catch (error) { results[index] = { ...items[index], current_price:null, usable:false, verification:'unavailable', entry_price:ENTRY_PRICES[items[index].symbol], quantity:QUANTITY, position_value:ENTRY_PRICES[items[index].symbol] * QUANTITY, unrealized_pnl:0, return_pct:0, errors:[String(error?.message ?? error)] }; }
+      catch (error) { results[index] = { ...items[index], current_price:null, usable:false, verification:'unavailable', entry_price:ENTRY_PRICES[items[index].symbol], quantity:QUANTITY, position_value:null, unrealized_pnl:null, return_pct:null, errors:[String(error?.message ?? error)] }; }
     }
   };
   await Promise.all(Array.from({ length:Math.min(limit, items.length) }, worker));
@@ -124,7 +129,63 @@ async function mapWithConcurrency(items, limit, mapper) {
 }
 
 function compactPayload(full) {
-  return { generated_at:full.generated_at, timezone:full.timezone, refresh_seconds:full.refresh_seconds, source_policy:full.source_policy, source_status:full.source_status, partial:full.partial, portfolio:full.portfolio, positions:full.quotes.map(quote => ({ symbol:quote.symbol, code:quote.code, name:quote.name, entry_price:quote.entry_price, current_price:quote.current_price, quote_time:quote.quote_time, unrealized_pnl:quote.unrealized_pnl, return_pct:quote.return_pct, verification:quote.verification, usable:quote.usable, max_difference_pct:quote.max_difference_pct, primary_source:quote.primary_source, secondary_source:quote.secondary_source, errors:quote.errors ?? [] })) };
+  return { generated_at:full.generated_at, timezone:full.timezone, refresh_seconds:full.refresh_seconds, source_policy:full.source_policy, source_status:full.source_status, partial:full.partial, portfolio:full.portfolio, positions:full.positions.map(quote => ({ symbol:quote.symbol, code:quote.code, name:quote.name, entry_price:quote.entry_price, quantity:quote.quantity, current_price:quote.current_price, quote_time:quote.quote_time, unrealized_pnl:quote.unrealized_pnl, return_pct:quote.return_pct, verification:quote.verification, usable:quote.usable, max_difference_pct:quote.max_difference_pct, primary_source:quote.primary_source, secondary_source:quote.secondary_source, errors:quote.errors ?? [] })) };
+}
+
+
+async function readPaperAsset(context, path) {
+  const url = new URL(path, context.request.url).toString();
+  const response = context.env?.ASSETS?.fetch
+    ? await context.env.ASSETS.fetch(new Request(url))
+    : await fetch(url, { headers:{ Accept:'application/json' } });
+  if (!response.ok) throw new Error('paper asset HTTP ' + response.status + ': ' + path);
+  return response.json();
+}
+async function buildPaperPortfolio(context, quotes) {
+  try {
+    const [ledger, report] = await Promise.all([
+      readPaperAsset(context, '/data/paper-trading/portfolio.json'),
+      readPaperAsset(context, '/data/paper-trading/latest-report.json'),
+    ]);
+    if (ledger.paper_only !== true || report.paper_only !== true) throw new Error('paper ledger integrity gate failed');
+    const cash = cleanNumber(ledger.cash), seed = cleanNumber(ledger.seed_cost_basis);
+    const map = new Map(quotes.map(q => [q.code, q]));
+    const positions = (ledger.positions ?? []).map(row => {
+      const quote = map.get(String(row.code)) ?? {};
+      const qty = cleanNumber(row.quantity), avg = cleanNumber(row.avg_cost);
+      const accepted = quote.usable === true && qty !== null && qty > 0 && avg !== null && avg > 0;
+      return { symbol:row.symbol, code:String(row.code), name:row.company_name, quantity:qty,
+        entry_price:avg, current_price:quote.current_price ?? null, quote_time:quote.quote_time ?? null,
+        verification:quote.verification ?? 'unavailable', usable:accepted,
+        max_difference_pct:quote.max_difference_pct ?? null, primary_source:quote.primary_source ?? null,
+        secondary_source:quote.secondary_source ?? null, errors:quote.errors ?? [],
+        verified_value:accepted ? quote.current_price * qty : null };
+    });
+    const count = positions.filter(p => p.usable).length;
+    const complete = Boolean(cash !== null && seed !== null && seed > 0 &&
+      positions.length > 0 && count === positions.length);
+    const currentEquity = complete ? cash + positions.reduce((sum,p) => sum + p.verified_value,0) : null;
+    const unrealized = complete ? positions.reduce((sum,p) => sum + (p.current_price - p.entry_price) * p.quantity,0) : null;
+    const pnl = complete ? currentEquity - seed : null;
+    const confirmed = {
+      generated_at:report.generated_at, trading_date:report.trading_date,
+      equity:report.summary?.equity ?? null, total_pnl:report.summary?.total_pnl ?? null,
+      cumulative_return_pct:report.summary?.cumulative_return_pct ?? null,
+      unrealized_pnl:report.summary?.unrealized_pnl ?? null,
+    };
+    return {positions,portfolio:{ basis:'paper-ledger', paper_only:true,
+      total_entry_value:seed, initial_capital:seed, cash, realized_pnl:cleanNumber(ledger.realized_pnl),
+      total_current_value:currentEquity, total_unrealized_pnl:unrealized, unrealized_pnl:unrealized,
+      total_pnl:pnl, total_return_pct:complete?pnl/seed*100:null,
+      valuation_complete:complete, usable_quotes:count, position_count:positions.length,
+      double_checked:positions.filter(p => p.verification === 'double-checked' && p.usable).length,
+      confirmed, valuation_note:complete?'全保有銘柄の株価を検証':'検証未完了のため現在損益は算定しない。最終保存値と混同しない。' }};
+  } catch (error) {
+    return {positions:[],portfolio:{basis:'paper-ledger',paper_only:true,
+      valuation_complete:false,usable_quotes:0,position_count:null,
+      total_current_value:null,total_unrealized_pnl:null,unrealized_pnl:null,total_pnl:null,
+      total_return_pct:null,confirmed:null,valuation_note:'ledger_unavailable: ' + String(error?.message ?? error)}};
+  }
 }
 
 export async function onRequestGet(context) {
@@ -139,24 +200,23 @@ export async function onRequestGet(context) {
     if (cached) return cached;
   }
   const quotes = await mapWithConcurrency(SECURITIES, CONCURRENCY, buildQuote);
-  const totalEntryValue = quotes.reduce((sum, quote) => sum + quote.entry_price * quote.quantity, 0);
-  const totalCurrentValue = quotes.reduce((sum, quote) => sum + quote.position_value, 0);
-  const totalPnl = totalCurrentValue - totalEntryValue;
-  const usable = quotes.filter(quote => quote.usable).length;
-  const failed = quotes.filter(quote => quote.current_price === null).length;
+  const paper = await buildPaperPortfolio(context, quotes);
+  const usable = quotes.filter(q => q.usable).length;
+  const failed = quotes.filter(q => q.current_price === null).length;
   const sourceErrors = quotes.reduce((sum, quote) => sum + (quote.errors?.length ?? 0), 0);
   const full = {
     generated_at:new Date().toISOString(),
     timezone:'Asia/Tokyo',
     refresh_seconds:60,
-    source_policy:{ primary:'Yahoo!ファイナンス日本版', secondary:'Yahoo Finance chart / Google Finance', validation:'3%超の価格差は評価へ不使用', warning:'公開データは遅延・停止・訂正される場合があります。' },
-    source_status:{ usable, failed, total:quotes.length, source_errors:sourceErrors, concurrency:CONCURRENCY, timeout_ms:SOURCE_TIMEOUT_MS },
-    partial:usable < quotes.length,
-    portfolio:{ total_entry_value:totalEntryValue, total_current_value:totalCurrentValue, total_unrealized_pnl:totalPnl, total_return_pct:totalEntryValue ? totalPnl / totalEntryValue * 100 : 0, winners:quotes.filter(quote => quote.unrealized_pnl > 0).length, losers:quotes.filter(quote => quote.unrealized_pnl < 0).length, unchanged:quotes.filter(quote => quote.unrealized_pnl === 0).length, usable_quotes:usable, double_checked:quotes.filter(quote => quote.verification === 'double-checked').length, checked_with_time_skew:quotes.filter(quote => quote.verification === 'checked-with-time-skew').length },
+    source_policy:{ primary:'Yahoo / Google 公開株価', secondary:'Yahoo Finance chart', validation:'独立情報源の一致・時刻・企業行動を照合できない価格を損益へ使用しない', warning:'公開データは遅延・訂正されます。実発注・実口座の損益ではありません。' },
+    source_status:{ usable, failed, total:quotes.length, source_errors:sourceErrors, concurrency:CONCURRENCY, timeout_ms:SOURCE_TIMEOUT_MS, ledger_verified:paper.portfolio.valuation_complete },
+    partial:usable < quotes.length || !paper.portfolio.valuation_complete,
+    portfolio:paper.portfolio,
+    positions:paper.positions,
     quotes,
   };
   const payload = compact ? compactPayload(full) : full;
   const response = Response.json(payload, { headers:{ 'Cache-Control':'public, max-age=45, s-maxage=55, stale-while-revalidate=120', 'Content-Type':'application/json; charset=utf-8', 'X-Content-Type-Options':'nosniff' } });
-  if (usable > 0) context.waitUntil(caches.default.put(cacheKey, response.clone()));
+  if (context.waitUntil && caches?.default) context.waitUntil(caches.default.put(cacheKey, response.clone()));
   return response;
 }
