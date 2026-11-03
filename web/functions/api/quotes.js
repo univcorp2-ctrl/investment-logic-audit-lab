@@ -41,18 +41,49 @@ async function fetchWithTimeout(url, init = {}, timeoutMs = SOURCE_TIMEOUT_MS) {
   }
 }
 
-function parseYahooJapan(html) {
+function datedTokyoQuote(month, day, time = '15:30:00') {
+  const year = Number(tokyoDate().slice(0, 4));
+  const m = String(month).padStart(2,'0'), d = String(day).padStart(2,'0');
+  const clock = time.length === 5 ? time + ':00' : time;
+  let candidate = year + '-' + m + '-' + d + 'T' + clock + '+09:00';
+  if (Date.parse(candidate) - Date.now() > 2 * 86400000) candidate =
+    (year-1) + '-' + m + '-' + d + 'T' + clock + '+09:00';
+  return candidate;
+}
+export function parseYahooJapan(html) {
   const text = stripHtml(html);
-  const priceMatch = text.match(/([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*前日比[\s\S]{0,160}?リアルタイム株価\s*(\d{1,2}:\d{2})/);
-  if (!priceMatch) throw new Error('Yahoo Japan quote pattern not found');
+  // Yahoo JP changed the quote label from HH:MM to M/D on closed-market days.
+  const match = text.match(/([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*前日比[\s\S]{0,220}?リアルタイム株価\s*(?:(\d{1,2})\/(\d{1,2})(?:\s+(\d{1,2}:\d{2}))?|(\d{1,2}:\d{2}))/);
+  if (!match) throw new Error('Yahoo Japan quote pattern not found');
+  const price = cleanNumber(match[1]);
+  const sourceDate = match[2] && match[3]
+    ? datedTokyoQuote(match[2],match[3],match[4]??'15:30')
+    : timeToIso(match[5]);
   const highMatch = text.match(/高値\s*(?:用語\s*)?([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*\((\d{1,2}:\d{2})\)/);
   const lowMatch = text.match(/安値\s*(?:用語\s*)?([0-9]{1,3}(?:,[0-9]{3})*(?:\.[0-9]+)?)\s*\((\d{1,2}:\d{2})\)/);
-  const price = cleanNumber(priceMatch[1]);
-  const dayHigh = cleanNumber(highMatch?.[1]);
-  const dayLow = cleanNumber(lowMatch?.[1]);
-  return { price, quote_time:timeToIso(priceMatch[2]), day_high:dayHigh, day_low:dayLow, in_day_range:price !== null && (dayHigh === null || price <= dayHigh) && (dayLow === null || price >= dayLow), source:'Yahoo!ファイナンス日本版', source_mode:'realtime-labelled' };
+  const dayHigh = cleanNumber(highMatch?.[1]), dayLow = cleanNumber(lowMatch?.[1]);
+  return { price, quote_time:sourceDate, day_high:dayHigh, day_low:dayLow,
+    in_day_range:price !== null && (dayHigh === null || price <= dayHigh) && (dayLow === null || price >= dayLow),
+    source:'Yahoo!ファイナンス日本版', source_mode:'date-labelled-close-or-session' };
 }
-
+export function parseGoogleFinance(html) {
+  const patterns = [
+    /data-last-price=["']?([0-9.]+)/i,
+    /jsname=["']Pdsbrc["'][^>]*>\s*<span[^>]*>\s*[¥￥]?\s*([0-9,.]+)/i,
+    /<[^>]*class=["'][^"']*YMlKec[^"']*["'][^>]*>\s*[¥￥]?\s*([0-9,.]+)/i,
+  ];
+  let price = null;
+  for (const pattern of patterns) {
+    price = cleanNumber(html.match(pattern)?.[1]);
+    if (price !== null) break;
+  }
+  if (price === null) throw new Error('Google Finance quote pattern not found');
+  const epoch = html.match(/data-last-normal-market-timestamp=["']?([0-9]+)/i)?.[1];
+  const dated = html.match(/class=["'][^"']*jZZ2de[^"']*["'][^>]*>\s*(\d{1,2})月(\d{1,2})日,\s*(\d{1,2}:\d{2}:\d{2})\s*UTC\+9/i);
+  const quoteTime = epoch ? new Date(Number(epoch)*1000).toISOString() :
+    dated ? datedTokyoQuote(dated[1],dated[2],dated[3]) : null;
+  return {price,quote_time:quoteTime,source:'Google Finance',source_mode:'secondary-check'};
+}
 async function fetchYahooJapan(security) {
   const response = await fetchWithTimeout(`https://finance.yahoo.co.jp/quote/${security.symbol}`, { headers:{Accept:'text/html,application/xhtml+xml','Accept-Language':'ja-JP,ja;q=0.9','User-Agent':'Mozilla/5.0 (compatible; ValueScopeDemo/2.0)'} });
   if (!response.ok) throw new Error(`Yahoo Japan HTTP ${response.status}`);
@@ -61,13 +92,7 @@ async function fetchYahooJapan(security) {
 async function fetchGoogleFinance(security) {
   const response = await fetchWithTimeout(`https://www.google.com/finance/quote/${security.code}:TYO?hl=ja`, { headers:{Accept:'text/html,application/xhtml+xml','Accept-Language':'ja-JP,ja;q=0.9','User-Agent':'Mozilla/5.0 (compatible; ValueScopeDemo/2.0)'} });
   if (!response.ok) throw new Error(`Google Finance HTTP ${response.status}`);
-  const html = await response.text();
-  const patterns = [/data-last-price=["']?([0-9.]+)/i, /<[^>]*class=["'][^"']*YMlKec[^"']*["'][^>]*>\s*[¥￥]?\s*([0-9,.]+)/i];
-  let price = null;
-  for (const pattern of patterns) { price = cleanNumber(html.match(pattern)?.[1]); if (price !== null) break; }
-  if (price === null) throw new Error('Google Finance quote pattern not found');
-  const timestamp = html.match(/data-last-normal-market-timestamp=["']?([0-9]+)/i)?.[1];
-  return { price, quote_time:timestamp ? new Date(Number(timestamp) * 1000).toISOString() : null, source:'Google Finance', source_mode:'secondary-check' };
+  return parseGoogleFinance(await response.text());
 }
 async function fetchYahooChart(security) {
   const response = await fetchWithTimeout(`https://query2.finance.yahoo.com/v8/finance/chart/${security.symbol}?interval=1m&range=1d&includePrePost=false`, { headers:{Accept:'application/json','User-Agent':'Mozilla/5.0 (compatible; ValueScopeDemo/2.0)'} });
