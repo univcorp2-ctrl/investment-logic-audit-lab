@@ -29,10 +29,11 @@ test('builds an immediate saved quote fallback from daily report and demo entrie
   };
   const demo = { positions:[{code:'1000',symbol:'1000.T',company_name:'例社',quantity:100,entry_price:100}] };
   const full = buildSavedQuotePayload(report, demo, false);
-  assert.equal(full.portfolio.total_current_value, 11000);
-  assert.equal(full.portfolio.total_unrealized_pnl, 1000);
+  assert.equal(full.portfolio.total_current_value, null);
+  assert.equal(full.portfolio.total_unrealized_pnl, null);
   assert.equal(full.quotes[0].primary_source, '日次保存スナップショット');
   const compact = deriveCompactQuotePayload(full);
-  assert.equal(compact.positions[0].current_price, 110);
-  assert.match(portfolioStatusText(compact), /total\t10000\t11000\t1000/);
+  assert.equal(compact.positions[0].current_price, null);
+  assert.equal(compact.positions[0].usable, false);
+  assert.match(portfolioStatusText(compact), /total\t10000\t\t/);
 });
