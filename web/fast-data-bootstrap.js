@@ -81,9 +81,12 @@ async function loadDaily() {
 window.addEventListener('valuescope:quotes', event => {
   const payload = event.detail ?? {};
   const status = ensureStatus();
-  const live = Number(payload.portfolio?.total_unrealized_pnl);
+  // Legacy ten-stock watchlist is not the current paper ledger.
+  const currentPortfolio = payload.portfolio ?? {};
+  const verified = currentPortfolio.basis === 'paper-ledger' && currentPortfolio.valuation_complete === true;
+  const live = verified ? currentPortfolio.unrealized_pnl : null;
   const node = $('#uxUnrealizedPnl') ?? overviewMetric('含み損益');
-  if (node && Number.isFinite(live)) {
+  if (verified && node && typeof live === 'number' && Number.isFinite(live)) {
     node.textContent = `${live >= 0 ? '+' : ''}${money(live)}`;
     signed(node, live);
   }
@@ -94,8 +97,8 @@ window.addEventListener('valuescope:quotes', event => {
     status.textContent = '現在値取得失敗・保存値を表示';
     status.className = 'ux-load-status stale';
   } else {
-    status.textContent = '現在値反映済み';
-    status.className = 'ux-load-status ready';
+    status.textContent = verified ? '保有銘柄の検証済み現在値' : '現在値未検証・前回確定の仮想損益を表示';
+    status.className = verified ? 'ux-load-status ready' : 'ux-load-status stale';
   }
 });
 

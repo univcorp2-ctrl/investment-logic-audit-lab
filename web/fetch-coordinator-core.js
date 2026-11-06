@@ -30,7 +30,7 @@ export function normalizeQuotePayload(payload = {}) {
     name: item.name ?? item.company_name,
     current_price: item.current_price,
     quote_time: item.quote_time,
-    usable: item.usable !== false,
+    usable: item.usable === true,
     verification: item.verification ?? 'unknown',
     primary_source: item.primary_source ?? null,
     secondary_source: item.secondary_source ?? null,

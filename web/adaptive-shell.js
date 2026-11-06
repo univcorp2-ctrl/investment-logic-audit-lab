@@ -293,7 +293,8 @@ async function loadOverview() {
   ]);
   const summary = report.summary ?? {};
   const realized = numberOrNull(summary.realized_pnl) ?? 0;
-  const liveUnrealized = numberOrNull(quotes?.portfolio?.total_unrealized_pnl);
+  const verifiedLive = quotes?.portfolio?.basis === 'paper-ledger' && quotes?.portfolio?.valuation_complete === true;
+  const liveUnrealized = verifiedLive ? numberOrNull(quotes.portfolio.total_unrealized_pnl) : null;
   const unrealized = liveUnrealized ?? numberOrNull(summary.unrealized_pnl) ?? 0;
   const total = realized + unrealized;
   const equity = numberOrNull(summary.equity) ?? numberOrNull(quotes?.portfolio?.total_current_value);
@@ -304,13 +305,13 @@ async function loadOverview() {
   if (!section) return;
   section.innerHTML = `
     <div class="adaptive-overview-heading">
-      <div><p class="eyebrow">TODAY AT A GLANCE</p><h1 id="adaptiveOverviewTitle">今日の状況</h1><p>現在の紙上ポートフォリオは<strong class="${total >= 0 ? 'positive-text' : 'negative-text'}">${total >= 0 ? 'プラス' : 'マイナス'}</strong>です。実現・含み・合計を分けて確認できます。</p></div>
+      <div><p class="eyebrow">TODAY AT A GLANCE</p><h1 id="adaptiveOverviewTitle">今日の状況</h1><p>最終確認済みの紙上ポートフォリオは<strong class="${total >= 0 ? 'positive-text' : 'negative-text'}">${total >= 0 ? 'プラス' : 'マイナス'}</strong>です。実現・含み・合計を分けて確認できます。</p></div>
       <div class="adaptive-overview-meta"><span>最終日次集計</span><strong id="adaptiveOverviewUpdated">${dateTime(report.generated_at)}</strong><small>実注文は送信されません</small></div>
     </div>
     <div class="adaptive-kpi-grid">
-      ${overviewCard('現在評価額', equity, 'money')}
+      ${overviewCard(verifiedLive?'検証済み現在評価額':'最終確定評価額', verifiedLive ? quotes.portfolio.total_current_value : equity, 'money')}
       ${overviewCard('実現損益', realized, 'money', '確定済み')}
-      ${overviewCard('含み損益', unrealized, 'money', liveUnrealized === null ? '日次終値' : '現在値反映')}
+      ${overviewCard('含み損益', unrealized, 'money', liveUnrealized === null ? '最終確定日次（現在値未検証）' : '検証済み現在値')}
       ${overviewCard('合計損益', total, 'money', '実現 + 含み')}
       ${overviewCard('現在DD', currentDd, 'percent', '直近ピーク比')}
       ${overviewCard('最大DD', maxDd, 'percent', '記録期間内')}

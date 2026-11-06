@@ -16,7 +16,7 @@ if (!window.__valuescopeFetchCoordinatorInstalled) {
   const staticTtlMs = 5 * 60 * 1000;
   const quoteTtlMs = 55 * 1000;
   const savedQuoteTtlMs = 10 * 1000;
-  const quoteStorageKey = 'valuescope-last-quotes-v3';
+  const quoteStorageKey = 'valuescope-last-quotes-v4-verified-ledger';
   let quoteValue = null;
   let quoteExpiresAt = 0;
   let quoteInflight = null;
@@ -120,7 +120,7 @@ if (!window.__valuescopeFetchCoordinatorInstalled) {
     if (quoteInflight) return quoteInflight;
     quoteInflight = (async () => {
       try {
-        const response = await fetchWithTimeout('/api/quotes?compact=1', { cache:'default' }, 12000);
+        const response = await fetchWithTimeout('/api/quotes?compact=1', { cache:'no-cache' }, 16000);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const payload = normalizeQuotePayload(await response.json());
         quoteValue = payload;
@@ -144,16 +144,9 @@ if (!window.__valuescopeFetchCoordinatorInstalled) {
   }
 
   async function getSharedQuotes({ force = false } = {}) {
-    if (force) return refreshLiveQuotes();
-    if (quoteValue && quoteExpiresAt > Date.now()) return quoteValue;
-    const saved = await getSavedQuotes().catch(() => readStoredQuotes());
-    if (saved) {
-      quoteValue = normalizeQuotePayload({ ...saved, _saved_snapshot:true });
-      quoteExpiresAt = Date.now() + savedQuoteTtlMs;
-      publishQuotes(quoteValue);
-      refreshLiveQuotes().catch(() => {});
-      return quoteValue;
-    }
+    if (!force && quoteValue && quoteExpiresAt > Date.now() &&
+        !quoteValue._stale && !quoteValue._saved_snapshot) return quoteValue;
+    // Fetch the actual source before the first UI render; saved demo data is not a live quote.
     return refreshLiveQuotes();
   }
 
