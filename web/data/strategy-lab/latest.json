@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-29T07:18:33.282649+00:00",
+  "generated_at": "2026-11-07T06:28:09.785526+00:00",
   "purpose": "research_only",
   "auto_adopt": false,
   "fundamental_cutoff": "2026-05-11T00:00:00+09:00",
   "evaluation_start": "2026-05-12T00:00:00+09:00",
-  "evaluation_end": "2026-08-28T00:00:00+09:00",
-  "observations": 77,
+  "evaluation_end": "2026-11-06T00:00:00+09:00",
+  "observations": 122,
   "symbols": [
     "8035.T",
     "6857.T",
@@ -32,10 +32,10 @@
   "engine": {
     "primary": "pandas",
     "vectorbt": {
-      "available": false,
-      "version": null,
-      "validation_total_return_pct": null,
-      "status": "pandas_fallback:ValueError"
+      "available": true,
+      "version": "1.1.2",
+      "validation_total_return_pct": -28.28561361010864,
+      "status": "validated"
     },
     "qlib_pattern": "experiment manifest only; Qlib is not installed",
     "bt_pattern": "not installed; existing portfolio backtester overlaps"
@@ -45,16 +45,16 @@
       "name": "baseline_equal_weight",
       "metrics": {
         "status": "ok",
-        "observations": 77,
-        "total_return_pct": -3.2984863327338743,
-        "cagr_pct": -10.396067036676426,
-        "volatility_pct": 58.41783951808517,
-        "sharpe": 0.1046211597662547,
-        "sortino": 0.17422653723809062,
-        "max_drawdown_pct": -33.167384250784174,
-        "turnover": 1.0,
-        "hit_rate_pct": 54.54545454545454,
-        "profit_factor": 1.0167155729232538
+        "observations": 122,
+        "total_return_pct": -28.28561361010864,
+        "cagr_pct": -49.67959435387566,
+        "volatility_pct": 55.35449675316361,
+        "sharpe": -0.9602464026801345,
+        "sortino": -1.4290396556074472,
+        "max_drawdown_pct": -42.22179217103124,
+        "turnover": 0.9999999999999999,
+        "hit_rate_pct": 51.63934426229508,
+        "profit_factor": 0.8553939491043716
       },
       "baseline_excess_pct": 0.0
     },
@@ -62,92 +62,92 @@
       "name": "trend_confirmed",
       "metrics": {
         "status": "ok",
-        "observations": 77,
-        "total_return_pct": 3.584496455832542,
-        "cagr_pct": 12.216204532495635,
-        "volatility_pct": 53.19366586860408,
-        "sharpe": 0.4830087547876102,
-        "sortino": 0.7076666659978709,
-        "max_drawdown_pct": -36.04439716437672,
-        "turnover": 20.752380952380957,
-        "hit_rate_pct": 48.05194805194805,
-        "profit_factor": 1.0867849130688694
+        "observations": 122,
+        "total_return_pct": -22.77770604616781,
+        "cagr_pct": -41.36941025690128,
+        "volatility_pct": 51.57678470499738,
+        "sharpe": -0.7721611773184865,
+        "sortino": -0.9312436770883932,
+        "max_drawdown_pct": -44.75913748033064,
+        "turnover": 37.75238095238095,
+        "hit_rate_pct": 39.34426229508197,
+        "profit_factor": 0.863762397062616
       },
-      "baseline_excess_pct": 6.882982788566416
+      "baseline_excess_pct": 5.5079075639408295
     },
     {
       "name": "quality_value",
       "metrics": {
         "status": "ok",
-        "observations": 77,
-        "total_return_pct": 3.8937678674653142,
-        "cagr_pct": 13.3164339765389,
-        "volatility_pct": 55.1264500750935,
-        "sharpe": 0.5020049980170987,
-        "sortino": 0.8565616842418474,
-        "max_drawdown_pct": -26.260621978642884,
+        "observations": 122,
+        "total_return_pct": -18.154354433863272,
+        "cagr_pct": -33.887139336727856,
+        "volatility_pct": 53.59636549396573,
+        "sharpe": -0.5016337993753066,
+        "sortino": -0.7467988485561848,
+        "max_drawdown_pct": -30.191094039108112,
         "turnover": 1.0,
-        "hit_rate_pct": 51.94805194805194,
-        "profit_factor": 1.0831247381593556
+        "hit_rate_pct": 50.81967213114754,
+        "profit_factor": 0.921789491517005
       },
-      "baseline_excess_pct": 7.192254200199189
+      "baseline_excess_pct": 10.131259176245369
     },
     {
       "name": "low_volatility",
       "metrics": {
         "status": "ok",
-        "observations": 77,
-        "total_return_pct": 14.300891194959009,
-        "cagr_pct": 54.87473037573245,
-        "volatility_pct": 41.34311609671306,
-        "sharpe": 1.2655714255076005,
-        "sortino": 2.339885661333973,
-        "max_drawdown_pct": -19.84377213913816,
-        "turnover": 9.000000000000002,
-        "hit_rate_pct": 57.14285714285714,
-        "profit_factor": 1.2142966300253704
+        "observations": 122,
+        "total_return_pct": -5.762580225204717,
+        "cagr_pct": -11.538051015128147,
+        "volatility_pct": 39.20380879067726,
+        "sharpe": -0.11590629740338085,
+        "sortino": -0.1846297195589384,
+        "max_drawdown_pct": -25.242135806444722,
+        "turnover": 12.600000000000001,
+        "hit_rate_pct": 52.459016393442624,
+        "profit_factor": 0.9818989372541946
       },
-      "baseline_excess_pct": 17.599377527692884
+      "baseline_excess_pct": 22.523033384903925
     },
     {
       "name": "inverse_volatility",
       "metrics": {
         "status": "ok",
-        "observations": 77,
-        "total_return_pct": 3.142279329653763,
-        "cagr_pct": 10.655940837279697,
-        "volatility_pct": 42.47791508472945,
-        "sharpe": 0.45061133696058014,
-        "sortino": 0.7340980099729756,
-        "max_drawdown_pct": -23.048022039754912,
-        "turnover": 3.728902440133248,
-        "hit_rate_pct": 55.84415584415584,
-        "profit_factor": 1.0761576680050322
+        "observations": 122,
+        "total_return_pct": -16.869428328797976,
+        "cagr_pct": -31.725277273907338,
+        "volatility_pct": 41.54079997210479,
+        "sharpe": -0.7092338700350937,
+        "sortino": -1.0452417691162976,
+        "max_drawdown_pct": -31.001382317065453,
+        "turnover": 5.585512847203721,
+        "hit_rate_pct": 52.459016393442624,
+        "profit_factor": 0.8897027450662922
       },
-      "baseline_excess_pct": 6.440765662387637
+      "baseline_excess_pct": 11.416185281310664
     },
     {
       "name": "momentum_confirmed",
       "metrics": {
         "status": "ok",
-        "observations": 77,
-        "total_return_pct": 1.4082149606714056,
-        "cagr_pct": 4.682895047456781,
-        "volatility_pct": 55.29086142345927,
-        "sharpe": 0.3577748724197744,
-        "sortino": 0.643215421649739,
-        "max_drawdown_pct": -29.070598829012496,
-        "turnover": 23.931746031746037,
-        "hit_rate_pct": 46.75324675324675,
-        "profit_factor": 1.0610452309360179
+        "observations": 122,
+        "total_return_pct": -20.217941494443657,
+        "cagr_pct": -37.28404615966202,
+        "volatility_pct": 52.02712391637987,
+        "sharpe": -0.6356633935418687,
+        "sortino": -0.9763028232515655,
+        "max_drawdown_pct": -43.33944830005873,
+        "turnover": 44.76507936507937,
+        "hit_rate_pct": 40.16393442622951,
+        "profit_factor": 0.8954587319508028
       },
-      "baseline_excess_pct": 4.706701293405279
+      "baseline_excess_pct": 8.067672115664983
     }
   ],
   "walk_forward": {
     "status": "insufficient_history",
     "required_days": 148,
-    "available_days": 77,
+    "available_days": 122,
     "windows": [],
     "selected_strategy": null
   },
@@ -155,16 +155,15 @@
   "adoption_status": "not_eligible_operational_history",
   "warnings": [
     "Free-plan data with an effective cutoff of 2026-05-11 was not available to this app until the ranking was generated on 2026-08-03. Returns measured from 2026-05-12 are counterfactual diagnostics and were not executable with the Free plan at that time.",
-    "Walk-forward validation has insufficient post-cutoff history; no strategy may be promoted.",
-    "vectorbt optional validation was unavailable; the deterministic pandas engine produced the report."
+    "Walk-forward validation has insufficient post-cutoff history; no strategy may be promoted."
   ],
   "disclaimer": "Historical counterfactual research only. The delayed snapshot was not operationally available during most of the displayed comparison period. No paper or broker rule is changed automatically and no future return is guaranteed.",
   "availability_model": {
     "effective_data_cutoff": "2026-05-11",
     "snapshot_generated_at": "2026-08-03T14:07:31.566915+09:00",
     "operational_start": "2026-08-04T00:00:00+09:00",
-    "counterfactual_observations": 77,
-    "operational_observations": 19,
+    "counterfactual_observations": 122,
+    "operational_observations": 69,
     "counterfactual_only": true
   }
 }
