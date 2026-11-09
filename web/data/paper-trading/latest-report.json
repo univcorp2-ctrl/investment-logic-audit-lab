@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-06T23:58:16.208654+09:00",
-  "trading_date": "2026-11-06",
+  "generated_at": "2026-11-10T02:25:51.976161+09:00",
+  "trading_date": "2026-11-10",
   "mode": "simulation-execute",
   "paper_only": true,
   "disclaimer": "この処理は外部注文を送信しないデモ・シミュレーションです。表示された判断や損益は将来の利益を保証しません。",
@@ -21,7 +21,7 @@
   },
   "quote_source": {
     "endpoint": "https://valuescope-japan.pages.dev/api/quotes?compact=1",
-    "generated_at": "2026-11-06T14:58:14.035Z",
+    "generated_at": "2026-11-09T17:25:50.744Z",
     "errors": []
   },
   "config": {
@@ -47,7 +47,7 @@
     "unrealized_pnl": 0.0,
     "total_pnl": 234000.0,
     "cumulative_return_pct": 0.7617,
-    "daily_return_pct": -0.1883,
+    "daily_return_pct": 0.0,
     "max_drawdown_pct": -2.4199,
     "position_count": 3,
     "turnover_today": 0.0,
@@ -514,10 +514,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 28015.0,
-        "quote_time": "2026-11-06T06:30:00.000Z",
+        "current_price": 28375.0,
+        "quote_time": "2026-11-09T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 96.0797,
+        "max_difference_pct": 96.0273,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"
@@ -618,10 +618,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 32040.0,
-        "quote_time": "2026-11-06T06:30:00.000Z",
+        "current_price": 32480.0,
+        "quote_time": "2026-11-09T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 96.5722,
+        "max_difference_pct": 96.5294,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"
@@ -721,10 +721,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 8178.0,
-        "quote_time": "2026-11-06T06:30:00.000Z",
+        "current_price": 8606.0,
+        "quote_time": "2026-11-09T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 86.5706,
+        "max_difference_pct": 86.9017,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"

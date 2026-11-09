@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-06T14:58:17.231264+00:00",
+  "generated_at": "2026-11-09T17:25:52.834926+00:00",
   "paper_only": true,
   "thresholds": {
     "portfolio_drawdown_alert_pct": -8.0,
@@ -23,7 +23,7 @@
     "unrealized_loss_pct_of_seed": 0.0,
     "max_drawdown_pct": -2.4199496907684415,
     "current_drawdown_pct": -2.4199496907684415,
-    "observations": 24
+    "observations": 25
   },
   "causes": [
     {
@@ -57,7 +57,7 @@
       "title": "ファンダメンタルが古い",
       "evidence": [
         "実効cutoff 2026-05-11",
-        "評価時点から約179日"
+        "評価時点から約182日"
       ],
       "explanation": "Freeの遅延データでは、現在の決算・業績変化が投資判断へ反映されるまで時間差があります。"
     },
@@ -106,7 +106,7 @@
     "goal": "勝率の最大化ではなく、期待値・ドローダウン・再現性のバランスを改善する",
     "rule_change_allowed": false,
     "preferred_evidence_reached": false,
-    "observations": 24,
+    "observations": 25,
     "minimum_observations": 42,
     "preferred_observations": 60,
     "principles": [

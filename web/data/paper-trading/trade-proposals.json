@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-06T23:58:16.208654+09:00",
+  "generated_at": "2026-11-10T02:25:51.976161+09:00",
   "paper_only": true,
   "manual_review_required": true,
   "proposals": [
@@ -71,10 +71,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 28015.0,
-        "quote_time": "2026-11-06T06:30:00.000Z",
+        "current_price": 28375.0,
+        "quote_time": "2026-11-09T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 96.0797,
+        "max_difference_pct": 96.0273,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"
@@ -175,10 +175,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 32040.0,
-        "quote_time": "2026-11-06T06:30:00.000Z",
+        "current_price": 32480.0,
+        "quote_time": "2026-11-09T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 96.5722,
+        "max_difference_pct": 96.5294,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"
