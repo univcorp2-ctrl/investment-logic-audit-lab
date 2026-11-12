@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-11T15:06:56.702789+00:00",
+  "generated_at": "2026-11-12T15:56:38.485282+00:00",
   "paper_only": true,
   "thresholds": {
     "portfolio_drawdown_alert_pct": -8.0,
@@ -23,7 +23,7 @@
     "unrealized_loss_pct_of_seed": 0.0,
     "max_drawdown_pct": -2.4199496907684415,
     "current_drawdown_pct": -2.4199496907684415,
-    "observations": 27
+    "observations": 28
   },
   "causes": [
     {
@@ -36,7 +36,7 @@
         "三井金属 Technical 0.0",
         "フジクラ Technical 0.0",
         "アドバンテスト Technical 0.0",
-        "レーザーテック Technical 15.0"
+        "レーザーテック Technical 23.0"
       ],
       "explanation": "トレンド崩れ・負のモメンタム・高ボラ化が含み損を拡大させる典型要因です。"
     },
@@ -57,7 +57,7 @@
       "title": "ファンダメンタルが古い",
       "evidence": [
         "実効cutoff 2026-05-11",
-        "評価時点から約184日"
+        "評価時点から約185日"
       ],
       "explanation": "Freeの遅延データでは、現在の決算・業績変化が投資判断へ反映されるまで時間差があります。"
     },
@@ -106,7 +106,7 @@
     "goal": "勝率の最大化ではなく、期待値・ドローダウン・再現性のバランスを改善する",
     "rule_change_allowed": false,
     "preferred_evidence_reached": false,
-    "observations": 27,
+    "observations": 28,
     "minimum_observations": 42,
     "preferred_observations": 60,
     "principles": [

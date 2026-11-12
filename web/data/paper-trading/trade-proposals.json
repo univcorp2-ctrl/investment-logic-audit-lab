@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-12T00:06:55.774479+09:00",
+  "generated_at": "2026-11-13T00:56:37.615367+09:00",
   "paper_only": true,
   "manual_review_required": true,
   "proposals": [
@@ -41,19 +41,19 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 29690.0,
-        "price_date": "2026-11-10",
-        "sma20": 33738.75,
-        "sma60": 34536.8625,
-        "price_vs_sma20_pct": -12.0003,
-        "price_vs_sma60_pct": -14.0339,
-        "rsi14": 40.6738,
-        "momentum20_pct": -28.647,
-        "momentum60_pct": -13.2131,
-        "volatility20_pct": 93.1567,
-        "drawdown20_pct": -26.5099,
-        "average_volume20": 19185450.0,
-        "trading_value20": 638341818025.0,
+        "price": 31440.0,
+        "price_date": "2026-11-11",
+        "sma20": 33290.75,
+        "sma60": 34485.8657,
+        "price_vs_sma20_pct": -5.5594,
+        "price_vs_sma60_pct": -8.8322,
+        "rsi14": 43.6414,
+        "momentum20_pct": -22.1782,
+        "momentum60_pct": -8.8691,
+        "volatility20_pct": 96.3932,
+        "drawdown20_pct": -22.1397,
+        "average_volume20": 19361305.0,
+        "trading_value20": 636716676825.0,
         "score": 0.0,
         "regime": "DOWNTREND",
         "positive_reasons": [],
@@ -69,10 +69,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 31440.0,
-        "quote_time": "2026-11-11T06:30:00.000Z",
+        "current_price": 29985.0,
+        "quote_time": "2026-11-12T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 96.4253,
+        "max_difference_pct": 96.2648,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"
@@ -142,23 +142,24 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 34990.0,
-        "price_date": "2026-11-10",
-        "sma20": 38814.0,
-        "sma60": 38374.8333,
-        "price_vs_sma20_pct": -9.8521,
-        "price_vs_sma60_pct": -8.8205,
-        "rsi14": 42.1933,
-        "momentum20_pct": -27.9448,
-        "momentum60_pct": -11.6191,
-        "volatility20_pct": 97.6729,
-        "drawdown20_pct": -24.0833,
-        "average_volume20": 5303405.0,
-        "trading_value20": 206078330350.0,
-        "score": 15.0,
+        "price": 37200.0,
+        "price_date": "2026-11-11",
+        "sma20": 38369.5,
+        "sma60": 38345.1667,
+        "price_vs_sma20_pct": -3.048,
+        "price_vs_sma60_pct": -2.9865,
+        "rsi14": 45.496,
+        "momentum20_pct": -19.2883,
+        "momentum60_pct": -4.5664,
+        "volatility20_pct": 100.2268,
+        "drawdown20_pct": -18.0075,
+        "average_volume20": 5294495.0,
+        "trading_value20": 203443123750.0,
+        "score": 23.0,
         "regime": "DOWNTREND",
         "positive_reasons": [
-          "20日線が60日線を上回る上昇基調"
+          "20日線が60日線を上回る上昇基調",
+          "RSIが過熱しすぎない強気圏"
         ],
         "risk_reasons": [
           "株価が20日移動平均を下回る",
@@ -171,10 +172,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 37200.0,
-        "quote_time": "2026-11-11T06:30:00.000Z",
+        "current_price": 36380.0,
+        "quote_time": "2026-11-12T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 96.9788,
+        "max_difference_pct": 96.9214,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"
@@ -182,10 +183,11 @@
       },
       "decision": {
         "action": "SIM_SELL",
-        "confidence": 43.87,
+        "confidence": 45.47,
         "reasons": [
           "企業品質スコアが高い",
-          "20日線が60日線を上回る上昇基調"
+          "20日線が60日線を上回る上昇基調",
+          "RSIが過熱しすぎない強気圏"
         ],
         "risks": [
           "株価が20日移動平均を下回る",
