@@ -1,0 +1,1078 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-11-14T00:19:05.846901+09:00",
+  "trading_date": "2026-11-14",
+  "mode": "simulation-execute",
+  "paper_only": true,
+  "disclaimer": "この処理は外部注文を送信しないデモ・シミュレーションです。表示された判断や損益は将来の利益を保証しません。",
+  "fundamental_source": {
+    "name": "J-Quants API V2 (Free staged liquid universe)",
+    "plan": {
+      "name": "free",
+      "history_years": 2,
+      "delay_days": 84,
+      "requests_per_minute": 5
+    },
+    "effective_data_cutoff": "2026-05-11",
+    "warnings": [
+      "Free-plan staged mode screens a liquidity-selected subset, not every listed issue.",
+      "The effective data cutoff is delayed by 12 weeks; verify current prices and disclosures."
+    ]
+  },
+  "quote_source": {
+    "endpoint": "https://valuescope-japan.pages.dev/api/quotes?compact=1",
+    "generated_at": "2026-11-13T15:19:04.278Z",
+    "errors": []
+  },
+  "config": {
+    "quantity": 100,
+    "buy_fundamental": 58.0,
+    "buy_quality": 55.0,
+    "buy_technical": 60.0,
+    "buy_completeness": 35.0,
+    "buy_max_trap": 50.0,
+    "sell_fundamental": 40.0,
+    "sell_technical": 35.0,
+    "sell_trap": 70.0,
+    "stop_loss_pct": -8.0,
+    "max_drawdown_pct": -12.0,
+    "max_quote_difference_pct": 3.0,
+    "max_quote_age_days": 4
+  },
+  "summary": {
+    "cash": 21548300.0,
+    "market_value": 9407800.0,
+    "equity": 30956100.0,
+    "realized_pnl": 234000.0,
+    "unrealized_pnl": 0.0,
+    "total_pnl": 234000.0,
+    "cumulative_return_pct": 0.7617,
+    "daily_return_pct": 0.0,
+    "max_drawdown_pct": -2.4199,
+    "position_count": 3,
+    "turnover_today": 0.0,
+    "trade_count_total": 17,
+    "executed_today": 0
+  },
+  "decisions": [
+    {
+      "symbol": "285A.T",
+      "code": "285A",
+      "company_name": "キオクシアホールディングス",
+      "rank": 8,
+      "holding": {
+        "quantity": 0,
+        "avg_cost": null
+      },
+      "fundamental": {
+        "value_score": 33.3333,
+        "quality_score": 59.8039,
+        "growth_stability_score": 35.2381,
+        "value_trap_risk": 36.1,
+        "data_completeness": 46.3333,
+        "earnings_yield": 0.0059,
+        "book_to_market": 0.0391,
+        "fcf_yield": 0.0062,
+        "roe": null,
+        "operating_margin": 0.205,
+        "latest_disclosure_date": "2026-02-12T00:00:00",
+        "score": 46.2405,
+        "positive_reasons": [],
+        "risk_reasons": [],
+        "missing": [
+          "roe"
+        ],
+        "source_positive_reasons": "fcf_stabilityが相対的に良好 / データ不足のため信頼度が低い",
+        "source_negative_reasons": ""
+      },
+      "technical": {
+        "price": 9300.0,
+        "price_date": "2026-11-12",
+        "sma20": 11774.05,
+        "sma60": 15766.8672,
+        "price_vs_sma20_pct": -21.0127,
+        "price_vs_sma60_pct": -41.0155,
+        "rsi14": 33.6281,
+        "momentum20_pct": -36.6916,
+        "momentum60_pct": -46.048,
+        "volatility20_pct": 115.4661,
+        "drawdown20_pct": -35.8842,
+        "average_volume20": 102680715.0,
+        "trading_value20": 1148215817870.0,
+        "score": 0.0,
+        "regime": "DOWNTREND",
+        "positive_reasons": [],
+        "risk_reasons": [
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "RSIが弱気圏",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い"
+        ],
+        "missing": []
+      },
+      "quote": {
+        "valid": false,
+        "current_price": null,
+        "quote_time": null,
+        "verification": null,
+        "max_difference_pct": null,
+        "risks": [
+          "現在値を取得できない"
+        ]
+      },
+      "decision": {
+        "action": "WATCH",
+        "confidence": 37.04,
+        "reasons": [],
+        "risks": [
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "RSIが弱気圏",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い",
+          "現在値を取得できない"
+        ],
+        "execution_allowed": false,
+        "execution_note": "監視のみ"
+      },
+      "proposal": {
+        "side": null,
+        "quantity": 0,
+        "paper_only": true,
+        "manual_review_required": true
+      }
+    },
+    {
+      "symbol": "5016.T",
+      "code": "5016",
+      "company_name": "ＪＸ金属",
+      "rank": 4,
+      "holding": {
+        "quantity": 0,
+        "avg_cost": null
+      },
+      "fundamental": {
+        "value_score": 39.3443,
+        "quality_score": 85.2941,
+        "growth_stability_score": 100.0,
+        "value_trap_risk": 17.2,
+        "data_completeness": 42.6667,
+        "earnings_yield": 0.0197,
+        "book_to_market": 0.1582,
+        "fcf_yield": 0.0057,
+        "roe": null,
+        "operating_margin": 0.1978,
+        "latest_disclosure_date": "2026-05-11T00:00:00",
+        "score": 71.7787,
+        "positive_reasons": [
+          "企業品質スコアが高い",
+          "成長・安定性が良好"
+        ],
+        "risk_reasons": [
+          "データ充足率が低い"
+        ],
+        "missing": [
+          "roe"
+        ],
+        "source_positive_reasons": "operating_marginが相対的に良好 / revenue_growthが相対的に良好 / eps_growthが相対的に良好 / データ不足のため信頼度が低い",
+        "source_negative_reasons": ""
+      },
+      "technical": {
+        "price": 2551.0,
+        "price_date": "2026-11-12",
+        "sma20": 2858.275,
+        "sma60": 3401.0528,
+        "price_vs_sma20_pct": -10.7504,
+        "price_vs_sma60_pct": -24.9938,
+        "rsi14": 37.7919,
+        "momentum20_pct": -26.2717,
+        "momentum60_pct": -33.7424,
+        "volatility20_pct": 69.6726,
+        "drawdown20_pct": -19.0416,
+        "average_volume20": 19191945.0,
+        "trading_value20": 54396093237.5,
+        "score": 0.0,
+        "regime": "DOWNTREND",
+        "positive_reasons": [],
+        "risk_reasons": [
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい"
+        ],
+        "missing": []
+      },
+      "quote": {
+        "valid": false,
+        "current_price": null,
+        "quote_time": null,
+        "verification": null,
+        "max_difference_pct": null,
+        "risks": [
+          "現在値を取得できない"
+        ]
+      },
+      "decision": {
+        "action": "WATCH",
+        "confidence": 41.41,
+        "reasons": [
+          "企業品質スコアが高い",
+          "成長・安定性が良好"
+        ],
+        "risks": [
+          "データ充足率が低い",
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい",
+          "現在値を取得できない"
+        ],
+        "execution_allowed": false,
+        "execution_note": "監視のみ"
+      },
+      "proposal": {
+        "side": null,
+        "quantity": 0,
+        "paper_only": true,
+        "manual_review_required": true
+      }
+    },
+    {
+      "symbol": "5706.T",
+      "code": "5706",
+      "company_name": "三井金属",
+      "rank": 10,
+      "holding": {
+        "quantity": 0,
+        "avg_cost": null
+      },
+      "fundamental": {
+        "value_score": 25.0,
+        "quality_score": 50.0,
+        "growth_stability_score": 25.0,
+        "value_trap_risk": 32.2739,
+        "data_completeness": 33.0,
+        "earnings_yield": 0.0167,
+        "book_to_market": 0.1266,
+        "fcf_yield": null,
+        "roe": null,
+        "operating_margin": 0.1323,
+        "latest_disclosure_date": "2026-02-13T00:00:00",
+        "score": 38.9089,
+        "positive_reasons": [],
+        "risk_reasons": [
+          "データ充足率が低い"
+        ],
+        "missing": [
+          "fcf_yield",
+          "roe"
+        ],
+        "source_positive_reasons": "データ不足のため信頼度が低い",
+        "source_negative_reasons": ""
+      },
+      "technical": {
+        "price": 1617.5,
+        "price_date": "2026-11-12",
+        "sma20": 1985.8,
+        "sma60": 2324.5834,
+        "price_vs_sma20_pct": -18.5467,
+        "price_vs_sma60_pct": -30.4176,
+        "rsi14": 28.8041,
+        "momentum20_pct": -37.8363,
+        "momentum60_pct": -41.6288,
+        "volatility20_pct": 88.0004,
+        "drawdown20_pct": -30.8761,
+        "average_volume20": 15059080.0,
+        "trading_value20": 29684761102.5,
+        "score": 0.0,
+        "regime": "DOWNTREND",
+        "positive_reasons": [],
+        "risk_reasons": [
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "RSIが弱気圏",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い"
+        ],
+        "missing": []
+      },
+      "quote": {
+        "valid": false,
+        "current_price": null,
+        "quote_time": null,
+        "verification": null,
+        "max_difference_pct": null,
+        "risks": [
+          "現在値を取得できない"
+        ]
+      },
+      "decision": {
+        "action": "WATCH",
+        "confidence": 27.88,
+        "reasons": [],
+        "risks": [
+          "データ充足率が低い",
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "RSIが弱気圏",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い",
+          "現在値を取得できない"
+        ],
+        "execution_allowed": false,
+        "execution_note": "監視のみ"
+      },
+      "proposal": {
+        "side": null,
+        "quantity": 0,
+        "paper_only": true,
+        "manual_review_required": true
+      }
+    },
+    {
+      "symbol": "5803.T",
+      "code": "5803",
+      "company_name": "フジクラ",
+      "rank": 3,
+      "holding": {
+        "quantity": 0,
+        "avg_cost": null
+      },
+      "fundamental": {
+        "value_score": 75.0,
+        "quality_score": 67.6471,
+        "growth_stability_score": 75.0,
+        "value_trap_risk": 32.2739,
+        "data_completeness": 33.0,
+        "earnings_yield": 0.0594,
+        "book_to_market": 0.2856,
+        "fcf_yield": null,
+        "roe": null,
+        "operating_margin": 0.1663,
+        "latest_disclosure_date": "2026-02-09T00:00:00",
+        "score": 71.703,
+        "positive_reasons": [
+          "割安性スコアが高い",
+          "企業品質スコアが高い",
+          "成長・安定性が良好"
+        ],
+        "risk_reasons": [
+          "データ充足率が低い"
+        ],
+        "missing": [
+          "fcf_yield",
+          "roe"
+        ],
+        "source_positive_reasons": "利益利回りが相対的に良好 / 純資産価値が相対的に良好 / operating_marginが相対的に良好 / データ不足のため信頼度が低い",
+        "source_negative_reasons": ""
+      },
+      "technical": {
+        "price": 3002.0,
+        "price_date": "2026-11-12",
+        "sma20": 3828.35,
+        "sma60": 4763.7699,
+        "price_vs_sma20_pct": -21.585,
+        "price_vs_sma60_pct": -36.9827,
+        "rsi14": 20.5689,
+        "momentum20_pct": -42.2692,
+        "momentum60_pct": -47.458,
+        "volatility20_pct": 76.0057,
+        "drawdown20_pct": -33.8767,
+        "average_volume20": 40511850.0,
+        "trading_value20": 150109590320.0,
+        "score": 0.0,
+        "regime": "DOWNTREND",
+        "positive_reasons": [],
+        "risk_reasons": [
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "RSIが弱気圏",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い"
+        ],
+        "missing": []
+      },
+      "quote": {
+        "valid": false,
+        "current_price": null,
+        "quote_time": null,
+        "verification": null,
+        "max_difference_pct": null,
+        "risks": [
+          "現在値を取得できない"
+        ]
+      },
+      "decision": {
+        "action": "WATCH",
+        "confidence": 36.08,
+        "reasons": [
+          "割安性スコアが高い",
+          "企業品質スコアが高い",
+          "成長・安定性が良好"
+        ],
+        "risks": [
+          "データ充足率が低い",
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "RSIが弱気圏",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い",
+          "現在値を取得できない"
+        ],
+        "execution_allowed": false,
+        "execution_note": "監視のみ"
+      },
+      "proposal": {
+        "side": null,
+        "quantity": 0,
+        "paper_only": true,
+        "manual_review_required": true
+      }
+    },
+    {
+      "symbol": "6857.T",
+      "code": "6857",
+      "company_name": "アドバンテスト",
+      "rank": 2,
+      "holding": {
+        "symbol": "6857.T",
+        "code": "6857",
+        "company_name": "アドバンテスト",
+        "quantity": 100,
+        "avg_cost": 40400.0,
+        "opened_at": "2026-10-13T23:59:15.262965+09:00"
+      },
+      "fundamental": {
+        "value_score": 61.7486,
+        "quality_score": 68.6275,
+        "growth_stability_score": 82.1429,
+        "value_trap_risk": 15.2,
+        "data_completeness": 49.3333,
+        "earnings_yield": 0.0179,
+        "book_to_market": 0.0381,
+        "fcf_yield": 0.0144,
+        "roe": null,
+        "operating_margin": 0.4422,
+        "latest_disclosure_date": "2026-04-27T00:00:00",
+        "score": 71.3488,
+        "positive_reasons": [
+          "企業品質スコアが高い",
+          "成長・安定性が良好"
+        ],
+        "risk_reasons": [],
+        "missing": [
+          "roe"
+        ],
+        "source_positive_reasons": "fcf_growthが相対的に良好 / 利益利回りが相対的に良好 / FCF利回りが相対的に良好 / データ不足のため信頼度が低い",
+        "source_negative_reasons": ""
+      },
+      "technical": {
+        "price": 29985.0,
+        "price_date": "2026-11-12",
+        "sma20": 32771.0,
+        "sma60": 34387.4859,
+        "price_vs_sma20_pct": -8.5014,
+        "price_vs_sma60_pct": -12.8026,
+        "rsi14": 44.8096,
+        "momentum20_pct": -25.7429,
+        "momentum60_pct": -16.4479,
+        "volatility20_pct": 97.0919,
+        "drawdown20_pct": -19.0251,
+        "average_volume20": 19565230.0,
+        "trading_value20": 634183871400.0,
+        "score": 0.0,
+        "regime": "DOWNTREND",
+        "positive_reasons": [],
+        "risk_reasons": [
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い"
+        ],
+        "missing": []
+      },
+      "quote": {
+        "valid": false,
+        "current_price": 30610.0,
+        "quote_time": "2026-11-13T06:30:00.000Z",
+        "verification": "price-discrepancy",
+        "max_difference_pct": 96.3879,
+        "risks": [
+          "価格ソースの安全判定がfalse",
+          "価格ソース間の差が許容値を超える"
+        ]
+      },
+      "decision": {
+        "action": "SIM_SELL",
+        "confidence": 44.97,
+        "reasons": [
+          "企業品質スコアが高い",
+          "成長・安定性が良好"
+        ],
+        "risks": [
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い",
+          "価格ソースの安全判定がfalse",
+          "価格ソース間の差が許容値を超える"
+        ],
+        "execution_allowed": false,
+        "execution_note": "価格検証により停止"
+      },
+      "proposal": {
+        "side": "SELL",
+        "quantity": 100,
+        "paper_only": true,
+        "manual_review_required": true
+      }
+    },
+    {
+      "symbol": "6920.T",
+      "code": "6920",
+      "company_name": "レーザーテック",
+      "rank": 5,
+      "holding": {
+        "symbol": "6920.T",
+        "code": "6920",
+        "company_name": "レーザーテック",
+        "quantity": 100,
+        "avg_cost": 46090.0,
+        "opened_at": "2026-10-13T23:59:15.262990+09:00"
+      },
+      "fundamental": {
+        "value_score": 50.0,
+        "quality_score": 90.1961,
+        "growth_stability_score": 29.5238,
+        "value_trap_risk": 26.1,
+        "data_completeness": 46.3333,
+        "earnings_yield": 0.0143,
+        "book_to_market": 0.057,
+        "fcf_yield": 0.009,
+        "roe": null,
+        "operating_margin": 0.4612,
+        "latest_disclosure_date": "2026-04-30T00:00:00",
+        "score": 61.5486,
+        "positive_reasons": [
+          "企業品質スコアが高い"
+        ],
+        "risk_reasons": [],
+        "missing": [
+          "roe"
+        ],
+        "source_positive_reasons": "operating_marginが相対的に良好 / データ不足のため信頼度が低い",
+        "source_negative_reasons": ""
+      },
+      "technical": {
+        "price": 36380.0,
+        "price_date": "2026-11-12",
+        "sma20": 37920.0,
+        "sma60": 38276.6667,
+        "price_vs_sma20_pct": -4.0612,
+        "price_vs_sma60_pct": -4.9552,
+        "rsi14": 48.3787,
+        "momentum20_pct": -19.8149,
+        "momentum60_pct": -10.1507,
+        "volatility20_pct": 100.3081,
+        "drawdown20_pct": -12.527,
+        "average_volume20": 5136440.0,
+        "trading_value20": 194201142100.0,
+        "score": 0.0,
+        "regime": "DOWNTREND",
+        "positive_reasons": [
+          "RSIが過熱しすぎない強気圏"
+        ],
+        "risk_reasons": [
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い"
+        ],
+        "missing": []
+      },
+      "quote": {
+        "valid": false,
+        "current_price": 36130.0,
+        "quote_time": "2026-11-13T06:30:00.000Z",
+        "verification": "price-discrepancy",
+        "max_difference_pct": 96.9403,
+        "risks": [
+          "価格ソースの安全判定がfalse",
+          "価格ソース間の差が許容値を超える"
+        ]
+      },
+      "decision": {
+        "action": "SIM_SELL",
+        "confidence": 40.87,
+        "reasons": [
+          "企業品質スコアが高い",
+          "RSIが過熱しすぎない強気圏"
+        ],
+        "risks": [
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い",
+          "価格ソースの安全判定がfalse",
+          "価格ソース間の差が許容値を超える"
+        ],
+        "execution_allowed": false,
+        "execution_note": "価格検証により停止"
+      },
+      "proposal": {
+        "side": "SELL",
+        "quantity": 100,
+        "paper_only": true,
+        "manual_review_required": true
+      }
+    },
+    {
+      "symbol": "7974.T",
+      "code": "7974",
+      "company_name": "任天堂",
+      "rank": 7,
+      "holding": {
+        "symbol": "7974.T",
+        "code": "7974",
+        "company_name": "任天堂",
+        "quantity": 100,
+        "avg_cost": 7588.0,
+        "opened_at": "2026-08-03T14:37:00+09:00"
+      },
+      "fundamental": {
+        "value_score": 65.082,
+        "quality_score": 59.8039,
+        "growth_stability_score": 66.6667,
+        "value_trap_risk": 17.2,
+        "data_completeness": 42.6667,
+        "earnings_yield": 0.0519,
+        "book_to_market": 0.3652,
+        "fcf_yield": 0.0099,
+        "roe": null,
+        "operating_margin": 0.1557,
+        "latest_disclosure_date": "2026-05-08T00:00:00",
+        "score": 66.4732,
+        "positive_reasons": [
+          "割安性スコアが高い",
+          "成長・安定性が良好"
+        ],
+        "risk_reasons": [
+          "データ充足率が低い"
+        ],
+        "missing": [
+          "roe"
+        ],
+        "source_positive_reasons": "dividend_yieldが相対的に良好 / fcf_stabilityが相対的に良好 / eps_growthが相対的に良好 / データ不足のため信頼度が低い",
+        "source_negative_reasons": ""
+      },
+      "technical": {
+        "price": 8563.0,
+        "price_date": "2026-11-12",
+        "sma20": 8461.0,
+        "sma60": 8386.3498,
+        "price_vs_sma20_pct": 1.2055,
+        "price_vs_sma60_pct": 2.1064,
+        "rsi14": 47.8576,
+        "momentum20_pct": 3.4429,
+        "momentum60_pct": 3.8455,
+        "volatility20_pct": 46.9237,
+        "drawdown20_pct": -3.5698,
+        "average_volume20": 8648620.0,
+        "trading_value20": 73167812815.0,
+        "score": 100.0,
+        "regime": "UPTREND",
+        "positive_reasons": [
+          "株価が20日移動平均を上回る",
+          "20日線が60日線を上回る上昇基調",
+          "20日モメンタムがプラス",
+          "60日モメンタムがプラス",
+          "RSIが過熱しすぎない強気圏"
+        ],
+        "risk_reasons": [],
+        "missing": []
+      },
+      "quote": {
+        "valid": false,
+        "current_price": 8773.0,
+        "quote_time": "2026-11-13T06:30:00.000Z",
+        "verification": "price-discrepancy",
+        "max_difference_pct": 87.3993,
+        "risks": [
+          "価格ソースの安全判定がfalse",
+          "価格ソース間の差が許容値を超える"
+        ]
+      },
+      "decision": {
+        "action": "SIM_HOLD",
+        "confidence": 60.08,
+        "reasons": [
+          "割安性スコアが高い",
+          "成長・安定性が良好",
+          "株価が20日移動平均を上回る",
+          "20日線が60日線を上回る上昇基調",
+          "20日モメンタムがプラス",
+          "60日モメンタムがプラス",
+          "RSIが過熱しすぎない強気圏"
+        ],
+        "risks": [
+          "データ充足率が低い",
+          "価格ソースの安全判定がfalse",
+          "価格ソース間の差が許容値を超える"
+        ],
+        "execution_allowed": false,
+        "execution_note": "監視のみ"
+      },
+      "proposal": {
+        "side": null,
+        "quantity": 100,
+        "paper_only": true,
+        "manual_review_required": true
+      }
+    },
+    {
+      "symbol": "8035.T",
+      "code": "8035",
+      "company_name": "東京エレクトロン",
+      "rank": 1,
+      "holding": {
+        "quantity": 0,
+        "avg_cost": null
+      },
+      "fundamental": {
+        "value_score": 92.8962,
+        "quality_score": 76.4706,
+        "growth_stability_score": 91.6667,
+        "value_trap_risk": 17.2,
+        "data_completeness": 42.6667,
+        "earnings_yield": 0.0241,
+        "book_to_market": 0.0874,
+        "fcf_yield": 0.0187,
+        "roe": null,
+        "operating_margin": 0.2558,
+        "latest_disclosure_date": "2026-04-30T00:00:00",
+        "score": 86.2082,
+        "positive_reasons": [
+          "割安性スコアが高い",
+          "企業品質スコアが高い",
+          "成長・安定性が良好"
+        ],
+        "risk_reasons": [
+          "データ充足率が低い"
+        ],
+        "missing": [
+          "roe"
+        ],
+        "source_positive_reasons": "利益利回りが相対的に良好 / FCF利回りが相対的に良好 / dividend_yieldが相対的に良好 / データ不足のため信頼度が低い",
+        "source_negative_reasons": ""
+      },
+      "technical": {
+        "price": 9304.0,
+        "price_date": "2026-11-12",
+        "sma20": 9555.5,
+        "sma60": 10637.7936,
+        "price_vs_sma20_pct": -2.632,
+        "price_vs_sma60_pct": -12.5383,
+        "rsi14": 48.5619,
+        "momentum20_pct": -17.2242,
+        "momentum60_pct": -21.195,
+        "volatility20_pct": 71.2103,
+        "drawdown20_pct": -12.4741,
+        "average_volume20": 18844885.0,
+        "trading_value20": 177614157890.0,
+        "score": 0.0,
+        "regime": "DOWNTREND",
+        "positive_reasons": [
+          "RSIが過熱しすぎない強気圏"
+        ],
+        "risk_reasons": [
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い"
+        ],
+        "missing": []
+      },
+      "quote": {
+        "valid": false,
+        "current_price": null,
+        "quote_time": null,
+        "verification": null,
+        "max_difference_pct": null,
+        "risks": [
+          "現在値を取得できない"
+        ]
+      },
+      "decision": {
+        "action": "WATCH",
+        "confidence": 45.02,
+        "reasons": [
+          "割安性スコアが高い",
+          "企業品質スコアが高い",
+          "成長・安定性が良好",
+          "RSIが過熱しすぎない強気圏"
+        ],
+        "risks": [
+          "データ充足率が低い",
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い",
+          "現在値を取得できない"
+        ],
+        "execution_allowed": false,
+        "execution_note": "監視のみ"
+      },
+      "proposal": {
+        "side": null,
+        "quantity": 0,
+        "paper_only": true,
+        "manual_review_required": true
+      }
+    },
+    {
+      "symbol": "9983.T",
+      "code": "9983",
+      "company_name": "ファーストリテイリング",
+      "rank": 6,
+      "holding": {
+        "quantity": 0,
+        "avg_cost": null
+      },
+      "fundamental": {
+        "value_score": 41.2821,
+        "quality_score": 55.1821,
+        "growth_stability_score": 39.6825,
+        "value_trap_risk": 26.1,
+        "data_completeness": 46.3333,
+        "earnings_yield": 0.0121,
+        "book_to_market": 0.1176,
+        "fcf_yield": 0.0139,
+        "roe": null,
+        "operating_margin": 0.1949,
+        "latest_disclosure_date": "2026-04-09T00:00:00",
+        "score": 50.0248,
+        "positive_reasons": [],
+        "risk_reasons": [],
+        "missing": [
+          "roe"
+        ],
+        "source_positive_reasons": "データ不足のため信頼度が低い",
+        "source_negative_reasons": ""
+      },
+      "technical": {
+        "price": 80190.0,
+        "price_date": "2026-11-12",
+        "sma20": 76606.5,
+        "sma60": 72923.1279,
+        "price_vs_sma20_pct": 4.6778,
+        "price_vs_sma60_pct": 9.9651,
+        "rsi14": 64.3642,
+        "momentum20_pct": 5.7358,
+        "momentum60_pct": 4.4454,
+        "volatility20_pct": 32.3906,
+        "drawdown20_pct": -1.6918,
+        "average_volume20": 1281440.0,
+        "trading_value20": 98951915850.0,
+        "score": 100.0,
+        "regime": "UPTREND",
+        "positive_reasons": [
+          "株価が20日移動平均を上回る",
+          "20日線が60日線を上回る上昇基調",
+          "20日モメンタムがプラス",
+          "60日モメンタムがプラス",
+          "RSIが過熱しすぎない強気圏"
+        ],
+        "risk_reasons": [],
+        "missing": []
+      },
+      "quote": {
+        "valid": false,
+        "current_price": null,
+        "quote_time": null,
+        "verification": null,
+        "max_difference_pct": null,
+        "risks": [
+          "現在値を取得できない"
+        ]
+      },
+      "decision": {
+        "action": "WATCH",
+        "confidence": 57.99,
+        "reasons": [
+          "株価が20日移動平均を上回る",
+          "20日線が60日線を上回る上昇基調",
+          "20日モメンタムがプラス",
+          "60日モメンタムがプラス",
+          "RSIが過熱しすぎない強気圏"
+        ],
+        "risks": [
+          "現在値を取得できない"
+        ],
+        "execution_allowed": false,
+        "execution_note": "監視のみ"
+      },
+      "proposal": {
+        "side": null,
+        "quantity": 0,
+        "paper_only": true,
+        "manual_review_required": true
+      }
+    },
+    {
+      "symbol": "9984.T",
+      "code": "9984",
+      "company_name": "ソフトバンクグループ",
+      "rank": 9,
+      "holding": {
+        "quantity": 0,
+        "avg_cost": null
+      },
+      "fundamental": {
+        "value_score": 56.5385,
+        "quality_score": 46.6667,
+        "growth_stability_score": 24.6032,
+        "value_trap_risk": 65.425,
+        "data_completeness": 42.3333,
+        "earnings_yield": 0.0964,
+        "book_to_market": 0.5595,
+        "fcf_yield": -0.1416,
+        "roe": null,
+        "operating_margin": null,
+        "latest_disclosure_date": "2026-02-12T00:00:00",
+        "score": 43.8953,
+        "positive_reasons": [],
+        "risk_reasons": [
+          "バリュートラップリスクが高い",
+          "データ充足率が低い"
+        ],
+        "missing": [
+          "roe",
+          "operating_margin"
+        ],
+        "source_positive_reasons": "利益利回りが相対的に良好 / 純資産価値が相対的に良好 / バリュートラップ要因が強い / データ不足のため信頼度が低い",
+        "source_negative_reasons": ""
+      },
+      "technical": {
+        "price": 3738.0,
+        "price_date": "2026-11-12",
+        "sma20": 4306.8,
+        "sma60": 5341.6587,
+        "price_vs_sma20_pct": -13.207,
+        "price_vs_sma60_pct": -30.0217,
+        "rsi14": 38.7276,
+        "momentum20_pct": -30.1439,
+        "momentum60_pct": -32.8916,
+        "volatility20_pct": 87.5169,
+        "drawdown20_pct": -24.3932,
+        "average_volume20": 57736330.0,
+        "trading_value20": 245869566910.0,
+        "score": 0.0,
+        "regime": "DOWNTREND",
+        "positive_reasons": [],
+        "risk_reasons": [
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い"
+        ],
+        "missing": []
+      },
+      "quote": {
+        "valid": false,
+        "current_price": null,
+        "quote_time": null,
+        "verification": null,
+        "max_difference_pct": null,
+        "risks": [
+          "現在値を取得できない"
+        ]
+      },
+      "decision": {
+        "action": "WATCH",
+        "confidence": 34.26,
+        "reasons": [],
+        "risks": [
+          "バリュートラップリスクが高い",
+          "データ充足率が低い",
+          "株価が20日移動平均を下回る",
+          "20日線が60日線を下回る下降基調",
+          "20日モメンタムがマイナス",
+          "60日モメンタムがマイナス",
+          "20日高値からの下落が大きい",
+          "短期ボラティリティが高い",
+          "現在値を取得できない"
+        ],
+        "execution_allowed": false,
+        "execution_note": "監視のみ"
+      },
+      "proposal": {
+        "side": null,
+        "quantity": 0,
+        "paper_only": true,
+        "manual_review_required": true
+      }
+    }
+  ],
+  "executed_simulation_events": [],
+  "skipped": [
+    {
+      "symbol": "6857.T",
+      "reasons": [
+        "価格ソースの安全判定がfalse",
+        "価格ソース間の差が許容値を超える"
+      ]
+    },
+    {
+      "symbol": "6920.T",
+      "reasons": [
+        "価格ソースの安全判定がfalse",
+        "価格ソース間の差が許容値を超える"
+      ]
+    }
+  ],
+  "disclosures": {
+    "availability": "unavailable",
+    "provider": "J-Quants TDnet/Company Disclosure add-on",
+    "items": [],
+    "message": "現在のサニタイズ済みデータに適時開示はありません。TDnet/Company Disclosure add-onの契約・権限を確認してください。"
+  },
+  "adaptive_policy": {
+    "source": "default",
+    "policy_path": "web/data/adaptive-strategy/active-policy.json",
+    "name": "default",
+    "status": "default",
+    "applied": false,
+    "reason": "unverified_or_inactive_policy",
+    "operational_data_verified": false,
+    "paper_only": true
+  }
+}
