@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-14T00:19:05.846901+09:00",
+  "generated_at": "2026-11-17T01:57:47.890877+09:00",
   "paper_only": true,
   "manual_review_required": true,
   "proposals": [
@@ -41,22 +41,24 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 29985.0,
-        "price_date": "2026-11-12",
-        "sma20": 32771.0,
-        "sma60": 34387.4859,
-        "price_vs_sma20_pct": -8.5014,
-        "price_vs_sma60_pct": -12.8026,
-        "rsi14": 44.8096,
-        "momentum20_pct": -25.7429,
-        "momentum60_pct": -16.4479,
-        "volatility20_pct": 97.0919,
-        "drawdown20_pct": -19.0251,
-        "average_volume20": 19565230.0,
-        "trading_value20": 634183871400.0,
+        "price": 30610.0,
+        "price_date": "2026-11-13",
+        "sma20": 32584.5,
+        "sma60": 34284.0452,
+        "price_vs_sma20_pct": -6.0596,
+        "price_vs_sma60_pct": -10.7165,
+        "rsi14": 46.3301,
+        "momentum20_pct": -10.862,
+        "momentum60_pct": -16.8578,
+        "volatility20_pct": 83.8441,
+        "drawdown20_pct": -17.3373,
+        "average_volume20": 19245020.0,
+        "trading_value20": 619498871350.0,
         "score": 0.0,
         "regime": "DOWNTREND",
-        "positive_reasons": [],
+        "positive_reasons": [
+          "RSIが過熱しすぎない強気圏"
+        ],
         "risk_reasons": [
           "株価が20日移動平均を下回る",
           "20日線が60日線を下回る下降基調",
@@ -69,10 +71,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 30610.0,
-        "quote_time": "2026-11-13T06:30:00.000Z",
+        "current_price": 27205.0,
+        "quote_time": "2026-11-16T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 96.3879,
+        "max_difference_pct": 95.9518,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"
@@ -83,7 +85,8 @@
         "confidence": 44.97,
         "reasons": [
           "企業品質スコアが高い",
-          "成長・安定性が良好"
+          "成長・安定性が良好",
+          "RSIが過熱しすぎない強気圏"
         ],
         "risks": [
           "株価が20日移動平均を下回る",
@@ -142,19 +145,19 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 36380.0,
-        "price_date": "2026-11-12",
-        "sma20": 37920.0,
-        "sma60": 38276.6667,
-        "price_vs_sma20_pct": -4.0612,
-        "price_vs_sma60_pct": -4.9552,
-        "rsi14": 48.3787,
-        "momentum20_pct": -19.8149,
-        "momentum60_pct": -10.1507,
-        "volatility20_pct": 100.3081,
-        "drawdown20_pct": -12.527,
-        "average_volume20": 5136440.0,
-        "trading_value20": 194201142100.0,
+        "price": 36130.0,
+        "price_date": "2026-11-13",
+        "sma20": 37765.5,
+        "sma60": 38231.8333,
+        "price_vs_sma20_pct": -4.3307,
+        "price_vs_sma60_pct": -5.4976,
+        "rsi14": 46.3674,
+        "momentum20_pct": -7.8786,
+        "momentum60_pct": -6.9294,
+        "volatility20_pct": 89.0907,
+        "drawdown20_pct": -13.1282,
+        "average_volume20": 4975270.0,
+        "trading_value20": 187229501550.0,
         "score": 0.0,
         "regime": "DOWNTREND",
         "positive_reasons": [
@@ -172,10 +175,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 36130.0,
-        "quote_time": "2026-11-13T06:30:00.000Z",
+        "current_price": 31490.0,
+        "quote_time": "2026-11-16T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 96.9403,
+        "max_difference_pct": 96.5027,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"
