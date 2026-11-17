@@ -1,11 +1,11 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-11-16T16:57:48.333850+00:00",
+  "generated_at": "2026-11-17T16:51:21.195417+00:00",
   "paper_only": true,
   "sample": {
-    "observations": 30,
+    "observations": 31,
     "start_date": "2026-08-03T00:00:00",
-    "end_date": "2026-11-17T00:00:00",
+    "end_date": "2026-11-18T00:00:00",
     "seed_cost_basis": 30722100.0,
     "current_equity": 30956100.0,
     "status": {
@@ -38,7 +38,7 @@
     "cagr_pct": {
       "value": null,
       "status": "insufficient_history",
-      "note": "60営業日以上を推奨。現在30日。"
+      "note": "60営業日以上を推奨。現在31日。"
     },
     "best_day_pct": {
       "value": 2.524862380556714,
@@ -51,14 +51,14 @@
       "note": null
     },
     "average_daily_return_pct": {
-      "value": 0.027482102869785807,
+      "value": 0.02659558342237336,
       "status": "ok",
       "note": null
     }
   },
   "risk": {
     "annualized_volatility_pct": {
-      "value": 10.518922736850907,
+      "value": 10.348159028667169,
       "status": "ok",
       "note": null
     },
@@ -78,17 +78,17 @@
       "note": null
     },
     "ulcer_index": {
-      "value": 1.5524871138104088,
+      "value": 1.5867898007929684,
       "status": "ok",
       "note": null
     },
     "pain_index_pct": {
-      "value": 1.2719753184679665,
+      "value": 1.3078495176023563,
       "status": "ok",
       "note": null
     },
     "historical_var_95_pct": {
-      "value": -1.0571670162498457,
+      "value": -1.0214400255302114,
       "status": "ok",
       "note": null
     },
@@ -98,12 +98,12 @@
       "note": null
     },
     "skewness": {
-      "value": 0.9746285913213913,
+      "value": 0.9932167627053783,
       "status": "ok",
       "note": null
     },
     "excess_kurtosis": {
-      "value": 7.138168175889608,
+      "value": 7.441701051609227,
       "status": "ok",
       "note": null
     }
@@ -112,17 +112,17 @@
     "sharpe_ratio": {
       "value": null,
       "status": "insufficient_history",
-      "note": "60営業日以上を推奨。現在30日。"
+      "note": "60営業日以上を推奨。現在31日。"
     },
     "sortino_ratio": {
       "value": null,
       "status": "insufficient_history",
-      "note": "60営業日以上を推奨。現在30日。"
+      "note": "60営業日以上を推奨。現在31日。"
     },
     "calmar_ratio": {
       "value": null,
       "status": "insufficient_history",
-      "note": "60営業日以上を推奨。現在30日。"
+      "note": "60営業日以上を推奨。現在31日。"
     },
     "recovery_factor": {
       "value": 0.3147586096131306,
@@ -233,12 +233,12 @@
       "note": null
     },
     "daily_win_rate_pct": {
-      "value": 46.666666666666664,
+      "value": 45.16129032258064,
       "status": "ok",
       "note": null
     },
     "daily_loss_rate_pct": {
-      "value": 30.0,
+      "value": 29.03225806451613,
       "status": "ok",
       "note": null
     },
@@ -256,7 +256,7 @@
     "recovery_date": null,
     "drawdown_duration_periods": 15,
     "recovery_duration_periods": null,
-    "time_under_water_periods": 26
+    "time_under_water_periods": 27
   },
   "benchmark": {
     "name": "TOPIX連動型上場投資信託 (1306.T proxy)",
@@ -489,6 +489,12 @@
         "equity": 30956100.0,
         "total_pnl": 234000.0,
         "cumulative_return_pct": 0.7617
+      },
+      {
+        "date": "2026-11-18",
+        "equity": 30956100.0,
+        "total_pnl": 234000.0,
+        "cumulative_return_pct": 0.7617
       }
     ],
     "daily_pnl": [
@@ -641,6 +647,11 @@
         "date": "2026-11-17",
         "daily_pnl": 0.0,
         "daily_return_pct": 0.0
+      },
+      {
+        "date": "2026-11-18",
+        "daily_pnl": 0.0,
+        "daily_return_pct": 0.0
       }
     ],
     "drawdown": [
@@ -763,6 +774,10 @@
       {
         "date": "2026-11-17",
         "drawdown_pct": -2.4199496907684415
+      },
+      {
+        "date": "2026-11-18",
+        "drawdown_pct": -2.4199496907684415
       }
     ],
     "contributions": [
@@ -802,7 +817,7 @@
     ]
   },
   "warnings": [
-    "Sharpe・Sortino・CAGR・Calmarは60営業日以上で表示。現在30日。"
+    "Sharpe・Sortino・CAGR・Calmarは60営業日以上で表示。現在31日。"
   ],
   "definitions": {
     "risk_reward_ratio": "決済トレードの平均利益 / 平均損失の絶対値。決済が無い場合のみ日次リターンを代理使用。",

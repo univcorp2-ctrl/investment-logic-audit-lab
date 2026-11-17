@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-17T01:57:47.890877+09:00",
+  "generated_at": "2026-11-18T01:51:20.620770+09:00",
   "paper_only": true,
   "manual_review_required": true,
   "proposals": [
@@ -41,24 +41,22 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 30610.0,
-        "price_date": "2026-11-13",
-        "sma20": 32584.5,
-        "sma60": 34284.0452,
-        "price_vs_sma20_pct": -6.0596,
-        "price_vs_sma60_pct": -10.7165,
-        "rsi14": 46.3301,
-        "momentum20_pct": -10.862,
-        "momentum60_pct": -16.8578,
-        "volatility20_pct": 83.8441,
-        "drawdown20_pct": -17.3373,
-        "average_volume20": 19245020.0,
-        "trading_value20": 619498871350.0,
+        "price": 27205.0,
+        "price_date": "2026-11-16",
+        "sma20": 32218.25,
+        "sma60": 34108.7099,
+        "price_vs_sma20_pct": -15.5603,
+        "price_vs_sma60_pct": -20.2403,
+        "rsi14": 42.482,
+        "momentum20_pct": -21.2134,
+        "momentum60_pct": -27.8862,
+        "volatility20_pct": 91.5033,
+        "drawdown20_pct": -26.5325,
+        "average_volume20": 19775760.0,
+        "trading_value20": 628185220675.0,
         "score": 0.0,
         "regime": "DOWNTREND",
-        "positive_reasons": [
-          "RSIが過熱しすぎない強気圏"
-        ],
+        "positive_reasons": [],
         "risk_reasons": [
           "株価が20日移動平均を下回る",
           "20日線が60日線を下回る下降基調",
@@ -71,10 +69,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 27205.0,
-        "quote_time": "2026-11-16T06:30:00.000Z",
+        "current_price": 26010.0,
+        "quote_time": "2026-11-17T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 95.9518,
+        "max_difference_pct": 95.8116,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"
@@ -85,8 +83,7 @@
         "confidence": 44.97,
         "reasons": [
           "企業品質スコアが高い",
-          "成長・安定性が良好",
-          "RSIが過熱しすぎない強気圏"
+          "成長・安定性が良好"
         ],
         "risks": [
           "株価が20日移動平均を下回る",
@@ -145,24 +142,22 @@
         "source_negative_reasons": ""
       },
       "technical": {
-        "price": 36130.0,
-        "price_date": "2026-11-13",
-        "sma20": 37765.5,
-        "sma60": 38231.8333,
-        "price_vs_sma20_pct": -4.3307,
-        "price_vs_sma60_pct": -5.4976,
-        "rsi14": 46.3674,
-        "momentum20_pct": -7.8786,
-        "momentum60_pct": -6.9294,
-        "volatility20_pct": 89.0907,
-        "drawdown20_pct": -13.1282,
-        "average_volume20": 4975270.0,
-        "trading_value20": 187229501550.0,
+        "price": 31490.0,
+        "price_date": "2026-11-16",
+        "sma20": 37280.0,
+        "sma60": 38102.3333,
+        "price_vs_sma20_pct": -15.5311,
+        "price_vs_sma60_pct": -17.3541,
+        "rsi14": 40.0066,
+        "momentum20_pct": -23.568,
+        "momentum60_pct": -19.7911,
+        "volatility20_pct": 96.8545,
+        "drawdown20_pct": -24.2847,
+        "average_volume20": 4934340.0,
+        "trading_value20": 183345229950.0,
         "score": 0.0,
         "regime": "DOWNTREND",
-        "positive_reasons": [
-          "RSIが過熱しすぎない強気圏"
-        ],
+        "positive_reasons": [],
         "risk_reasons": [
           "株価が20日移動平均を下回る",
           "20日線が60日線を下回る下降基調",
@@ -175,10 +170,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 31490.0,
-        "quote_time": "2026-11-16T06:30:00.000Z",
+        "current_price": 31050.0,
+        "quote_time": "2026-11-17T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 96.5027,
+        "max_difference_pct": 96.4914,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"
@@ -188,8 +183,7 @@
         "action": "SIM_SELL",
         "confidence": 40.87,
         "reasons": [
-          "企業品質スコアが高い",
-          "RSIが過熱しすぎない強気圏"
+          "企業品質スコアが高い"
         ],
         "risks": [
           "株価が20日移動平均を下回る",
