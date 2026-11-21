@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-14T06:55:31.795996+00:00",
+  "generated_at": "2026-11-21T07:37:37.443954+00:00",
   "purpose": "research_only",
   "auto_adopt": false,
   "fundamental_cutoff": "2026-05-11T00:00:00+09:00",
   "evaluation_start": "2026-05-12T00:00:00+09:00",
-  "evaluation_end": "2026-11-13T00:00:00+09:00",
-  "observations": 127,
+  "evaluation_end": "2026-11-20T00:00:00+09:00",
+  "observations": 132,
   "symbols": [
     "8035.T",
     "6857.T",
@@ -34,7 +34,7 @@
     "vectorbt": {
       "available": true,
       "version": "1.1.2",
-      "validation_total_return_pct": -24.579767246023778,
+      "validation_total_return_pct": -36.757560604133865,
       "status": "validated"
     },
     "qlib_pattern": "experiment manifest only; Qlib is not installed",
@@ -45,16 +45,16 @@
       "name": "baseline_equal_weight",
       "metrics": {
         "status": "ok",
-        "observations": 127,
-        "total_return_pct": -24.579767246023778,
-        "cagr_pct": -42.86462770455388,
-        "volatility_pct": 55.049160997136745,
-        "sharpe": -0.7386233704815259,
-        "sortino": -1.1035422135252397,
-        "max_drawdown_pct": -42.52741108945989,
+        "observations": 132,
+        "total_return_pct": -36.757560604133865,
+        "cagr_pct": -58.30275585102858,
+        "volatility_pct": 56.20815382304228,
+        "sharpe": -1.2698728802299155,
+        "sortino": -1.848046064716302,
+        "max_drawdown_pct": -49.04739546669185,
         "turnover": 0.9999999999999999,
-        "hit_rate_pct": 51.96850393700787,
-        "profit_factor": 0.8868970250590078
+        "hit_rate_pct": 51.515151515151516,
+        "profit_factor": 0.8125137793802555
       },
       "baseline_excess_pct": 0.0
     },
@@ -62,92 +62,92 @@
       "name": "trend_confirmed",
       "metrics": {
         "status": "ok",
-        "observations": 127,
-        "total_return_pct": -19.797189181747456,
-        "cagr_pct": -35.45122519519066,
-        "volatility_pct": 50.97049700659835,
-        "sharpe": -0.5992857206937222,
-        "sortino": -0.7238297639718141,
+        "observations": 132,
+        "total_return_pct": -19.448846615480587,
+        "cagr_pct": -33.82675116612841,
+        "volatility_pct": 50.32900687959323,
+        "sharpe": -0.5641810919093466,
+        "sortino": -0.6802996669551415,
         "max_drawdown_pct": -44.759134948535575,
         "turnover": 41.75238095238095,
-        "hit_rate_pct": 39.37007874015748,
-        "profit_factor": 0.8927940919494293
+        "hit_rate_pct": 40.15151515151515,
+        "profit_factor": 0.8989652365981706
       },
-      "baseline_excess_pct": 4.782578064276322
+      "baseline_excess_pct": 17.308713988653277
     },
     {
       "name": "quality_value",
       "metrics": {
         "status": "ok",
-        "observations": 127,
-        "total_return_pct": -11.200591141076844,
-        "cagr_pct": -20.998999916120287,
-        "volatility_pct": 53.159986952567884,
-        "sharpe": -0.17554404657148673,
-        "sortino": -0.2607703029106865,
-        "max_drawdown_pct": -30.191094039108137,
+        "observations": 132,
+        "total_return_pct": -23.98092058202628,
+        "cagr_pct": -40.75244541912624,
+        "volatility_pct": 54.64440032127308,
+        "sharpe": -0.6809695792802005,
+        "sortino": -0.9805583450870011,
+        "max_drawdown_pct": -35.215416191372995,
         "turnover": 1.0,
-        "hit_rate_pct": 51.96850393700787,
-        "profit_factor": 0.9720102355740575
+        "hit_rate_pct": 51.515151515151516,
+        "profit_factor": 0.8954049512520401
       },
-      "baseline_excess_pct": 13.379176104946934
+      "baseline_excess_pct": 12.776640022107586
     },
     {
       "name": "low_volatility",
       "metrics": {
         "status": "ok",
-        "observations": 127,
-        "total_return_pct": 0.3685786273681879,
-        "cagr_pct": 0.7326794211617971,
-        "volatility_pct": 39.17306361354958,
-        "sharpe": 0.21510005143853447,
-        "sortino": 0.3443954629498606,
-        "max_drawdown_pct": -25.24213764281189,
-        "turnover": 13.000000000000002,
-        "hit_rate_pct": 53.54330708661418,
-        "profit_factor": 1.0345862020312215
+        "observations": 132,
+        "total_return_pct": -12.281959110719665,
+        "cagr_pct": -22.133333779825758,
+        "volatility_pct": 40.004087876347086,
+        "sharpe": -0.4240026182014265,
+        "sortino": -0.6507413196982644,
+        "max_drawdown_pct": -30.413911970460738,
+        "turnover": 13.0,
+        "hit_rate_pct": 51.515151515151516,
+        "profit_factor": 0.9346282424307791
       },
-      "baseline_excess_pct": 24.948345873391965
+      "baseline_excess_pct": 24.4756014934142
     },
     {
       "name": "inverse_volatility",
       "metrics": {
         "status": "ok",
-        "observations": 127,
-        "total_return_pct": -12.225439170445751,
-        "cagr_pct": -22.797891368731605,
-        "volatility_pct": 41.47987448290863,
-        "sharpe": -0.4151160380080767,
-        "sortino": -0.6144107908288132,
-        "max_drawdown_pct": -31.25946838182079,
-        "turnover": 5.7695386516397,
-        "hit_rate_pct": 52.75590551181102,
-        "profit_factor": 0.9339193042233717
+        "observations": 132,
+        "total_return_pct": -24.17215164499551,
+        "cagr_pct": -41.03665319820681,
+        "volatility_pct": 42.74850909725428,
+        "sharpe": -1.0190172214159998,
+        "sortino": -1.44266914742011,
+        "max_drawdown_pct": -37.06266414017962,
+        "turnover": 5.897474897912474,
+        "hit_rate_pct": 52.27272727272727,
+        "profit_factor": 0.843984036486053
       },
-      "baseline_excess_pct": 12.354328075578026
+      "baseline_excess_pct": 12.585408959138356
     },
     {
       "name": "momentum_confirmed",
       "metrics": {
         "status": "ok",
-        "observations": 127,
-        "total_return_pct": -15.887268778391483,
-        "cagr_pct": -29.057457327225322,
-        "volatility_pct": 51.672990504415,
-        "sharpe": -0.40550214236348336,
-        "sortino": -0.6208273987365925,
+        "observations": 132,
+        "total_return_pct": -15.39247983260652,
+        "cagr_pct": -27.31963207028778,
+        "volatility_pct": 51.026365742671274,
+        "sharpe": -0.3697382209075658,
+        "sortino": -0.5628038721668343,
         "max_drawdown_pct": -43.33944634674503,
-        "turnover": 48.76507936507937,
-        "hit_rate_pct": 40.15748031496063,
-        "profit_factor": 0.9319708752577126
+        "turnover": 50.76507936507937,
+        "hit_rate_pct": 40.909090909090914,
+        "profit_factor": 0.9377849643925737
       },
-      "baseline_excess_pct": 8.692498467632294
+      "baseline_excess_pct": 21.365080771527346
     }
   ],
   "walk_forward": {
     "status": "insufficient_history",
     "required_days": 148,
-    "available_days": 127,
+    "available_days": 132,
     "windows": [],
     "selected_strategy": null
   },
@@ -162,8 +162,8 @@
     "effective_data_cutoff": "2026-05-11",
     "snapshot_generated_at": "2026-08-03T14:07:31.566915+09:00",
     "operational_start": "2026-08-04T00:00:00+09:00",
-    "counterfactual_observations": 127,
-    "operational_observations": 74,
+    "counterfactual_observations": 132,
+    "operational_observations": 79,
     "counterfactual_only": true
   }
 }
