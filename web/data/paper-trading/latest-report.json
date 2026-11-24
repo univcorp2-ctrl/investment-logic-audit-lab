@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-24T04:11:41.653647+09:00",
-  "trading_date": "2026-11-24",
+  "generated_at": "2026-11-25T03:51:03.986837+09:00",
+  "trading_date": "2026-11-25",
   "mode": "simulation-execute",
   "paper_only": true,
   "disclaimer": "この処理は外部注文を送信しないデモ・シミュレーションです。表示された判断や損益は将来の利益を保証しません。",
@@ -21,7 +21,7 @@
   },
   "quote_source": {
     "endpoint": "https://valuescope-japan.pages.dev/api/quotes?compact=1",
-    "generated_at": "2026-11-23T19:11:40.637Z",
+    "generated_at": "2026-11-24T18:51:03.000Z",
     "errors": []
   },
   "config": {
@@ -513,10 +513,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 24255.0,
-        "quote_time": "2026-11-20T06:30:00.000Z",
+        "current_price": 27275.0,
+        "quote_time": "2026-11-24T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 95.6524,
+        "max_difference_pct": 96.1009,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"
@@ -615,10 +615,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 30250.0,
-        "quote_time": "2026-11-20T06:30:00.000Z",
+        "current_price": 33200.0,
+        "quote_time": "2026-11-24T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 96.514,
+        "max_difference_pct": 96.7972,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"
@@ -717,10 +717,10 @@
       },
       "quote": {
         "valid": false,
-        "current_price": 8832.0,
-        "quote_time": "2026-11-20T06:30:00.000Z",
+        "current_price": 8656.0,
+        "quote_time": "2026-11-24T06:30:00.000Z",
         "verification": "price-discrepancy",
-        "max_difference_pct": 88.0605,
+        "max_difference_pct": 87.7158,
         "risks": [
           "価格ソースの安全判定がfalse",
           "価格ソース間の差が許容値を超える"
