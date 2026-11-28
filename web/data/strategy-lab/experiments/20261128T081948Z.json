@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-11-28T08:19:48.817411+00:00",
+  "purpose": "research_only",
+  "auto_adopt": false,
+  "fundamental_cutoff": "2026-05-11T00:00:00+09:00",
+  "evaluation_start": "2026-05-12T00:00:00+09:00",
+  "evaluation_end": "2026-11-27T00:00:00+09:00",
+  "observations": 136,
+  "symbols": [
+    "8035.T",
+    "6857.T",
+    "5803.T",
+    "5016.T",
+    "6920.T",
+    "9983.T",
+    "7974.T",
+    "285A.T",
+    "9984.T",
+    "5706.T"
+  ],
+  "data_errors": {},
+  "config": {
+    "fee_bps": 5.0,
+    "slippage_bps": 2.0,
+    "train_days": 126,
+    "test_days": 21,
+    "purge_days": 1,
+    "min_oos_days": 42,
+    "annualization": 252
+  },
+  "engine": {
+    "primary": "pandas",
+    "vectorbt": {
+      "available": true,
+      "version": "1.1.2",
+      "validation_total_return_pct": -32.96075272333422,
+      "status": "validated"
+    },
+    "qlib_pattern": "experiment manifest only; Qlib is not installed",
+    "bt_pattern": "not installed; existing portfolio backtester overlaps"
+  },
+  "strategies": [
+    {
+      "name": "baseline_equal_weight",
+      "metrics": {
+        "status": "ok",
+        "observations": 136,
+        "total_return_pct": -32.96075272333422,
+        "cagr_pct": -52.33516514932865,
+        "volatility_pct": 58.39140271871486,
+        "sharpe": -0.9721894042503121,
+        "sortino": -1.4087008837101658,
+        "max_drawdown_pct": -50.911374136498274,
+        "turnover": 0.9999999999999999,
+        "hit_rate_pct": 52.20588235294118,
+        "profit_factor": 0.8533556224404378
+      },
+      "baseline_excess_pct": 0.0
+    },
+    {
+      "name": "trend_confirmed",
+      "metrics": {
+        "status": "ok",
+        "observations": 136,
+        "total_return_pct": -16.982840339033388,
+        "cagr_pct": -29.169090449051595,
+        "volatility_pct": 49.784415149397205,
+        "sharpe": -0.43949570162138324,
+        "sortino": -0.5257698103030007,
+        "max_drawdown_pct": -44.759134948535575,
+        "turnover": 41.75238095238095,
+        "hit_rate_pct": 41.17647058823529,
+        "profit_factor": 0.9199842671015556
+      },
+      "baseline_excess_pct": 15.97791238430083
+    },
+    {
+      "name": "quality_value",
+      "metrics": {
+        "status": "ok",
+        "observations": 136,
+        "total_return_pct": -20.768048432077002,
+        "cagr_pct": -35.036666573176454,
+        "volatility_pct": 56.80376704515029,
+        "sharpe": -0.4715832080952201,
+        "sortino": -0.6719369040009392,
+        "max_drawdown_pct": -37.315720162790356,
+        "turnover": 1.0,
+        "hit_rate_pct": 52.20588235294118,
+        "profit_factor": 0.9262279306321928
+      },
+      "baseline_excess_pct": 12.192704291257215
+    },
+    {
+      "name": "low_volatility",
+      "metrics": {
+        "status": "ok",
+        "observations": 136,
+        "total_return_pct": -9.90982772657314,
+        "cagr_pct": -17.58240820937509,
+        "volatility_pct": 41.08152941606184,
+        "sharpe": -0.2638933398599089,
+        "sortino": -0.40001334198984695,
+        "max_drawdown_pct": -31.991421232944084,
+        "turnover": 13.0,
+        "hit_rate_pct": 52.20588235294118,
+        "profit_factor": 0.9588514675695408
+      },
+      "baseline_excess_pct": 23.050924996761076
+    },
+    {
+      "name": "inverse_volatility",
+      "metrics": {
+        "status": "ok",
+        "observations": 136,
+        "total_return_pct": -20.288058956360366,
+        "cagr_pct": -34.305558553352824,
+        "volatility_pct": 44.336368348027506,
+        "sharpe": -0.7234178904900257,
+        "sortino": -1.0255495908521792,
+        "max_drawdown_pct": -38.293050494551174,
+        "turnover": 6.030903755668302,
+        "hit_rate_pct": 52.94117647058824,
+        "profit_factor": 0.886971685018218
+      },
+      "baseline_excess_pct": 12.67269376697385
+    },
+    {
+      "name": "momentum_confirmed",
+      "metrics": {
+        "status": "ok",
+        "observations": 136,
+        "total_return_pct": -13.447438695434277,
+        "cagr_pct": -23.478515077522356,
+        "volatility_pct": 50.39084279474386,
+        "sharpe": -0.27868597539973267,
+        "sortino": -0.41870265855550376,
+        "max_drawdown_pct": -43.33944634674503,
+        "turnover": 52.76507936507936,
+        "hit_rate_pct": 41.911764705882355,
+        "profit_factor": 0.9523958417105994
+      },
+      "baseline_excess_pct": 19.513314027899938
+    }
+  ],
+  "walk_forward": {
+    "status": "insufficient_history",
+    "required_days": 148,
+    "available_days": 136,
+    "windows": [],
+    "selected_strategy": null
+  },
+  "research_candidate": null,
+  "adoption_status": "not_eligible_insufficient_validation",
+  "warnings": [
+    "Walk-forward validation has insufficient post-cutoff history; no strategy may be promoted."
+  ],
+  "disclaimer": "Historical research only. No paper or broker rule is changed automatically and no future return is guaranteed."
+}
